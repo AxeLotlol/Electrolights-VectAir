@@ -167,7 +167,7 @@ public class DriveTrain implements Subsystem {
 
     @Override
     public void initialize() {
-        imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
+        imu = new IMUEx("imu", Direction.FORWARD, Direction.LEFT).zeroed();
         servoPos = ActiveOpMode.hardwareMap().get(Servo.class, "servoPos");
         limelight = ActiveOpMode.hardwareMap().get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(APRILTAG_PIPELINE);

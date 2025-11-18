@@ -38,8 +38,6 @@ public class DriveTrain implements Subsystem {
     private DriveTrain() { }
 
     private Limelight3A limelight;
-
-    private Follower follower;
     public static boolean spinstop = false;
     private double tx;
     private boolean hasTag;
@@ -83,9 +81,9 @@ public class DriveTrain implements Subsystem {
     private void slowfalse(){
         slow = false;
     }
-    public static final MotorEx fL = new MotorEx("frontLeft").brakeMode();
+    public static final MotorEx fL = new MotorEx("frontLeft").brakeMode().reversed();
     public static final MotorEx fR = new MotorEx("frontRight").brakeMode();
-    public static final MotorEx bL = new MotorEx("backLeft").brakeMode();
+    public static final MotorEx bL = new MotorEx("backLeft").brakeMode().reversed();
     public static final MotorEx bR = new MotorEx("backRight").brakeMode();
 
     public static double sensistivity = 1;
@@ -129,8 +127,8 @@ public class DriveTrain implements Subsystem {
                     fR,
                     bL,
                     bR,
-                    Gamepads.gamepad1().leftStickY().map(it -> -it),
                     Gamepads.gamepad1().leftStickX().map(it -> it),
+                    Gamepads.gamepad1().leftStickY().map(it -> it),
                     yVCtx,
                     new FieldCentric(imu)
             );
@@ -143,8 +141,8 @@ public class DriveTrain implements Subsystem {
                         fR,
                         bL,
                         bR,
-                        Gamepads.gamepad1().leftStickY().map(it -> -it * 0.4),
-                        Gamepads.gamepad1().leftStickX().map(it -> it *0.4),
+                        Gamepads.gamepad1().leftStickX().map(it -> it * 0.4),
+                        Gamepads.gamepad1().leftStickY().map(it -> it *0.4),
                         Gamepads.gamepad1().rightStickX().map(it -> it * 0.4 * 0.75),
                         new FieldCentric(imu)
                 );
@@ -157,9 +155,10 @@ public class DriveTrain implements Subsystem {
                         fR,
                         bL,
                         bR,
-                        Gamepads.gamepad1().leftStickY().map(it -> -it),
                         Gamepads.gamepad1().leftStickX().map(it -> it),
-                        Gamepads.gamepad1().rightStickX().map(it -> it * 0.75)
+                        Gamepads.gamepad1().leftStickY().map(it -> it),
+                        Gamepads.gamepad1().rightStickX().map(it -> it * 0.75),
+                        new FieldCentric(imu)
                 );
             }
         }
@@ -167,7 +166,7 @@ public class DriveTrain implements Subsystem {
 
     @Override
     public void initialize() {
-        imu = new IMUEx("imu", Direction.FORWARD, Direction.LEFT).zeroed();
+        imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
         servoPos = ActiveOpMode.hardwareMap().get(Servo.class, "servoPos");
         limelight = ActiveOpMode.hardwareMap().get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(APRILTAG_PIPELINE);
@@ -180,17 +179,7 @@ public class DriveTrain implements Subsystem {
     @Override
     public void periodic() {
         if (firsttime==true){
-            follower = Constants.createFollower(ActiveOpMode.hardwareMap());
-            follower.setStartingPose(new Pose(97,8));
-            follower.update();
-            double x = follower.getPose().getX();
-            double y = follower.getPose().getY();
-            double distinch = Math.sqrt(Math.pow(x, 2)+Math.pow((y-144), 2)) - 8;
-            double dist = distinch / 39.37;
-            ActiveOpMode.telemetry().addData("Distance", distinch);
-            ActiveOpMode.telemetry().addData("X", x);
-            ActiveOpMode.telemetry().addData("Y", y);
-            float tps = findTPS((float) dist);
+            float tps = findTPS((float) 0.86);
             shooter(tps);
             firsttime=false;
         }
@@ -206,15 +195,7 @@ public class DriveTrain implements Subsystem {
         yVCtx = () -> visionYawCommand(tx);
         //ActiveOpMode.telemetry().update();
 
-        follower.update();
-        double x = follower.getPose().getX();
-        double y = follower.getPose().getY();
-        double distinch = Math.sqrt(Math.pow(x, 2)+Math.pow((y-144), 2)) - 8;
-        double dist = distinch / 39.37;
-        ActiveOpMode.telemetry().addData("Distance", distinch);
-        ActiveOpMode.telemetry().addData("X", x);
-        ActiveOpMode.telemetry().addData("Y", y);
-        float tps = findTPS((float) dist);
+        float tps = findTPS((float) 2.08);
         shooter(tps);
         if(autolock==true){
             limelight.pipelineSwitch(APRILTAG_PIPELINE);

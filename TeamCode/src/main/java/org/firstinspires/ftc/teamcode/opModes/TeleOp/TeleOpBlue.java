@@ -19,7 +19,7 @@ public class TeleOpBlue extends NextFTCOpMode {
     public MotorEx intakeMotor;
     public TeleOpBlue() {
         addComponents(
-                new SubsystemComponent(Flywheel.INSTANCE, DriveTrain.INSTANCE/*, Intake.INSTANCE, Spindexer.INSTANCE*/),
+                new SubsystemComponent(DriveTrain.INSTANCE/*, Intake.INSTANCE, Spindexer.INSTANCE*/),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE
 

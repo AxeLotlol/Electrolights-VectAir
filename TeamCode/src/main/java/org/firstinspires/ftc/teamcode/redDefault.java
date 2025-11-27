@@ -193,35 +193,38 @@ public class redDefault extends NextFTCOpMode {
 
         new SequentialGroup(
                 spinFlyWheel1500,
-                new FollowPath(paths.PreLoadLaunch),
+                new FollowPath(paths.PreLoadLaunch,true,0.5),
                 // Shooting logic with transfer insert here
                 new Delay(2),
                 stopFlywheel,
                 intakeMotorOn,
-                new FollowPath(paths.Intake1set),
+                new FollowPath(paths.Intake1set,false,0.5),
 
-                new FollowPath(paths.ClassifierRamp1),
+                new FollowPath(paths.ClassifierRamp1,false,0.5),
                 intakeMotorOff,
                 spinFlyWheel1500,
                 // Sorting logic all here with the order, etc
-                new FollowPath(paths.Launch1Real),
+                new FollowPath(paths.Launch1Real,true,0.5),
                 // Transfer logic with transfer
+                new Delay(2),
                 intakeMotorOn,
-                new FollowPath(paths.Intake2ndSet),
+                new FollowPath(paths.Intake2ndSet,false,0.5),
                 intakeMotorOff,
                 spinFlyWheel1500,
                 // Sorting logic and order here
 
-                new FollowPath(paths.Launch2),
+                new FollowPath(paths.Launch2,true,0.5),
                 // Transfer logic with transfer
+                new Delay(1),
                 intakeMotorOn,
                 stopFlywheel,
-                new FollowPath(paths.Intake3rdSet),
+                new FollowPath(paths.Intake3rdSet,false,0.5),
                 intakeMotorOff,
                 spinFlyWheel1500,
                 // Sorting logic here
-                new FollowPath(paths.Launch3),
+                new FollowPath(paths.Launch3,false,0.5),
                 // Transfer and shoot logic
+                new Delay(2),
                 new FollowPath(paths.teleOp)
 
 

@@ -15,9 +15,11 @@ import dev.nextftc.control.KineticState;
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
 import dev.nextftc.core.commands.groups.ParallelGroup;
+import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
+import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
@@ -104,6 +106,15 @@ public class redDefault extends NextFTCOpMode {
     public static double spindexvelocity;
     public static MotorEx spindex = new MotorEx("spindexer");
 
+    public static MotorEx transfer = new MotorEx("transfer");
+
+    Command  flywheelYes= new LambdaCommand()
+            .setStart(() -> Flywheel.shooter(1500));
+
+
+
+
+
 
     Command pathCommand = new LambdaCommand()
             .setStart(() -> follower.followPath(paths.Intake1set))
@@ -130,7 +141,7 @@ public class redDefault extends NextFTCOpMode {
         controller.setGoal(new KineticState(0.0, configtps, 0.0));
 
         double power = controller.calculate(currentstate);
-        spindex.setPower(power);
+
     }
     public static void spin(float tps) {
         BindingManager.update();
@@ -154,60 +165,74 @@ public class redDefault extends NextFTCOpMode {
         actionTimer = new Timer();
         opmodeTimer = new Timer();
         follower.setStartingPose(start);
-        Flywheel.shooter(0);
+
         pathState = 0;
         telemetry.addLine("Follower + IMU + Odo Pods initialized successfully!");
         telemetry.addLine("Initialization complete!");
         telemetry.update();
     }
 
+    Command spinFlyWheel1500 = new LambdaCommand()
+            .setStart(() -> Flywheel.shooter(1500));
+
+    Command stopFlywheel = new LambdaCommand()
+            .setStart(() -> Flywheel.shooter(0));
+    Command intakeMotorOn = new LambdaCommand()
+            .setStart(() -> intakeMotor.setPower(-1));
+    Command intakeMotorOff = new LambdaCommand()
+            .setStart(() -> intakeMotor.setPower(0));
 
     public void onStartButtonPressed() {
         opmodeTimer.resetTimer();
         pathTimer.resetTimer();
         //int tag=MotifScanning.INSTANCE.findMotif();
-        follower.followPath(paths.PreLoadLaunch);
-        Flywheel.shooter(1500);
+
         telemetry.addLine("The shooter has started btw");
         telemetry.addLine("Started Path 1");
         telemetry.update();
+
+        new SequentialGroup(
+                spinFlyWheel1500,
+                new FollowPath(paths.PreLoadLaunch),
+                // Shooting logic with transfer insert here
+                new Delay(2),
+                stopFlywheel,
+                intakeMotorOn,
+                new FollowPath(paths.Intake1set),
+
+                new FollowPath(paths.ClassifierRamp1),
+                intakeMotorOff,
+                spinFlyWheel1500,
+                // Sorting logic all here with the order, etc
+                new FollowPath(paths.Launch1Real),
+                // Transfer logic with transfer
+                intakeMotorOn,
+                new FollowPath(paths.Intake2ndSet),
+                intakeMotorOff,
+                spinFlyWheel1500,
+                // Sorting logic and order here
+
+                new FollowPath(paths.Launch2),
+                // Transfer logic with transfer
+                intakeMotorOn,
+                stopFlywheel,
+                new FollowPath(paths.Intake3rdSet),
+                intakeMotorOff,
+                spinFlyWheel1500,
+                // Sorting logic here
+                new FollowPath(paths.Launch3),
+                // Transfer and shoot logic
+                new FollowPath(paths.teleOp)
+
+
+
+        );
+
+
     }
 
 
-    public void onUpdate() {
-        follower.update();
-        switch (pathState) {
 
-            case 0:
-                if (!follower.isBusy()) {
-                    pathTimer.resetTimer();
-
-
-                    pathState++;
-
-                }
-                break;
-            case 1:
-                if (!follower.isBusy()) {
-                    pathTimer.resetTimer();
-
-                    follower.followPath(paths.ClassifierRamp1);
-                    pathState++;
-                }
-
-
-
-
-
-
-
-        }
-
-        telemetry.addData("State", pathState);
-        telemetry.addData("Pose", follower.getPose());
-        telemetry.addData("Path Timer", pathTimer.getElapsedTime());
-        telemetry.update();
-    }
 
     @Override
     public void onStop() {

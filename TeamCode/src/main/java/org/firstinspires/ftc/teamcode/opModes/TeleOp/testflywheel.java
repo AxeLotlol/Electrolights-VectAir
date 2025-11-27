@@ -67,7 +67,7 @@ public class testflywheel extends NextFTCOpMode {
     public void onStartButtonPressed() {
         shooter(1500);
         Gamepads.gamepad1().triangle().whenBecomesTrue(() -> hood());
-        //Gamepads.gamepad1().circle().whenBecomesTrue(() -> TempHood.INSTANCE.HoodPowerZero.schedule());
+        Gamepads.gamepad1().circle().whenBecomesTrue(() -> TempHood.INSTANCE.HoodPowerZero.schedule());
     }
     @Override
     public void onUpdate(){
@@ -76,7 +76,7 @@ public class testflywheel extends NextFTCOpMode {
             if (running == false) {
                 running = true;
                 TempHood.INSTANCE.HoodUp.schedule();
-                //ActiveOpMode.telemetry().addLine("power set up");
+                ActiveOpMode.telemetry().addLine("power set up");
                 running = false;
 
             }
@@ -85,7 +85,7 @@ public class testflywheel extends NextFTCOpMode {
             if (running == false) {
                 running = true;
                 TempHood.INSTANCE.HoodDown.schedule();
-                //ActiveOpMode.telemetry().addLine("power set down");
+                ActiveOpMode.telemetry().addLine("power set down");
                 running = false;
             }
         }

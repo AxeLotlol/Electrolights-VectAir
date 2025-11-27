@@ -39,7 +39,7 @@ public class TempHood implements Subsystem {
             new SetPower(hoodServo2,-1)
     );
 
-    ParallelGroup HoodPowerZero=new ParallelGroup(
+    public ParallelGroup HoodPowerZero=new ParallelGroup(
             new SetPower(hoodServo1,0),
             new SetPower(hoodServo2,0)
     );

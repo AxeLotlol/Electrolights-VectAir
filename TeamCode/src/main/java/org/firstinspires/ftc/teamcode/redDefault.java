@@ -70,15 +70,15 @@ public class redDefault extends NextFTCOpMode {
 
     public Pose Launch1 = new Pose(86.2258064516129, 85.64516129032258);
 
-    public Pose ControlPoint2 = new Pose(39,57);
+    public Pose ControlPoint2 = new Pose(57.19626168224299,51.364485981308405);
 
     public Pose Intake2 = new Pose(129.19626168224298,59.43925233644861);
 
-    public Pose ControlPoint3 = new Pose(45.29032258064516,25.258064516129032);
+    public Pose ControlPoint3 = new Pose(61.23364485981308,28.71028037383178);
 
     public Pose Intake3 = new Pose(131.2258064516129,35.12903225806451);
 
-    public Pose Teleop1 = new Pose(72.29032258064517,46.16129032258064);
+    public Pose Teleop1 = new Pose(84.11214953271028,37.009345794392516);
 
 
 

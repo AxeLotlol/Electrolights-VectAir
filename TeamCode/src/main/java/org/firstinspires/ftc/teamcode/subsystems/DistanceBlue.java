@@ -26,7 +26,7 @@ public class DistanceBlue implements Subsystem {
 
     public void periodic() {
         YawPitchRollAngles orientation = bench.getOrientation();
-        limelight3A.updateRobotOrientation(orientation.getYaw(AngleUnit.DEGREES));  XZ
+        limelight3A.updateRobotOrientation(orientation.getYaw(AngleUnit.DEGREES));
         LLResult llResult = limelight3A.getLatestResult();
         if (llResult != null && llResult.isValid()) {
             ta = llResult.getTa();

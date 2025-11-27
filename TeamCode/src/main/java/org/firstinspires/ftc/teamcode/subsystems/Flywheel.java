@@ -21,6 +21,8 @@ public class Flywheel implements Subsystem {
 
     public static MotorEx flywheel = new MotorEx("launchingmotor");
 
+    public static float configvelocity = 1400; //far zone - ~1500. near zone - ~1200-1300
+
     public static void velocityControlWithFeedforwardExample(KineticState currentstate, float configtps) {
         // Create a velocity controller with PID and feedforward
         ControlSystem controller = ControlSystem.builder()
@@ -53,5 +55,17 @@ public class Flywheel implements Subsystem {
     @Override public void initialize() {
 
     }
+    /*@Override public void onUpdate() {
+        configvelocity=findTPS(4.03);
+        shooter(configvelocity);
+        double ticksPerSecond = flywheel.getVelocity();
+
+        double rpm = (ticksPerSecond / 28) * 60.0;
+        double goal = ShooterCalculations.requiredRPM;
+        double goal2 = ShooterCalculations.requiredTPS;
+        PanelsTelemetry.INSTANCE.getTelemetry().addData("Motor RPM", rpm);
+        PanelsTelemetry.INSTANCE.getTelemetry().addData("Required RPM", goal);
+        PanelsTelemetry.INSTANCE.getTelemetry().addData("Required TPS", goal2);
+        PanelsTelemetry.INSTANCE.getTelemetry().update(telemetry);*/
 }
 

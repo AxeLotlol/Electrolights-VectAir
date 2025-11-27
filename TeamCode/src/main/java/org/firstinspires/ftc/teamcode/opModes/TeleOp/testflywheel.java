@@ -32,7 +32,7 @@ public class testflywheel extends NextFTCOpMode {
 
     public testflywheel() {
         addComponents(
-                new SubsystemComponent(TempHood.INSTANCE /*Intake.INSTANCE, Spindexer.INSTANCE*/),
+                new SubsystemComponent(TempHood.INSTANCE, Flywheel.INSTANCE/*Intake.INSTANCE, Spindexer.INSTANCE*/),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE
 
@@ -41,20 +41,24 @@ public class testflywheel extends NextFTCOpMode {
 
 
 
-    public boolean lift=false;
+    public boolean lift;
 
     public boolean running=false;
 
     public void hood(){
         if(lift==false){
             lift=true;
+            TempHood.INSTANCE.HoodUp.schedule();
         }
-        else
-        {
-            if(lift==true){
-                lift=false;
-            }
+        else if (lift==true) {
+            lift=false;
+            TempHood.INSTANCE.HoodDown.schedule();
         }
+        else if (lift!=true&&lift!=false) {
+            lift=true;
+            TempHood.INSTANCE.HoodUp.schedule();
+        }
+
     }
 
 
@@ -65,14 +69,15 @@ public class testflywheel extends NextFTCOpMode {
         }
     @Override
     public void onStartButtonPressed() {
-        shooter(1500);
+        shooter(1000);
         Gamepads.gamepad1().triangle().whenBecomesTrue(() -> hood());
         Gamepads.gamepad1().circle().whenBecomesTrue(() -> TempHood.INSTANCE.HoodPowerZero.schedule());
     }
     @Override
     public void onUpdate(){
+        shooter(1000);
 
-        if (lift == true) {
+        /*if (lift == true) {
             if (running == false) {
                 running = true;
                 TempHood.INSTANCE.HoodUp.schedule();
@@ -81,14 +86,14 @@ public class testflywheel extends NextFTCOpMode {
 
             }
         }
-        if (lift == false) {
+        else if (lift == false) {
             if (running == false) {
                 running = true;
                 TempHood.INSTANCE.HoodDown.schedule();
                 ActiveOpMode.telemetry().addLine("power set down");
                 running = false;
             }
-        }
+        }*/
 
     }
 }

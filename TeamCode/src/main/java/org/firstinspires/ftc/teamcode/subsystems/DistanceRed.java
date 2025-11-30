@@ -43,7 +43,7 @@ public class DistanceRed implements Subsystem {
     }
 
     public double getDistanceFromTag() {
-        double distance = 1.892*Math.pow(ta, -0.513) + 0.1;
+        double distance = 1.892*Math.pow(ta, -0.513) + 0.08;
         return distance;
     }
 

@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import dev.nextftc.core.commands.delays.Delay;
 import dev.nextftc.ftc.ActiveOpMode;
 
+import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 import org.firstinspires.ftc.teamcode.subsystems.TempHood;
@@ -34,7 +35,7 @@ public class testflywheel extends NextFTCOpMode {
 
     public testflywheel() {
         addComponents(
-                new SubsystemComponent(TempHood.INSTANCE, Flywheel.INSTANCE/*Intake.INSTANCE, Spindexer.INSTANCE*/),
+                new SubsystemComponent(TempHood.INSTANCE, Flywheel.INSTANCE, DistanceRed.INSTANCE/*Intake.INSTANCE, Spindexer.INSTANCE*/),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE
 
@@ -79,14 +80,20 @@ public class testflywheel extends NextFTCOpMode {
     }
     @Override
     public void onUpdate(){
-        float newtps=findTPS(2);
-        shooter(newtps);
+        float newtps=findTPS(DistanceRed.INSTANCE.getDistanceFromTag());
+        //shooter(newtps);
         double ticksPerSecond = flywheel.getVelocity();
+
+        //shooter(configvelocity);
+        ActiveOpMode.telemetry().addData("Required RPM", newtps);
+
+        ActiveOpMode.telemetry().addData("Distance", DistanceRed.INSTANCE.getDistanceFromTag());
 
         double rpm = (ticksPerSecond / 28) * 60.0;
 
         ActiveOpMode.telemetry().addData("Motor RPM", rpm);
         ActiveOpMode.telemetry().update();
+
 
         /*if (lift == true) {
             if (running == false) {

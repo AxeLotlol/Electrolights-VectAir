@@ -58,9 +58,7 @@ public class Flywheel implements Subsystem {
     }
 
     @Override public void periodic() {
-        configvelocity=(findTPS(2) / 28) * 60.0;
-        //shooter(configvelocity);
-        ActiveOpMode.telemetry().addData("Required RPM", configvelocity);
+
     }
     /*@Override public void onUpdate() {
         configvelocity=findTPS(4.03);

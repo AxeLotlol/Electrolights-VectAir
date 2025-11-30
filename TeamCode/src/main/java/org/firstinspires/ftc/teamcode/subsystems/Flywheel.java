@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
 
 import dev.nextftc.bindings.*;
 import dev.nextftc.control.KineticState;
@@ -21,7 +22,7 @@ public class Flywheel implements Subsystem {
 
     public static MotorEx flywheel = new MotorEx("launchingmotor");
 
-    public static float configvelocity = 1400; //far zone - ~1500. near zone - ~1200-1300
+    public static double configvelocity = 1400; //far zone - ~1500. near zone - ~1200-1300
 
     public static void velocityControlWithFeedforwardExample(KineticState currentstate, float configtps) {
         // Create a velocity controller with PID and feedforward
@@ -54,6 +55,12 @@ public class Flywheel implements Subsystem {
     }
     @Override public void initialize() {
 
+    }
+
+    @Override public void periodic() {
+        configvelocity=(findTPS(2) / 28) * 60.0;
+        //shooter(configvelocity);
+        ActiveOpMode.telemetry().addData("Required RPM", configvelocity);
     }
     /*@Override public void onUpdate() {
         configvelocity=findTPS(4.03);

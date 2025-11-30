@@ -45,6 +45,7 @@ public class TempHood implements Subsystem {
     );
 
     public SequentialGroup HoodUp=new SequentialGroup(
+            new Delay(0.15),
             HoodRunUp,
             new Delay(0.2),
             HoodPowerZero

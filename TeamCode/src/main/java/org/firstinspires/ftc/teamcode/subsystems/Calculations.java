@@ -23,9 +23,9 @@ public class Calculations implements Subsystem {
 
     public static float findTPS(double dist){
         numerator = 9.81 * Math.pow(dist, 2);
-        denominator = (2 * Math.pow(Math.cos(1.103048) , 2) * (dist * Math.tan(1.103048) - 0.85125));
+        denominator = (2 * Math.pow(Math.cos(1.09956) , 2) * (dist * Math.tan(1.09956) - 0.85125));
         v0 = Math.sqrt(numerator / denominator);
-        requiredRPM = -39.357*v0*v0*v0 + 730.79*v0*v0 - 3905.4*v0 + 8535.9;
+        requiredRPM = 0.5* (13.628*v0*v0*v0 - 49.443*v0*v0 + 624.39*v0 + 1106.4);
         requiredTPS = (28*requiredRPM)/60;
         return (float) requiredTPS;
     }

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opModes.TeleOp;
 
+import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 
 
@@ -22,6 +23,7 @@ import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.ftc.components.BulkReadComponent;
 import dev.nextftc.hardware.impl.CRServoEx;
+import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.powerable.SetPower;
 
 import java.time.*;
@@ -38,6 +40,8 @@ public class testflywheel extends NextFTCOpMode {
 
         );
     }
+
+    public static MotorEx flywheel = new MotorEx("launchingmotor");
 
 
 
@@ -69,13 +73,20 @@ public class testflywheel extends NextFTCOpMode {
         }
     @Override
     public void onStartButtonPressed() {
-        shooter(1000);
+        flywheel.setPower(0.1);
         Gamepads.gamepad1().triangle().whenBecomesTrue(() -> hood());
         Gamepads.gamepad1().circle().whenBecomesTrue(() -> TempHood.INSTANCE.HoodPowerZero.schedule());
     }
     @Override
     public void onUpdate(){
-        shooter(1000);
+        float newtps=findTPS(2);
+        shooter(newtps);
+        double ticksPerSecond = flywheel.getVelocity();
+
+        double rpm = (ticksPerSecond / 28) * 60.0;
+
+        ActiveOpMode.telemetry().addData("Motor RPM", rpm);
+        ActiveOpMode.telemetry().update();
 
         /*if (lift == true) {
             if (running == false) {

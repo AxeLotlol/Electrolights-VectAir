@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import dev.nextftc.core.commands.delays.Delay;
 import dev.nextftc.ftc.ActiveOpMode;
 
+import org.firstinspires.ftc.teamcode.subsystems.DistanceBlue;
 import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
@@ -35,7 +36,7 @@ public class testflywheel extends NextFTCOpMode {
 
     public testflywheel() {
         addComponents(
-                new SubsystemComponent(TempHood.INSTANCE, Flywheel.INSTANCE, DistanceRed.INSTANCE/*Intake.INSTANCE, Spindexer.INSTANCE*/),
+                new SubsystemComponent(TempHood.INSTANCE, Flywheel.INSTANCE, DistanceBlue.INSTANCE/*Intake.INSTANCE, Spindexer.INSTANCE*/),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE
 
@@ -80,8 +81,8 @@ public class testflywheel extends NextFTCOpMode {
     }
     @Override
     public void onUpdate(){
-        float newtps=findTPS(DistanceRed.INSTANCE.getDistanceFromTag());
-        //shooter(newtps);
+        float newtps=findTPS(DistanceBlue.INSTANCE.getDistanceFromTag());
+        shooter(newtps);
         double ticksPerSecond = flywheel.getVelocity();
 
         //shooter(configvelocity);

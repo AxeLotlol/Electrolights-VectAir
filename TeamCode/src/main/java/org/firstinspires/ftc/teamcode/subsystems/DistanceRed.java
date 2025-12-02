@@ -15,7 +15,6 @@ import dev.nextftc.ftc.ActiveOpMode;
 public class DistanceRed implements Subsystem {
 
     private Limelight3A limelight3A;
-    public double distance;
     double ta;
 
     private IMU imu;

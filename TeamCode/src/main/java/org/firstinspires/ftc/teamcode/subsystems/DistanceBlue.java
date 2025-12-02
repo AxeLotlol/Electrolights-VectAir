@@ -4,28 +4,36 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.har
 
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 import dev.nextftc.core.subsystems.Subsystem;
+import dev.nextftc.ftc.ActiveOpMode;
 
 public class DistanceBlue implements Subsystem {
 
     private Limelight3A limelight3A;
-    TestBench bench = new TestBench();
-    public double distance;
     double ta;
 
+    private IMU imu;
+
+    public DistanceBlue() {
+
+    }
+
+    public static final DistanceBlue INSTANCE = new DistanceBlue();
+
     public void initialize() {
-        bench.init(hardwareMap);
-        limelight3A = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight3A = ActiveOpMode.hardwareMap().get(Limelight3A.class, "limelight");
         limelight3A.pipelineSwitch(8); //april tag 8 pipeline
         limelight3A.start();
+        imu = ActiveOpMode.hardwareMap().get(IMU.class, "imu");
     }
 
     public void periodic() {
-        YawPitchRollAngles orientation = bench.getOrientation();
+        YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
         limelight3A.updateRobotOrientation(orientation.getYaw(AngleUnit.DEGREES));
         LLResult llResult = limelight3A.getLatestResult();
         if (llResult != null && llResult.isValid()) {
@@ -34,8 +42,7 @@ public class DistanceBlue implements Subsystem {
     }
 
     public double getDistanceFromTag() {
-        double scale = 5249; // y - value in graph equation (Ayush FTC yt playlist)
-        double distance = scale / ta;
+        double distance = 1.892*Math.pow(ta, -0.513) + 0.08;
         return distance;
     }
 

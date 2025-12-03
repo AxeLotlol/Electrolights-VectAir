@@ -14,10 +14,10 @@ import dev.nextftc.hardware.impl.MotorEx;
 
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOpBlue")
-public class TeleOpBlue extends NextFTCOpMode {
+public class TeleOpRed extends NextFTCOpMode {
 
     public MotorEx intakeMotor;
-    public TeleOpBlue() {
+    public TeleOpRed() {
         addComponents(
                 new SubsystemComponent(DriveTrain.INSTANCE/*, Intake.INSTANCE, Spindexer.INSTANCE*/),
                 BulkReadComponent.INSTANCE,
@@ -25,9 +25,9 @@ public class TeleOpBlue extends NextFTCOpMode {
 
         );
     }
-    
 
-    public static boolean isBlue(){
+
+    public static boolean isRed(){
         return true;
     }
 
@@ -84,7 +84,7 @@ public class TeleOpBlue extends NextFTCOpMode {
     @Override
     public void onStartButtonPressed() {
         //Gamepads.gamepad1().rightTrigger().greaterThan(0.2).whenBecomesTrue(() -> DriveTrain.shootingtrue())
-                //.whenBecomesFalse(() -> DriveTrain.shootingfalse());
+        //.whenBecomesFalse(() -> DriveTrain.shootingfalse());
         Gamepads.gamepad1().rightBumper().whenBecomesTrue(() -> intakeMotor.setPower(1))
                 .whenFalse(() -> intakeMotor.setPower(0));
         Gamepads.gamepad2().triangle().whenBecomesTrue(() -> findMotif = true);

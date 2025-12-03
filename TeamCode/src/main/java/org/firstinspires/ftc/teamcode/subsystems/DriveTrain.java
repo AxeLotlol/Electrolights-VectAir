@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
+import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpBlue.isBlue;
+import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpRed.isRed;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
@@ -92,6 +94,8 @@ public class DriveTrain implements Subsystem {
 
     public boolean firsttime = true;
 
+    public int alliance;
+
     public Supplier<Double> yVCtx;
 
 
@@ -104,6 +108,16 @@ public class DriveTrain implements Subsystem {
 
     @Override
     public Command getDefaultCommand() {
+
+        if(isBlue()==true) {
+            alliance=1;
+        }
+        else if(isRed()==true){
+            alliance=-1;
+        }
+        else if(isBlue()!=true && isRed()!=true) {
+            ActiveOpMode.telemetry().addLine("No direction set");
+        }
 
         Gamepads.gamepad1().triangle().whenBecomesTrue(() -> autolocktrue())
                 .whenBecomesFalse(() -> autolockfalse());
@@ -127,8 +141,8 @@ public class DriveTrain implements Subsystem {
                     fR,
                     bL,
                     bR,
-                    Gamepads.gamepad1().leftStickX().map(it -> it),
-                    Gamepads.gamepad1().leftStickY().map(it -> it),
+                    Gamepads.gamepad1().leftStickX().map(it -> alliance * it),
+                    Gamepads.gamepad1().leftStickY().map(it -> alliance * it),
                     yVCtx,
                     new FieldCentric(imu)
             );
@@ -141,8 +155,8 @@ public class DriveTrain implements Subsystem {
                         fR,
                         bL,
                         bR,
-                        Gamepads.gamepad1().leftStickX().map(it -> it * 0.4),
-                        Gamepads.gamepad1().leftStickY().map(it -> it *0.4),
+                        Gamepads.gamepad1().leftStickX().map(it -> alliance * it * 0.4),
+                        Gamepads.gamepad1().leftStickY().map(it -> alliance * it *0.4),
                         Gamepads.gamepad1().rightStickX().map(it -> it * 0.4 * 0.75),
                         new FieldCentric(imu)
                 );
@@ -155,8 +169,8 @@ public class DriveTrain implements Subsystem {
                         fR,
                         bL,
                         bR,
-                        Gamepads.gamepad1().leftStickX().map(it -> it),
-                        Gamepads.gamepad1().leftStickY().map(it -> it),
+                        Gamepads.gamepad1().leftStickX().map(it -> alliance *it),
+                        Gamepads.gamepad1().leftStickY().map(it -> alliance *it),
                         Gamepads.gamepad1().rightStickX().map(it -> it * 0.75),
                         new FieldCentric(imu)
                 );
@@ -194,11 +208,27 @@ public class DriveTrain implements Subsystem {
         }
         yVCtx = () -> visionYawCommand(tx);
         //ActiveOpMode.telemetry().update();
-
-        float tps = findTPS((float) 2.08);
-        shooter(tps);
+        float newtps = 1200;
+        if(isBlue()==true) {
+            newtps=findTPS(DistanceBlue.INSTANCE.getDistanceFromTag());
+        }
+        else if(isRed()==true){
+            newtps=findTPS(DistanceRed.INSTANCE.getDistanceFromTag());
+        }
+        else if(isBlue()!=true && isRed()!=true) {
+            newtps=findTPS(DistanceBlue.INSTANCE.getDistanceFromTag());
+        }
+        shooter(newtps);
         if(autolock==true){
-            limelight.pipelineSwitch(APRILTAG_PIPELINE);
+            if(isBlue()==true) {
+                limelight.pipelineSwitch(8);
+            }
+            else if(isRed()==true){
+                limelight.pipelineSwitch(7);
+            }
+            else if(isBlue()!=true && isRed()!=true) {
+                ActiveOpMode.telemetry().addLine("No pipeline set");
+            }
         }
         ActiveOpMode.telemetry().update();
     }

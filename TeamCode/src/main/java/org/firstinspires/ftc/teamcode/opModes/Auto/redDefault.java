@@ -14,6 +14,7 @@ import dev.nextftc.control.ControlSystem;
 import dev.nextftc.control.KineticState;
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
+import dev.nextftc.core.commands.groups.ParallelGroup;
 import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.components.BindingsComponent;
@@ -50,13 +51,15 @@ public class redDefault extends NextFTCOpMode {
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
 
-    public static final ServoEx servoPos = new ServoEx("servoPos");
+
+
+
     private Paths paths;
     public Pose start = new Pose(118.45161290322581,126, Math.toRadians(51));
 
     public Pose PreLoadLaunch1 = new Pose(86.2258064516129,97.83870967741936);
 
-    public Pose ControlPoint1 = new Pose(58.354838709677416,82.74193548387096);
+    public Pose ControlPoint1 = new Pose(61.00934579439252,82.76635514018692 );
 
     public Pose Intake1 = new Pose(127.4018691588785,83.66355140186916);
 
@@ -66,11 +69,13 @@ public class redDefault extends NextFTCOpMode {
 
     public Pose Launch1 = new Pose(86.2258064516129, 85.64516129032258);
 
-    public Pose ControlPoint2 = new Pose(57.19626168224299,51.364485981308405);
+    public Pose ControlPoint2 = new Pose(71.99999999999999,53.60747663551402);
 
     public Pose Intake2 = new Pose(129.19626168224298,59.43925233644861);
 
-    public Pose ControlPoint3 = new Pose(61.23364485981308,28.71028037383178);
+    public Pose ControlPoint3 = new Pose(75.3644859813084,23.77570093457944);
+
+    public Pose ControlPoint4 = new Pose(74.46728971962617,35.439252336448604);
 
     public Pose Intake3 = new Pose(131.2258064516129,35.12903225806451);
 
@@ -97,12 +102,12 @@ public class redDefault extends NextFTCOpMode {
     int ball2Color = 0;
     int ball3Color = 0;
     int tagId = 0;
-    private ServoEx servo = new ServoEx("servoPos");
+
 
     public static double spindexvelocity;
     public static MotorEx spindex = new MotorEx("spindexer");
 
-    public static MotorEx transfer = new MotorEx("transfer");
+
 
     Command  flywheelYes= new LambdaCommand()
             .setStart(() -> Flywheel.shooter(1500));
@@ -147,9 +152,15 @@ public class redDefault extends NextFTCOpMode {
     }
 
 
-
+    ServoEx hoodservo1 = new ServoEx("hoodServo1");
+    ServoEx hoodservo2 = new ServoEx("hoodServo2");
     public void onInit() {
         telemetry.addLine("Initializing Follower...");
+
+         MotorEx transfer1 = new MotorEx("transfer");
+         ServoEx transfer2 = new ServoEx("transferServo1");
+         ServoEx transfer3 = new ServoEx("transferServo2");
+
 
 
         telemetry.update();
@@ -177,6 +188,11 @@ public class redDefault extends NextFTCOpMode {
             .setStart(() -> intakeMotor.setPower(-1));
     Command intakeMotorOff = new LambdaCommand()
             .setStart(() -> intakeMotor.setPower(0));
+    Command hoodUp = new LambdaCommand()
+            .setStart(() -> hoodservo1.setPosition(0.2));
+    Command hoodup2 = new LambdaCommand()
+            .setStart(() -> hoodservo2.setPosition(0.2));
+
 
     public void onStartButtonPressed() {
         opmodeTimer.resetTimer();
@@ -191,7 +207,7 @@ public class redDefault extends NextFTCOpMode {
                 spinFlyWheel1500,
                 new FollowPath(paths.PreLoadLaunch,true,0.5),
                 // Shooting logic with transfer insert here
-                new Delay(2),
+                new Delay(2.0),
                 stopFlywheel,
                 intakeMotorOn,
                 new FollowPath(paths.Intake1set,false,0.5),
@@ -202,16 +218,20 @@ public class redDefault extends NextFTCOpMode {
                 // Sorting logic all here with the order, etc
                 new FollowPath(paths.Launch1Real,true,0.5),
                 // Transfer logic with transfer
-                new Delay(2),
+                new Delay(2.0),
                 intakeMotorOn,
                 new FollowPath(paths.Intake2ndSet,false,0.5),
                 intakeMotorOff,
                 spinFlyWheel1500,
                 // Sorting logic and order here
+                new ParallelGroup(
+                        hoodUp,
+                        hoodup2
+                ),
 
                 new FollowPath(paths.Launch2,true,0.5),
                 // Transfer logic with transfer
-                new Delay(1),
+                new Delay(1.0),
                 intakeMotorOn,
                 stopFlywheel,
                 new FollowPath(paths.Intake3rdSet,false,0.5),
@@ -220,12 +240,14 @@ public class redDefault extends NextFTCOpMode {
                 // Sorting logic here
                 new FollowPath(paths.Launch3,false,0.5),
                 // Transfer and shoot logic
-                new Delay(2),
+                new Delay(2.0),
                 new FollowPath(paths.teleOp)
 
 
 
+
         );
+
 
 
     }
@@ -326,6 +348,7 @@ public class redDefault extends NextFTCOpMode {
                     .addPath(new BezierCurve(
                             Launch1,
                             ControlPoint3,
+                            ControlPoint4,
                             Intake3
 
                     ))

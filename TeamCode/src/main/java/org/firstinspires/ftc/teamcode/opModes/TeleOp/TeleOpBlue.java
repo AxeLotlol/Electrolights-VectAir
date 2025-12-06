@@ -12,7 +12,6 @@ import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.ftc.components.BulkReadComponent;
 import dev.nextftc.hardware.impl.MotorEx;
 
-
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOpBlue")
 public class TeleOpBlue extends NextFTCOpMode {
 
@@ -25,13 +24,13 @@ public class TeleOpBlue extends NextFTCOpMode {
 
         );
     }
-    
 
     public static boolean isBlue(){
         return true;
     }
 
     public static int tagID;
+
     public static boolean findMotif = false;
     public static int ball1Color = 0; //green = 1, purple = 2
     public static int ball2Color = 0;

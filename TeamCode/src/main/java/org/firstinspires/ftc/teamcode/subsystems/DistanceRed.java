@@ -19,15 +19,13 @@ public class DistanceRed implements Subsystem {
 
     private IMU imu;
 
-    public DistanceRed() {
-
-    }
+    public DistanceRed() {}
 
     public static final DistanceRed INSTANCE = new DistanceRed();
 
     public void initialize() {
         limelight3A = ActiveOpMode.hardwareMap().get(Limelight3A.class, "limelight");
-        limelight3A.pipelineSwitch(7); //april tag 8 pipeline
+        limelight3A.pipelineSwitch(7); //april tag 7 pipeline
         limelight3A.start();
         imu = ActiveOpMode.hardwareMap().get(IMU.class, "imu");
     }
@@ -45,5 +43,4 @@ public class DistanceRed implements Subsystem {
         double distance = 1.892*Math.pow(ta, -0.513) + 0.08;
         return distance;
     }
-
 }

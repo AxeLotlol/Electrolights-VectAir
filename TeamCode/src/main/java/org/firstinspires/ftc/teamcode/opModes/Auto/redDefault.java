@@ -19,17 +19,22 @@ import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
+import dev.nextftc.core.units.Angle;
 import dev.nextftc.extensions.pedro.FollowPath;
+import dev.nextftc.extensions.pedro.TurnTo;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
+import dev.nextftc.hardware.powerable.SetPower;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 
 
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
+import org.firstinspires.ftc.teamcode.subsystems.MotifScanning;
+import org.jetbrains.annotations.Async;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -105,7 +110,8 @@ public class redDefault extends NextFTCOpMode {
 
 
     public static double spindexvelocity;
-    public static MotorEx spindex = new MotorEx("spindexer");
+
+
 
 
 
@@ -130,7 +136,7 @@ public class redDefault extends NextFTCOpMode {
             .setIsDone(() -> !follower.isBusy())
             .named("Path4 Command");
 
-    public static MotorEx flywheel = new MotorEx("launchingmotor").reversed();
+
 
 
     public static void velocityControlWithFeedforwardExample(KineticState currentstate, float configtps) {
@@ -144,22 +150,18 @@ public class redDefault extends NextFTCOpMode {
         double power = controller.calculate(currentstate);
 
     }
-    public static void spin(float tps) {
-        BindingManager.update();
-        spindexvelocity = spindex.getVelocity();
-        KineticState currentState = new KineticState(0, spindexvelocity, 0.0);
-        velocityControlWithFeedforwardExample(currentState, tps);
-    }
 
-
-    ServoEx hoodservo1 = new ServoEx("hoodServo1");
-    ServoEx hoodservo2 = new ServoEx("hoodServo2");
+    private MotorEx transfer1;
+    private ServoEx transfer2;
+    private ServoEx transfer3;
+    private ServoEx hoodservo1;
+    private ServoEx hoodservo2;
+    private Command spinFlyWheel1500;
+    private Command intakeMotorOn;
     public void onInit() {
         telemetry.addLine("Initializing Follower...");
 
-         MotorEx transfer1 = new MotorEx("transfer");
-         ServoEx transfer2 = new ServoEx("transferServo1");
-         ServoEx transfer3 = new ServoEx("transferServo2");
+
 
 
 
@@ -167,11 +169,22 @@ public class redDefault extends NextFTCOpMode {
         follower = Constants.createFollower(hardwareMap);
         paths = new Paths(follower);
         intakeMotor = new MotorEx("intake");
+        transfer1 = new MotorEx("transfer");
+        transfer2 = new ServoEx("transferServo1");
+        transfer3 = new ServoEx("transferServo2");
+        hoodservo1 = new ServoEx("hoodServo1");
+        hoodservo2 = new ServoEx("hoodServo2");
+
+        spinFlyWheel1500 = new LambdaCommand()
+                .setStart(() -> Flywheel.shooter(1500));
+        intakeMotorOn = new LambdaCommand()
+                .setStart(() -> intakeMotor.setPower(-1));
 
         pathTimer = new Timer();
         actionTimer = new Timer();
         opmodeTimer = new Timer();
         follower.setStartingPose(start);
+
 
         pathState = 0;
         telemetry.addLine("Follower + IMU + Odo Pods initialized successfully!");
@@ -179,74 +192,150 @@ public class redDefault extends NextFTCOpMode {
         telemetry.update();
     }
 
-    Command spinFlyWheel1500 = new LambdaCommand()
-            .setStart(() -> Flywheel.shooter(1500));
+
+    public MotorEx flywheel = new MotorEx("launchingmotor").reversed();
+
 
     Command stopFlywheel = new LambdaCommand()
             .setStart(() -> Flywheel.shooter(0));
-    Command intakeMotorOn = new LambdaCommand()
-            .setStart(() -> intakeMotor.setPower(-1));
+
     Command intakeMotorOff = new LambdaCommand()
             .setStart(() -> intakeMotor.setPower(0));
     Command hoodUp = new LambdaCommand()
             .setStart(() -> hoodservo1.setPosition(0.2));
     Command hoodup2 = new LambdaCommand()
             .setStart(() -> hoodservo2.setPosition(0.2));
+    Command getMotif = new LambdaCommand()
+            .setStart(() -> tagId = MotifScanning.INSTANCE.findMotif());
+
+    Command opentransfer = new LambdaCommand()
+            .setStart(()-> {
+                transfer2.setPosition(0.7);
+                transfer3.setPosition(0.7);
+            });
+    Command closeTransfer = new LambdaCommand()
+            .setStart(() -> {
+                transfer2.setPosition(0);
+                transfer3.setPosition(0);
+            });
+    Command transferOn = new LambdaCommand()
+            .setStart(()-> transfer1.setPower(0.5));
+    Command transferOff = new LambdaCommand()
+            .setStart(() -> transfer1.setPower(0));
+    /*Command shootByTag1 = new LambdaCommand()
+                .setStart(() -> {
+                if (tagId == 21) {
+                    opentransfer.schedule();
+                    transfer1.setPower(0.5);
+                    new Delay(0.4);
+                    new ParallelGroup(
+                            hoodUp,
+                            hoodup2
+
+                    );
 
 
-    public void onStartButtonPressed() {
-        opmodeTimer.resetTimer();
-        pathTimer.resetTimer();
-        //int tag=MotifScanning.INSTANCE.findMotif();
+                }
 
-        telemetry.addLine("The shooter has started btw");
-        telemetry.addLine("Started Path 1");
-        telemetry.update();
 
-        new SequentialGroup(
+            });*/
+
+    public Command Auto(){
+        return new SequentialGroup(
+
                 spinFlyWheel1500,
                 new FollowPath(paths.PreLoadLaunch,true,0.5),
-                // Shooting logic with transfer insert here
+                opentransfer,
+                transferOn,
                 new Delay(2.0),
                 stopFlywheel,
+                transferOff,
+                new TurnTo(Angle.fromDeg(90)),
+                getMotif,
+
+                new Delay(1.0),
+                closeTransfer,
+
                 intakeMotorOn,
+                transferOn,
                 new FollowPath(paths.Intake1set,false,0.5),
 
                 new FollowPath(paths.ClassifierRamp1,false,0.5),
+                transferOff,
                 intakeMotorOff,
                 spinFlyWheel1500,
                 // Sorting logic all here with the order, etc
                 new FollowPath(paths.Launch1Real,true,0.5),
+                opentransfer,
+                transferOn,
+
+
                 // Transfer logic with transfer
                 new Delay(2.0),
+                closeTransfer,
+                transferOff,
+                stopFlywheel,
+
                 intakeMotorOn,
+                transferOn,
                 new FollowPath(paths.Intake2ndSet,false,0.5),
+
                 intakeMotorOff,
+                transferOff,
                 spinFlyWheel1500,
                 // Sorting logic and order here
-                new ParallelGroup(
-                        hoodUp,
-                        hoodup2
-                ),
+
 
                 new FollowPath(paths.Launch2,true,0.5),
+                opentransfer,
+                transferOn,
+
                 // Transfer logic with transfer
                 new Delay(1.0),
+                closeTransfer,
+
+
                 intakeMotorOn,
                 stopFlywheel,
                 new FollowPath(paths.Intake3rdSet,false,0.5),
                 intakeMotorOff,
+                transferOff,
                 spinFlyWheel1500,
+
                 // Sorting logic here
                 new FollowPath(paths.Launch3,false,0.5),
                 // Transfer and shoot logic
+                opentransfer,
+                transferOn,
+
                 new Delay(2.0),
+                closeTransfer,
+                transferOff,
+                stopFlywheel,
                 new FollowPath(paths.teleOp)
 
 
 
 
         );
+    }
+
+    public void onStartButtonPressed() {
+        opmodeTimer.resetTimer();
+        pathTimer.resetTimer();
+        //int tag=MotifScanning.INSTANCE.findMotif();
+        Auto().schedule();
+
+
+        telemetry.addLine("The shooter has started btw");
+        telemetry.addLine("Started Path 1");
+        telemetry.update();
+
+
+
+
+
+
 
 
 

@@ -2,50 +2,39 @@
 
 package org.firstinspires.ftc.teamcode.opModes.Auto;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import dev.nextftc.bindings.BindingManager;
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
+import org.firstinspires.ftc.teamcode.subsystems.MotifScanning;
+
 import dev.nextftc.control.ControlSystem;
 import dev.nextftc.control.KineticState;
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
-import dev.nextftc.core.commands.groups.ParallelGroup;
 import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
-import dev.nextftc.core.units.Angle;
-import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.extensions.pedro.FollowPath;
-import dev.nextftc.extensions.pedro.TurnTo;
+import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
-import dev.nextftc.hardware.powerable.SetPower;
-
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 
-
-import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
-import org.firstinspires.ftc.teamcode.subsystems.MotifScanning;
-import org.jetbrains.annotations.Async;
-
-
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.bylazar.configurables.annotations.Configurable;
-
-
-@Autonomous(name = "Red Auto Default Position", group = "Autonomous")
+@Autonomous(name = "Red Auto New Position", group = "Autonomous")
 @Configurable
-public class redDefault extends NextFTCOpMode {
-    public redDefault(){
+public class redNewPos extends NextFTCOpMode {
+    public redNewPos(){
         addComponents(
                 new SubsystemComponent(Flywheel.INSTANCE),
                 BulkReadComponent.INSTANCE,
@@ -63,17 +52,17 @@ public class redDefault extends NextFTCOpMode {
 
 
     private Paths paths;
-    public Pose start = new Pose(118.45161290322581,126, Math.toRadians(51));
+    public Pose start = new Pose(88.37383177570092,8.52336448598131, Math.toRadians(90));
 
     public Pose PreLoadLaunch1 = new Pose(86.2258064516129,97.83870967741936);
 
-    public Pose ControlPoint1 = new Pose(61.00934579439252,82.76635514018692 );
+    public Pose ControlPoint1 = new Pose(61.00934579439252,81.76635514018692 );
 
-    public Pose Intake1 = new Pose(127.4018691588785,83.66355140186916);
+    public Pose Intake1 = new Pose(127.4018691588785,80.66355140186916);
 
     public Pose ClassifierRampPoint = new Pose(63.58064516129032,74.32258064516128);
 
-    public Pose ClassifierRamp = new Pose(131.74766355140187,75.14018691588785);
+    public Pose ClassifierRamp = new Pose(131.74766355140187,72.14018691588785);
 
     public Pose Launch1 = new Pose(86.2258064516129, 85.64516129032258);
 
@@ -249,7 +238,7 @@ public class redDefault extends NextFTCOpMode {
         return new SequentialGroup(
 
                 spinFlyWheel1500,
-                new FollowPath(paths.PreLoadLaunch,true,0.8),
+                new FollowPath(paths.PreLoadLaunch,true,0.9),
                 opentransfer,
                 transferOn,
                 new Delay(2.0),
@@ -263,13 +252,13 @@ public class redDefault extends NextFTCOpMode {
 
                 intakeMotorOn,
                 transferOn,
-                new FollowPath(paths.Intake1set,false,0.8),
+                new FollowPath(paths.Intake1set,false,0.7),
 
                 new FollowPath(paths.ClassifierRamp1,true,0.7),
                 transferOff,
                 intakeMotorOff,
                 spinFlyWheel1500,
-                new Delay(1.5),
+                new Delay(1.0),
                 // Sorting logic all here with the order, etc
                 new FollowPath(paths.Launch1Real,true,0.8),
                 opentransfer,
@@ -389,7 +378,7 @@ public class redDefault extends NextFTCOpMode {
                             start,
                             PreLoadLaunch1
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(51), Math.toRadians(56))
+                    .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(51))
                     //.setVelocityConstraint(50)
                     .build();
             Intake1set = follower.pathBuilder()

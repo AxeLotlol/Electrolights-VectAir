@@ -132,33 +132,21 @@ public class AirsortAuto extends NextFTCOpMode {
         telemetry.update();
     }
 
-    Command spinFlyWheel1500 = new LambdaCommand()
-            .setStart(() -> Flywheel.shooter(1500));
 
-    Command stopFlywheel = new LambdaCommand()
-            .setStart(() -> Flywheel.shooter(0));
-    Command intakeMotorOn = new LambdaCommand()
-            .setStart(() -> intakeMotor.setPower(-1));
-    Command intakeMotorOff = new LambdaCommand()
-            .setStart(() -> intakeMotor.setPower(0));
-    Command servo1 = new LambdaCommand()
-            .setStart(() -> transferServo1.setPosition(0.5));
-    Command servo2 = new LambdaCommand()
-            .setStart(() -> transferServo2.setPosition(0.5));
+    public SequentialGroup onStart= new SequentialGroup(
+            new Delay(1.0),
+            new SetPositions(transferServo1.to(0.5), transferServo2.to(0.5)),
+            new Delay(0.2),
+            TempHood.INSTANCE.HoodUp,
+            new Delay(0.1),
+            TempHood.INSTANCE.HoodDown
+    );
 
     public void onStartButtonPressed() {
         float newtps=findTPS(2);
         shooter(newtps);
         //int tag=MotifScanning.INSTANCE.findMotif();
-
-        new SequentialGroup(
-                new Delay(1.0),
-                new SetPositions(transferServo1.to(0.5), transferServo2.to(0.5)),
-                new Delay(0.2),
-                TempHood.INSTANCE.HoodUp,
-                new Delay(0.1),
-                TempHood.INSTANCE.HoodDown
-        );
+        onStart.schedule();
 
 
     }

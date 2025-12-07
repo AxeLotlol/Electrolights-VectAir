@@ -79,15 +79,9 @@ public class AirsortAuto extends NextFTCOpMode {
     int ball2Color = 0;
     int ball3Color = 0;
     int tagId = 0;
-    private ServoEx servo = new ServoEx("servoPos");
-
-    public static double spindexvelocity;
     public static MotorEx spindex = new MotorEx("spindexer");
 
     public static MotorEx transfer = new MotorEx("transfer");
-
-    Command  flywheelYes= new LambdaCommand()
-            .setStart(() -> Flywheel.shooter(1500));
 
     public static MotorEx flywheel = new MotorEx("launchingmotor");
 

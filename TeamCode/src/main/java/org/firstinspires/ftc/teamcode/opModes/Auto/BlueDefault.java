@@ -2,50 +2,39 @@
 
 package org.firstinspires.ftc.teamcode.opModes.Auto;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import dev.nextftc.bindings.BindingManager;
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
+import org.firstinspires.ftc.teamcode.subsystems.MotifScanning;
+
 import dev.nextftc.control.ControlSystem;
 import dev.nextftc.control.KineticState;
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
-import dev.nextftc.core.commands.groups.ParallelGroup;
 import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
-import dev.nextftc.core.units.Angle;
-import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.extensions.pedro.FollowPath;
-import dev.nextftc.extensions.pedro.TurnTo;
+import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
-import dev.nextftc.hardware.powerable.SetPower;
-
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 
-
-import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
-import org.firstinspires.ftc.teamcode.subsystems.MotifScanning;
-import org.jetbrains.annotations.Async;
-
-
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.bylazar.configurables.annotations.Configurable;
-
-
-@Autonomous(name = "Red Auto Default Position", group = "Autonomous")
+@Autonomous(name = "Blue Auto Default Position", group = "Autonomous")
 @Configurable
-public class redDefault extends NextFTCOpMode {
-    public redDefault(){
+public class BlueDefault extends NextFTCOpMode {
+    public BlueDefault(){
         addComponents(
                 new SubsystemComponent(Flywheel.INSTANCE),
                 BulkReadComponent.INSTANCE,
@@ -63,31 +52,31 @@ public class redDefault extends NextFTCOpMode {
 
 
     private Paths paths;
-    public Pose start = new Pose(118.45161290322581,126, Math.toRadians(51));
+    public Pose start = new Pose(24.677419354838708,125.70967741935485, Math.toRadians(125));
 
-    public Pose PreLoadLaunch1 = new Pose(86.2258064516129,97.83870967741936);
+    public Pose PreLoadLaunch1 = new Pose(57.6,101.27472527472527);
 
-    public Pose ControlPoint1 = new Pose(61.00934579439252,82.76635514018692 );
+    public Pose ControlPoint1 = new Pose(50.225806451612904,80.41935483870968 );
 
-    public Pose Intake1 = new Pose(127.4018691588785,83.66355140186916);
+    public Pose Intake1 = new Pose(15.25233644859813,83.66355140186916);
 
-    public Pose ClassifierRampPoint = new Pose(63.58064516129032,74.32258064516128);
+    public Pose ClassifierRampPoint = new Pose(69.38709677419355,69.67741935483872);
 
-    public Pose ClassifierRamp = new Pose(131.74766355140187,75.14018691588785);
+    public Pose ClassifierRamp = new Pose(14.579439252336448,74.89719626168224);
 
-    public Pose Launch1 = new Pose(86.2258064516129, 85.64516129032258);
+    public Pose Launch1 = new Pose(62.12903225806452, 96.67741935483872);
 
-    public Pose ControlPoint2 = new Pose(71.99999999999999,53.60747663551402);
+    public Pose ControlPoint2 = new Pose(63.87096774193548,53.70967741935483);
 
-    public Pose Intake2 = new Pose(129.19626168224298,54.43925233644861);
+    public Pose Intake2 = new Pose(12.11214953271028,60.11214953271029);
 
-    public Pose ControlPoint3 = new Pose(75.3644859813084,23.77570093457944);
+    public Pose ControlPoint3 = new Pose(72.87096774193549,25.258064516129032);
 
-    public Pose ControlPoint4 = new Pose(74.46728971962617,35.439252336448604);
 
-    public Pose Intake3 = new Pose(131.2258064516129,35.12903225806451);
 
-    public Pose Teleop1 = new Pose(84.11214953271028,37.009345794392516);
+    public Pose Intake3 = new Pose(11.214953271028037,25.258064516129032);
+
+    public Pose Teleop1 = new Pose(59.88785046728972,35.88785046728974);
 
 
 
@@ -249,7 +238,7 @@ public class redDefault extends NextFTCOpMode {
         return new SequentialGroup(
 
                 spinFlyWheel1500,
-                new FollowPath(paths.PreLoadLaunch,true,0.8),
+                new FollowPath(paths.PreLoadLaunch,true,0.9),
                 opentransfer,
                 transferOn,
                 new Delay(2.0),
@@ -271,7 +260,7 @@ public class redDefault extends NextFTCOpMode {
                 spinFlyWheel1500,
                 new Delay(1.5),
                 // Sorting logic all here with the order, etc
-                new FollowPath(paths.Launch1Real,true,0.8),
+                new FollowPath(paths.Launch1Real,true,0.9),
                 opentransfer,
                 transferOn,
 
@@ -292,7 +281,7 @@ public class redDefault extends NextFTCOpMode {
                 // Sorting logic and order here
 
 
-                new FollowPath(paths.Launch2,true,0.8),
+                new FollowPath(paths.Launch2,true,0.9),
                 opentransfer,
                 transferOn,
 
@@ -309,7 +298,7 @@ public class redDefault extends NextFTCOpMode {
                 spinFlyWheel1500,
 
                 // Sorting logic here
-                new FollowPath(paths.Launch3,false,0.8),
+                new FollowPath(paths.Launch3,false,0.9),
                 // Transfer and shoot logic
                 opentransfer,
                 transferOn,
@@ -389,7 +378,7 @@ public class redDefault extends NextFTCOpMode {
                             start,
                             PreLoadLaunch1
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(51), Math.toRadians(56))
+                    .setLinearHeadingInterpolation(Math.toRadians(125), Math.toRadians(130))
                     //.setVelocityConstraint(50)
                     .build();
             Intake1set = follower.pathBuilder()
@@ -399,7 +388,7 @@ public class redDefault extends NextFTCOpMode {
                             Intake1
 
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(56), Math.toRadians(0))
+                    .setLinearHeadingInterpolation(Math.toRadians(160), Math.toRadians(180))
 
                     .build();
             ClassifierRamp1 = follower.pathBuilder()
@@ -410,7 +399,7 @@ public class redDefault extends NextFTCOpMode {
 
 
                     ))
-                    .setConstantHeadingInterpolation(Math.toRadians(0))
+                    .setConstantHeadingInterpolation(Math.toRadians(180))
 
                     .build();
             Launch1Real = follower.pathBuilder()
@@ -418,7 +407,7 @@ public class redDefault extends NextFTCOpMode {
                             ClassifierRamp,
                             Launch1
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(59))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(130))
 
                     .build();
             Intake2ndSet = follower.pathBuilder()
@@ -428,7 +417,7 @@ public class redDefault extends NextFTCOpMode {
                             Intake2
 
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(50), Math.toRadians(0))
+                    .setLinearHeadingInterpolation(Math.toRadians(160), Math.toRadians(180))
 
                     .build();
             Launch2 = follower.pathBuilder()
@@ -436,18 +425,17 @@ public class redDefault extends NextFTCOpMode {
                             Intake2,
                             Launch1
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(59))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(130))
 
                     .build();
             Intake3rdSet = follower.pathBuilder()
                     .addPath(new BezierCurve(
                             Launch1,
                             ControlPoint3,
-                            ControlPoint4,
                             Intake3
 
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(60), Math.toRadians(0))
+                    .setLinearHeadingInterpolation(Math.toRadians(160), Math.toRadians(180))
 
                     .build();
             Launch3 = follower.pathBuilder()
@@ -455,7 +443,7 @@ public class redDefault extends NextFTCOpMode {
                             Intake3,
                             Launch1
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(59))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(130))
 
                     .build();
             teleOp = follower.pathBuilder()

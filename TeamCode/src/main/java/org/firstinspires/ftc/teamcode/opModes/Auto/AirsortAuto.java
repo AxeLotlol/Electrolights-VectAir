@@ -57,32 +57,8 @@ public class AirsortAuto extends NextFTCOpMode {
 
 
 
-
-
-
-
-
-
-
-
-
-
-    private MotorEx intakeMotor;
-
     private ServoEx transferServo1;
     private ServoEx transferServo2;
-
-    // private MotorEx spindexerMotor;
-
-    private boolean path2Following= false;
-    int ball1Color = 0;
-    int ball2Color = 0;
-    int ball3Color = 0;
-    int tagId = 0;
-    public static MotorEx spindex = new MotorEx("spindexer");
-
-    public static MotorEx transfer = new MotorEx("transfer");
-
     public static MotorEx flywheel = new MotorEx("launchingmotor");
 
 
@@ -93,21 +69,12 @@ public class AirsortAuto extends NextFTCOpMode {
 
 
     public void onInit() {
-        telemetry.addLine("Initializing Follower...");
         transferServo1 = new ServoEx("transferServo1");
         transferServo2 = new ServoEx("transferServo2");
-
-        telemetry.update();
-
-
-        intakeMotor = new MotorEx("intake");
-
-
-
-
         telemetry.addLine("Follower + IMU + Odo Pods initialized successfully!");
         telemetry.addLine("Initialization complete!");
         telemetry.update();
+
     }
 
     public void onUpdate(){
@@ -127,22 +94,23 @@ public class AirsortAuto extends NextFTCOpMode {
     }
 
 
-    public SequentialGroup onStart= new SequentialGroup(
-            new Delay(1.0),
-            new SetPositions(transferServo1.to(0.5), transferServo2.to(0.5)),
-            new Delay(0.2),
-            TempHood.INSTANCE.HoodUp,
-            new Delay(0.1),
-            TempHood.INSTANCE.HoodDown
-    );
+
 
     public void onStartButtonPressed() {
         float newtps=findTPS(2);
         shooter(newtps);
+        SequentialGroup onStart= new SequentialGroup(
+                new Delay(1.5),
+                new SetPositions(transferServo1.to(-0.25)),
+                new Delay(0.54),
+                TempHood.INSTANCE.HoodDown,
+                new Delay(1.0),
+                TempHood.INSTANCE.HoodUp,
+                new Delay(1.0),
+                new SetPositions(transferServo1.to(1))
+        );
         //int tag=MotifScanning.INSTANCE.findMotif();
         onStart.schedule();
-
-
     }
 
 

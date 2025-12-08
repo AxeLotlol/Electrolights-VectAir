@@ -13,7 +13,7 @@ import dev.nextftc.ftc.components.BulkReadComponent;
 import dev.nextftc.hardware.impl.MotorEx;
 
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOpBlue")
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOpRed")
 public class TeleOpRed extends NextFTCOpMode {
 
     public MotorEx intakeMotor;

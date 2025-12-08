@@ -65,7 +65,7 @@ public class DriveTrain implements Subsystem {
 
     private double visionYawCommand(double txDeg) {
         if (Math.abs(txDeg) < YAW_DEADBAND_DEG) return 0.0;
-        return 0.5*clip(YAW_KP * txDeg, -YAW_MAX, YAW_MAX);
+        return alliance*0.5*clip(YAW_KP * txDeg, -YAW_MAX, YAW_MAX);
     }
 
     private void autolocktrue(){
@@ -99,9 +99,9 @@ public class DriveTrain implements Subsystem {
     public Supplier<Double> yVCtx;
 
 
-    private Servo servoPos;
 
-    public boolean yep=false;
+
+
 
 
 
@@ -112,7 +112,7 @@ public class DriveTrain implements Subsystem {
         if(isBlue()==true) {
             alliance=1;
         }
-        else if(isRed()==true){
+        if(isRed()==true){
             alliance=-1;
         }
         else if(isBlue()!=true && isRed()!=true) {
@@ -181,7 +181,6 @@ public class DriveTrain implements Subsystem {
     @Override
     public void initialize() {
         imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
-        servoPos = ActiveOpMode.hardwareMap().get(Servo.class, "servoPos");
         limelight = ActiveOpMode.hardwareMap().get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(APRILTAG_PIPELINE);
         limelight.start();
@@ -223,7 +222,7 @@ public class DriveTrain implements Subsystem {
             if(isBlue()==true) {
                 limelight.pipelineSwitch(8);
             }
-            else if(isRed()==true){
+            if(isRed()==true){
                 limelight.pipelineSwitch(7);
             }
             else if(isBlue()!=true && isRed()!=true) {

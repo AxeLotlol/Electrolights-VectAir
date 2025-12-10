@@ -176,12 +176,13 @@ public class redDefault extends NextFTCOpMode {
         intakeMotor = new MotorEx("intake");
         transfer1 = new MotorEx("transfer");
         transfer2 = new ServoEx("transferServo1");
+
         transfer3 = new ServoEx("transferServo2");
         hoodservo1 = new ServoEx("hoodServo1");
         hoodservo2 = new ServoEx("hoodServo2");
 
         spinFlyWheel1500 = new LambdaCommand()
-                .setStart(() -> Flywheel.shooter(1500));
+                .setStart(() -> Flywheel.shooter(1000));
         intakeMotorOn = new LambdaCommand()
                 .setStart(() -> intakeMotor.setPower(-1));
 
@@ -215,16 +216,16 @@ public class redDefault extends NextFTCOpMode {
 
     Command opentransfer = new LambdaCommand()
             .setStart(()-> {
-                transfer2.setPosition(0.7);
-                transfer3.setPosition(0.7);
+                //`5transfer2.setPosition(-0.25);
+                transfer2.setPosition(0.25);
             });
     Command closeTransfer = new LambdaCommand()
             .setStart(() -> {
-                transfer2.setPosition(0);
-                transfer3.setPosition(0);
+                //transfer2.setPosition(1);
+                transfer2.setPosition(1);
             });
     Command transferOn = new LambdaCommand()
-            .setStart(()-> transfer1.setPower(0.5));
+            .setStart(()-> transfer1.setPower(1));
     Command transferOff = new LambdaCommand()
             .setStart(() -> transfer1.setPower(0));
     /*Command shootByTag1 = new LambdaCommand()

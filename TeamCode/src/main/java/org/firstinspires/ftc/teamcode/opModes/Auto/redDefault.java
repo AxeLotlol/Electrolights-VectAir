@@ -2,6 +2,9 @@
 
 package org.firstinspires.ftc.teamcode.opModes.Auto;
 
+import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
+import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
+
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
@@ -119,7 +122,7 @@ public class redDefault extends NextFTCOpMode {
 
 
     Command  flywheelYes= new LambdaCommand()
-            .setStart(() -> Flywheel.shooter(1500));
+            .setStart(() -> shooter(1500));
 
 
 
@@ -182,7 +185,7 @@ public class redDefault extends NextFTCOpMode {
         hoodservo2 = new ServoEx("hoodServo2");
 
         spinFlyWheel1500 = new LambdaCommand()
-                .setStart(() -> Flywheel.shooter(1000));
+                .setStart(() -> shooter(1000));
         intakeMotorOn = new LambdaCommand()
                 .setStart(() -> intakeMotor.setPower(-1));
 
@@ -199,11 +202,10 @@ public class redDefault extends NextFTCOpMode {
     }
 
 
-    public MotorEx flywheel = new MotorEx("launchingmotor").reversed();
 
 
     Command stopFlywheel = new LambdaCommand()
-            .setStart(() -> Flywheel.shooter(0));
+            .setStart(() -> shooter(0));
 
     Command intakeMotorOff = new LambdaCommand()
             .setStart(() -> intakeMotor.setPower(0));
@@ -225,7 +227,7 @@ public class redDefault extends NextFTCOpMode {
                 transfer2.setPosition(1);
             });
     Command transferOn = new LambdaCommand()
-            .setStart(()-> transfer1.setPower(1));
+            .setStart(()-> transfer1.setPower(-0.8));
     Command transferOff = new LambdaCommand()
             .setStart(() -> transfer1.setPower(0));
     /*Command shootByTag1 = new LambdaCommand()
@@ -250,16 +252,15 @@ public class redDefault extends NextFTCOpMode {
         return new SequentialGroup(
 
                 spinFlyWheel1500,
+                intakeMotorOn,
                 new FollowPath(paths.PreLoadLaunch,true,0.8),
                 opentransfer,
                 transferOn,
                 new Delay(2.0),
-                stopFlywheel,
-                transferOff,
+                //transferOff,
                 //new TurnTo(Angle.fromDeg(90)),
                 //getMotif,
 
-                new Delay(1.0),
                 closeTransfer,
 
                 intakeMotorOn,
@@ -268,8 +269,6 @@ public class redDefault extends NextFTCOpMode {
 
                 new FollowPath(paths.ClassifierRamp1,true,0.7),
                 transferOff,
-                intakeMotorOff,
-                spinFlyWheel1500,
                 new Delay(1.5),
                 // Sorting logic all here with the order, etc
                 new FollowPath(paths.Launch1Real,true,0.8),
@@ -281,7 +280,6 @@ public class redDefault extends NextFTCOpMode {
                 new Delay(2.0),
                 closeTransfer,
                 transferOff,
-                stopFlywheel,
 
                 intakeMotorOn,
                 transferOn,
@@ -289,7 +287,6 @@ public class redDefault extends NextFTCOpMode {
 
                 intakeMotorOff,
                 transferOff,
-                spinFlyWheel1500,
                 // Sorting logic and order here
 
 
@@ -303,11 +300,9 @@ public class redDefault extends NextFTCOpMode {
 
 
                 intakeMotorOn,
-                stopFlywheel,
                 new FollowPath(paths.Intake3rdSet,false,0.8),
                 intakeMotorOff,
                 transferOff,
-                spinFlyWheel1500,
 
                 // Sorting logic here
                 new FollowPath(paths.Launch3,false,0.8),
@@ -346,6 +341,12 @@ public class redDefault extends NextFTCOpMode {
 
 
 
+    }
+
+    @Override
+    public void onUpdate(){
+
+        shooter(1150);
     }
 
 
@@ -390,7 +391,7 @@ public class redDefault extends NextFTCOpMode {
                             start,
                             PreLoadLaunch1
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(51), Math.toRadians(56))
+                    .setLinearHeadingInterpolation(Math.toRadians(51), Math.toRadians(33))
                     //.setVelocityConstraint(50)
                     .build();
             Intake1set = follower.pathBuilder()

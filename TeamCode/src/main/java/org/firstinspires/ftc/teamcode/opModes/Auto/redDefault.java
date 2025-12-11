@@ -34,11 +34,14 @@ import dev.nextftc.hardware.powerable.SetPower;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
+import org.firstinspires.ftc.teamcode.subsystems.DistanceBlue;
+import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
 
 
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 import org.firstinspires.ftc.teamcode.subsystems.MotifScanning;
 import org.jetbrains.annotations.Async;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -50,7 +53,7 @@ import com.bylazar.configurables.annotations.Configurable;
 public class redDefault extends NextFTCOpMode {
     public redDefault(){
         addComponents(
-                new SubsystemComponent(Flywheel.INSTANCE),
+                new SubsystemComponent(Flywheel.INSTANCE,DistanceRed.INSTANCE),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE,
                 new PedroComponent(hwMap -> Constants.createFollower(hwMap))
@@ -78,7 +81,7 @@ public class redDefault extends NextFTCOpMode {
 
     public Pose ClassifierRamp = new Pose(131.74766355140187,75.14018691588785);
 
-    public Pose Launch1 = new Pose(86.2258064516129, 85.64516129032258);
+    public Pose Launch1 = new Pose(86.2258064516129, 97.83870967741936);
 
     public Pose ControlPoint2 = new Pose(71.99999999999999,53.60747663551402);
 
@@ -158,6 +161,8 @@ public class redDefault extends NextFTCOpMode {
     }
 
     private MotorEx transfer1;
+
+    public static float newtps = 1200;
     private ServoEx transfer2;
     private ServoEx transfer3;
     private ServoEx hoodservo1;
@@ -173,6 +178,9 @@ public class redDefault extends NextFTCOpMode {
 
         telemetry.update();
         follower = PedroComponent.follower();
+        Limelight3A limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight.start();
+
 
 
         paths = new Paths(follower);
@@ -216,6 +224,9 @@ public class redDefault extends NextFTCOpMode {
     Command getMotif = new LambdaCommand()
             .setStart(() -> tagId = MotifScanning.INSTANCE.findMotif());
 
+    Command distance = new LambdaCommand()
+            .setStart(()-> newtps=findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
+
     Command opentransfer = new LambdaCommand()
             .setStart(()-> {
                 //`5transfer2.setPosition(-0.25);
@@ -227,7 +238,7 @@ public class redDefault extends NextFTCOpMode {
                 transfer2.setPosition(1);
             });
     Command transferOn = new LambdaCommand()
-            .setStart(()-> transfer1.setPower(-0.8));
+            .setStart(()-> transfer1.setPower(-0.9));
     Command transferOff = new LambdaCommand()
             .setStart(() -> transfer1.setPower(0));
     /*Command shootByTag1 = new LambdaCommand()
@@ -254,6 +265,7 @@ public class redDefault extends NextFTCOpMode {
                 spinFlyWheel1500,
                 intakeMotorOn,
                 new FollowPath(paths.PreLoadLaunch,true,0.8),
+                distance,
                 opentransfer,
                 transferOn,
                 new Delay(2.0),
@@ -261,10 +273,11 @@ public class redDefault extends NextFTCOpMode {
                 //new TurnTo(Angle.fromDeg(90)),
                 //getMotif,
 
-                closeTransfer,
+
 
                 intakeMotorOn,
                 transferOn,
+                closeTransfer,
                 new FollowPath(paths.Intake1set,false,0.8),
 
                 new FollowPath(paths.ClassifierRamp1,true,0.7),
@@ -346,7 +359,9 @@ public class redDefault extends NextFTCOpMode {
     @Override
     public void onUpdate(){
 
-        shooter(1150);
+        shooter(newtps);
+        telemetry.addLine(String.valueOf(newtps));
+        telemetry.update();
     }
 
 
@@ -420,7 +435,7 @@ public class redDefault extends NextFTCOpMode {
                             ClassifierRamp,
                             Launch1
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(59))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(33))
 
                     .build();
             Intake2ndSet = follower.pathBuilder()
@@ -438,7 +453,7 @@ public class redDefault extends NextFTCOpMode {
                             Intake2,
                             Launch1
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(59))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(33))
 
                     .build();
             Intake3rdSet = follower.pathBuilder()
@@ -457,7 +472,7 @@ public class redDefault extends NextFTCOpMode {
                             Intake3,
                             Launch1
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(59))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(33))
 
                     .build();
             teleOp = follower.pathBuilder()

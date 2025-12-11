@@ -2,6 +2,7 @@
 
 package org.firstinspires.ftc.teamcode.opModes.Auto;
 
+
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 
@@ -26,8 +27,11 @@ import dev.nextftc.core.units.Angle;
 import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.extensions.pedro.TurnTo;
+import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
+import dev.nextftc.hardware.impl.Direction;
+import dev.nextftc.hardware.impl.IMUEx;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
 import dev.nextftc.hardware.powerable.SetPower;
@@ -98,7 +102,7 @@ public class redDefault extends NextFTCOpMode {
 
 
 
-
+    private static final int APRILTAG_PIPELINE = 8;
 
 
 
@@ -162,7 +166,7 @@ public class redDefault extends NextFTCOpMode {
 
     private MotorEx transfer1;
 
-    public static float newtps = 1200;
+    private int newtps;
     private ServoEx transfer2;
     private ServoEx transfer3;
     private ServoEx hoodservo1;
@@ -179,7 +183,13 @@ public class redDefault extends NextFTCOpMode {
         telemetry.update();
         follower = PedroComponent.follower();
         Limelight3A limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight.pipelineSwitch(APRILTAG_PIPELINE);
         limelight.start();
+
+
+        IMUEx imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
+
+
 
 
 
@@ -225,7 +235,7 @@ public class redDefault extends NextFTCOpMode {
             .setStart(() -> tagId = MotifScanning.INSTANCE.findMotif());
 
     Command distance = new LambdaCommand()
-            .setStart(()-> newtps=findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
+            .setStart(()-> findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
 
     Command opentransfer = new LambdaCommand()
             .setStart(()-> {
@@ -265,7 +275,6 @@ public class redDefault extends NextFTCOpMode {
                 spinFlyWheel1500,
                 intakeMotorOn,
                 new FollowPath(paths.PreLoadLaunch,true,0.8),
-                distance,
                 opentransfer,
                 transferOn,
                 new Delay(2.0),
@@ -359,9 +368,7 @@ public class redDefault extends NextFTCOpMode {
     @Override
     public void onUpdate(){
 
-        shooter(newtps);
-        telemetry.addLine(String.valueOf(newtps));
-        telemetry.update();
+        shooter(1150);
     }
 
 

@@ -16,6 +16,8 @@ import dev.nextftc.hardware.impl.MotorEx;
 public class TeleOpBlue extends NextFTCOpMode {
 
     public MotorEx intakeMotor;
+
+    public MotorEx transfer;
     public TeleOpBlue() {
         addComponents(
                 new SubsystemComponent(DriveTrain.INSTANCE/*, Intake.INSTANCE, Spindexer.INSTANCE*/),
@@ -54,8 +56,11 @@ public class TeleOpBlue extends NextFTCOpMode {
         limelight.pipelineSwitch(APRILTAG_PIPELINE);
         limelight.start();
         intakeMotor = new MotorEx("intake").reversed();
-        Gamepads.gamepad1().rightBumper().whenBecomesTrue(() -> intakeMotor.setPower(1))
-                .whenFalse(() -> intakeMotor.setPower(0));
+        transfer = new MotorEx("transfer").reversed();
+        Gamepads.gamepad1().leftTrigger().greaterThan(0.3).whenBecomesTrue(()-> intakeMotor.setPower(1))
+                .whenBecomesFalse(() -> intakeMotor.setPower(0));
+        Gamepads.gamepad1().leftBumper().whenBecomesTrue(()-> transfer.setPower(1))
+                .whenBecomesFalse(() -> transfer.setPower(0));
 
     }
 

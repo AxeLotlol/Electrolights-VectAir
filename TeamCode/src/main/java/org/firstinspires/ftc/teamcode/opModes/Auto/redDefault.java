@@ -275,33 +275,38 @@ public class redDefault extends NextFTCOpMode {
                 spinFlyWheel1500,
                 intakeMotorOn,
                 new FollowPath(paths.PreLoadLaunch,true,0.8),
+                new Delay(0.6),
                 opentransfer,
                 transferOn,
-                new Delay(2.0),
-                //transferOff,
+                new Delay(1.5),
+                transferOff,
                 //new TurnTo(Angle.fromDeg(90)),
                 //getMotif,
 
 
 
                 intakeMotorOn,
-                transferOn,
                 closeTransfer,
+                new Delay(0.2),
+                transferOn,
                 new FollowPath(paths.Intake1set,false,0.8),
+                transferOff,
 
                 new FollowPath(paths.ClassifierRamp1,true,0.7),
-                transferOff,
-                new Delay(1.5),
+                //transferOff,
+                new Delay(1),
                 // Sorting logic all here with the order, etc
                 new FollowPath(paths.Launch1Real,true,0.8),
+
                 opentransfer,
                 transferOn,
 
 
                 // Transfer logic with transfer
-                new Delay(2.0),
+                new Delay(1.5),
                 closeTransfer,
                 transferOff,
+                new Delay(0.2),
 
                 intakeMotorOn,
                 transferOn,
@@ -319,9 +324,12 @@ public class redDefault extends NextFTCOpMode {
                 // Transfer logic with transfer
                 new Delay(1.0),
                 closeTransfer,
+                transferOff,
+                new Delay(0.2),
 
 
                 intakeMotorOn,
+                transferOn,
                 new FollowPath(paths.Intake3rdSet,false,0.8),
                 intakeMotorOff,
                 transferOff,
@@ -334,6 +342,7 @@ public class redDefault extends NextFTCOpMode {
 
                 new Delay(2.0),
                 closeTransfer,
+                new Delay(0.2),
                 transferOff,
                 stopFlywheel,
                 new FollowPath(paths.teleOp,true,0.9)

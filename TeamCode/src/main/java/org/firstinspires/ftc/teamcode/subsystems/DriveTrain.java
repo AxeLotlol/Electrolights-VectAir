@@ -18,6 +18,8 @@ import dev.nextftc.control.ControlSystem;
 import dev.nextftc.control.KineticState;
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
+import dev.nextftc.core.commands.groups.SequentialGroup;
+import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.ftc.Gamepads;
@@ -188,13 +190,37 @@ public class DriveTrain implements Subsystem {
 
 
     }
+    private MotorEx intakeMotor;
+    private MotorEx transfer1;
+    private ServoEx transfer2;
+    private ServoEx transfer3;
+    Command opentransfer = new LambdaCommand()
+            .setStart(()-> {
+                //`5transfer2.setPosition(-0.25);
+                transfer2.setPosition(0.25);
+            });
+    Command closeTransfer = new LambdaCommand()
+            .setStart(() -> {
+                //transfer2.setPosition(1);
+                transfer2.setPosition(1);
+            });
+    Command transferOn = new LambdaCommand()
+            .setStart(()-> transfer1.setPower(-0.9));
+    Command transferOff = new LambdaCommand()
+            .setStart(() -> transfer1.setPower(0));
 
     @Override
     public void periodic() {
         if (firsttime==true){
+            intakeMotor = new MotorEx("intake");
+            transfer1 = new MotorEx("transfer");
+            transfer2 = new ServoEx("transferServo1");
+
+            transfer3 = new ServoEx("transferServo2");
             float tps = findTPS((float) 0.86);
             shooter(tps);
             firsttime=false;
+            SequentialGroup shoot = new SequentialGroup(opentransfer, transferOn, new Delay(1.5), transferOff, closeTransfer);
         }
 
         LLResult result = limelight.getLatestResult();

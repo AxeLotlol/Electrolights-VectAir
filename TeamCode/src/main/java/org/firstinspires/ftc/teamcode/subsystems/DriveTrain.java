@@ -209,6 +209,8 @@ public class DriveTrain implements Subsystem {
     Command transferOff = new LambdaCommand()
             .setStart(() -> transfer1.setPower(0));
 
+    public static SequentialGroup shoot = new SequentialGroup(opentransfer, transferOn, new Delay(1.5), transferOff, closeTransfer);
+
     @Override
     public void periodic() {
         if (firsttime==true){
@@ -220,7 +222,8 @@ public class DriveTrain implements Subsystem {
             float tps = findTPS((float) 0.86);
             shooter(tps);
             firsttime=false;
-            SequentialGroup shoot = new SequentialGroup(opentransfer, transferOn, new Delay(1.5), transferOff, closeTransfer);
+
+
         }
 
         LLResult result = limelight.getLatestResult();

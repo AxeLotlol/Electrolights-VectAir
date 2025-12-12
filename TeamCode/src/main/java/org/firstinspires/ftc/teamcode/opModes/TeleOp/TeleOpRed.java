@@ -17,6 +17,7 @@ import dev.nextftc.hardware.impl.MotorEx;
 public class TeleOpRed extends NextFTCOpMode {
 
     public MotorEx intakeMotor;
+    public MotorEx transfer;
     public TeleOpRed() {
         addComponents(
                 new SubsystemComponent(DriveTrain.INSTANCE/*, Intake.INSTANCE, Spindexer.INSTANCE*/),
@@ -55,8 +56,12 @@ public class TeleOpRed extends NextFTCOpMode {
         limelight.pipelineSwitch(APRILTAG_PIPELINE);
         limelight.start();
         intakeMotor = new MotorEx("intake").reversed();
-        Gamepads.gamepad1().rightBumper().whenBecomesTrue(() -> intakeMotor.setPower(1))
-                .whenFalse(() -> intakeMotor.setPower(0));
+        transfer = new MotorEx("transfer").reversed();
+        Gamepads.gamepad1().leftTrigger().greaterThan(0.3).whenBecomesTrue(()-> intakeMotor.setPower(1))
+                .whenBecomesFalse(() -> intakeMotor.setPower(0));
+        Gamepads.gamepad1().leftBumper().whenBecomesTrue(()-> transfer.setPower(1))
+                .whenBecomesFalse(() -> transfer.setPower(0));
+
 
     }
 
@@ -83,10 +88,8 @@ public class TeleOpRed extends NextFTCOpMode {
 
     @Override
     public void onStartButtonPressed() {
+        Gamepads.gamepad1().rightTrigger().greaterThan(0.2).whenBecomesTrue(() -> DriveTrain.shoot.schedule());
         //Gamepads.gamepad1().rightTrigger().greaterThan(0.2).whenBecomesTrue(() -> DriveTrain.shootingtrue())
         //.whenBecomesFalse(() -> DriveTrain.shootingfalse());
-        Gamepads.gamepad1().rightBumper().whenBecomesTrue(() -> intakeMotor.setPower(1))
-                .whenFalse(() -> intakeMotor.setPower(0));
-        Gamepads.gamepad2().triangle().whenBecomesTrue(() -> findMotif = true);
     }
 }

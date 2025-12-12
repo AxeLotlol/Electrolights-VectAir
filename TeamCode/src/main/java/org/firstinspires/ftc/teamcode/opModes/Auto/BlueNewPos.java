@@ -54,32 +54,29 @@ public class BlueNewPos extends NextFTCOpMode {
     private Paths paths;
     public Pose start = new Pose(55.401869158878505,8.52336448598131,Math.toRadians(90));
 
-    public Pose PreLoadLaunch1 = new Pose(57.6,101.27472527472527);
+    public Pose PreLoadLaunch1 = new Pose(86.2258064516129,97.83870967741936);
 
+    public Pose ControlPoint1 = new Pose(61.00934579439252,82.76635514018692 );
 
-    public Pose ControlPoint1 = new Pose(55.626168224299064,79.97196261682242 );
+    public Pose Intake1 = new Pose(127.4018691588785,83.66355140186916);
 
-    public Pose Intake1 = new Pose(15.25233644859813,79.66355140186916);
+    public Pose ClassifierRampPoint = new Pose(63.58064516129032,74.32258064516128);
 
-    public Pose ClassifierRampPoint = new Pose(69.38709677419355,75.67741935483872);
+    public Pose ClassifierRamp = new Pose(131.74766355140187,75.14018691588785);
 
-    public Pose ClassifierRamp = new Pose(14.579439252336448,75.89719626168224);
+    public Pose Launch1 = new Pose(86.2258064516129, 97.83870967741936);
 
-    public Pose Launch1 = new Pose(62.12903225806452, 96.67741935483872);
+    public Pose ControlPoint2 = new Pose(71.99999999999999,53.60747663551402);
 
-    public Pose ControlPoint2 = new Pose(63.87096774193548,53.70967741935483);
+    public Pose Intake2 = new Pose(124.19626168224298,53.43925233644861);
 
-    public Pose Intake2 = new Pose(12.11214953271028,58.11214953271029);
+    public Pose ControlPoint3 = new Pose(75.3644859813084,23.77570093457944);
 
-    public Pose ControlPoint3 = new Pose(72.87096774193549,28.258064516129032);
+    public Pose ControlPoint4 = new Pose(74.46728971962617,35.439252336448604);
 
+    public Pose Intake3 = new Pose(131.2258064516129,35.12903225806451);
 
-
-
-    public Pose Intake3 = new Pose(11.214953271028037,29.258064516129032);
-
-    public Pose Teleop1 = new Pose(59.88785046728972,35.88785046728974);
-
+    public Pose Teleop1 = new Pose(84.11214953271028,37.009345794392516);
 
 
 

@@ -2,6 +2,8 @@
 
 package org.firstinspires.ftc.teamcode.opModes.Auto;
 
+import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
+
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
@@ -56,19 +58,19 @@ public class redNewPos extends NextFTCOpMode {
 
     public Pose PreLoadLaunch1 = new Pose(86.2258064516129,97.83870967741936);
 
-    public Pose ControlPoint1 = new Pose(61.00934579439252,81.76635514018692 );
+    public Pose ControlPoint1 = new Pose(61.00934579439252,82.76635514018692 );
 
-    public Pose Intake1 = new Pose(127.4018691588785,80.66355140186916);
+    public Pose Intake1 = new Pose(127.4018691588785,83.66355140186916);
 
     public Pose ClassifierRampPoint = new Pose(63.58064516129032,74.32258064516128);
 
-    public Pose ClassifierRamp = new Pose(131.74766355140187,72.14018691588785);
+    public Pose ClassifierRamp = new Pose(131.74766355140187,75.14018691588785);
 
-    public Pose Launch1 = new Pose(86.2258064516129, 85.64516129032258);
+    public Pose Launch1 = new Pose(86.2258064516129, 97.83870967741936);
 
     public Pose ControlPoint2 = new Pose(71.99999999999999,53.60747663551402);
 
-    public Pose Intake2 = new Pose(129.19626168224298,54.43925233644861);
+    public Pose Intake2 = new Pose(124.19626168224298,53.43925233644861);
 
     public Pose ControlPoint3 = new Pose(75.3644859813084,23.77570093457944);
 
@@ -77,8 +79,6 @@ public class redNewPos extends NextFTCOpMode {
     public Pose Intake3 = new Pose(131.2258064516129,35.12903225806451);
 
     public Pose Teleop1 = new Pose(84.11214953271028,37.009345794392516);
-
-
 
 
 
@@ -238,46 +238,46 @@ public class redNewPos extends NextFTCOpMode {
         return new SequentialGroup(
 
                 spinFlyWheel1500,
-                new FollowPath(paths.PreLoadLaunch,true,0.9),
+                intakeMotorOn,
+                new FollowPath(paths.PreLoadLaunch,true,0.8),
+                new Delay(0.6),
                 opentransfer,
                 transferOn,
-                new Delay(2.0),
-                stopFlywheel,
+                new Delay(1.5),
                 transferOff,
                 //new TurnTo(Angle.fromDeg(90)),
                 //getMotif,
 
-                new Delay(1.0),
-                closeTransfer,
+
 
                 intakeMotorOn,
+                closeTransfer,
+                new Delay(0.4),
                 transferOn,
-                new FollowPath(paths.Intake1set,false,0.7),
+                new FollowPath(paths.Intake1set,false,0.8),
+                transferOff,
 
                 new FollowPath(paths.ClassifierRamp1,true,0.7),
-                transferOff,
-                intakeMotorOff,
-                spinFlyWheel1500,
-                new Delay(1.0),
+                //transferOff,
+                new Delay(0.75),
                 // Sorting logic all here with the order, etc
                 new FollowPath(paths.Launch1Real,true,0.8),
+
                 opentransfer,
                 transferOn,
 
 
                 // Transfer logic with transfer
-                new Delay(2.0),
+                new Delay(1.5),
                 closeTransfer,
                 transferOff,
-                stopFlywheel,
-
+                new Delay(0.4),
                 intakeMotorOn,
                 transferOn,
                 new FollowPath(paths.Intake2ndSet,false,0.8),
 
                 intakeMotorOff,
                 transferOff,
-                spinFlyWheel1500,
                 // Sorting logic and order here
 
 
@@ -288,14 +288,15 @@ public class redNewPos extends NextFTCOpMode {
                 // Transfer logic with transfer
                 new Delay(1.0),
                 closeTransfer,
+                transferOff,
+                new Delay(0.4),
 
 
                 intakeMotorOn,
-                stopFlywheel,
+                transferOn,
                 new FollowPath(paths.Intake3rdSet,false,0.8),
                 intakeMotorOff,
                 transferOff,
-                spinFlyWheel1500,
 
                 // Sorting logic here
                 new FollowPath(paths.Launch3,false,0.8),
@@ -305,6 +306,7 @@ public class redNewPos extends NextFTCOpMode {
 
                 new Delay(2.0),
                 closeTransfer,
+                new Delay(0.4),
                 transferOff,
                 stopFlywheel,
                 new FollowPath(paths.teleOp,true,0.9)
@@ -335,7 +337,13 @@ public class redNewPos extends NextFTCOpMode {
 
 
     }
+    @Override
+    public void onUpdate(){
 
+        shooter(1170);
+
+
+    }
 
 
 

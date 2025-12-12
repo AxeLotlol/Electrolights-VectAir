@@ -88,7 +88,7 @@ public class TeleOpRed extends NextFTCOpMode {
 
     @Override
     public void onStartButtonPressed() {
-        Gamepads.gamepad1().rightTrigger().greaterThan(0.2).whenBecomesTrue(() -> DriveTrain.shoot.schedule());
+        //Gamepads.gamepad1().rightTrigger().greaterThan(0.2).whenBecomesTrue(() -> DriveTrain.shoot.schedule());
         //Gamepads.gamepad1().rightTrigger().greaterThan(0.2).whenBecomesTrue(() -> DriveTrain.shootingtrue())
         //.whenBecomesFalse(() -> DriveTrain.shootingfalse());
     }

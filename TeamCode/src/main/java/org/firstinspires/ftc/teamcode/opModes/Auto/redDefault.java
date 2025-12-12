@@ -87,15 +87,15 @@ public class redDefault extends NextFTCOpMode {
 
     public Pose Launch1 = new Pose(86.2258064516129, 97.83870967741936);
 
-    public Pose ControlPoint2 = new Pose(71.99999999999999,53.60747663551402);
+    public Pose ControlPoint2 = new Pose(71.99999999999999,49.60747663551402);
 
-    public Pose Intake2 = new Pose(124.19626168224298,53.43925233644861);
+    public Pose Intake2 = new Pose(124.19626168224298,49.43925233644861);
 
     public Pose ControlPoint3 = new Pose(75.3644859813084,23.77570093457944);
 
     public Pose ControlPoint4 = new Pose(74.46728971962617,35.439252336448604);
 
-    public Pose Intake3 = new Pose(131.2258064516129,35.12903225806451);
+    public Pose Intake3 = new Pose(128.2258064516129,35.12903225806451);
 
     public Pose Teleop1 = new Pose(84.11214953271028,37.009345794392516);
 
@@ -320,7 +320,7 @@ public class redDefault extends NextFTCOpMode {
                 transferOn,
 
                 // Transfer logic with transfer
-                new Delay(1.0),
+                new Delay(1.5),
                 closeTransfer,
                 transferOff,
                 new Delay(0.4),
@@ -338,7 +338,7 @@ public class redDefault extends NextFTCOpMode {
                 opentransfer,
                 transferOn,
 
-                new Delay(2.0),
+                new Delay(1.5),
                 closeTransfer,
                 new Delay(0.4),
                 transferOff,
@@ -375,7 +375,7 @@ public class redDefault extends NextFTCOpMode {
     @Override
     public void onUpdate(){
 
-        shooter(1170);
+        shooter(1115);
 
 
     }
@@ -469,7 +469,7 @@ public class redDefault extends NextFTCOpMode {
                             Intake2,
                             Launch1
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(33))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(37))
 
                     .build();
             Intake3rdSet = follower.pathBuilder()
@@ -488,7 +488,7 @@ public class redDefault extends NextFTCOpMode {
                             Intake3,
                             Launch1
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(33))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(37))
 
                     .build();
             teleOp = follower.pathBuilder()

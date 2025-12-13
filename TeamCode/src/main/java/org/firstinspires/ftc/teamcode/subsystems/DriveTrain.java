@@ -215,7 +215,7 @@ public class DriveTrain implements Subsystem {
     static Command transferOff = new LambdaCommand()
             .setStart(() -> transfer1.setPower(0));
 
-    //public static SequentialGroup shoot = new SequentialGroup(opentransfer, transferOn, new Delay(1.5), transferOff, closeTransfer);
+    public static SequentialGroup shoot = new SequentialGroup(opentransfer, transferOn, new Delay(1.5), transferOff, closeTransfer);
 
     public static boolean pipeset=false;
     @Override

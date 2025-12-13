@@ -30,6 +30,7 @@ import dev.nextftc.extensions.pedro.TurnTo;
 import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
+import dev.nextftc.hardware.impl.CRServoEx;
 import dev.nextftc.hardware.impl.Direction;
 import dev.nextftc.hardware.impl.IMUEx;
 import dev.nextftc.hardware.impl.MotorEx;
@@ -50,6 +51,7 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.bylazar.configurables.annotations.Configurable;
+import com.qualcomm.robotcore.hardware.CRServo;
 
 
 @Autonomous(name = "Red Auto Default Position", group = "Autonomous")
@@ -79,11 +81,11 @@ public class redDefault extends NextFTCOpMode {
 
     public Pose ControlPoint1 = new Pose(61.00934579439252,82.76635514018692 );
 
-    public Pose Intake1 = new Pose(127.4018691588785,83.66355140186916);
+    public Pose Intake1 = new Pose(129.4018691588785,83.66355140186916);
 
     public Pose ClassifierRampPoint = new Pose(63.58064516129032,74.32258064516128);
 
-    public Pose ClassifierRamp = new Pose(131.74766355140187,75.14018691588785);
+    public Pose ClassifierRamp = new Pose(124.74766355140187,75.14018691588785);
 
     public Pose Launch1 = new Pose(86.2258064516129, 97.83870967741936);
 
@@ -98,7 +100,7 @@ public class redDefault extends NextFTCOpMode {
 
     public Pose Intake3 = new Pose(128.2258064516129,35.12903225806451);
 
-    public Pose Teleop1 = new Pose(84.11214953271028,37.009345794392516);
+    public Pose Teleop1 = new Pose(100.11214953271028,80.009345794392516);
 
 
 
@@ -174,6 +176,13 @@ public class redDefault extends NextFTCOpMode {
     private ServoEx hoodservo2;
     private Command spinFlyWheel1500;
     private Command intakeMotorOn;
+
+    private CRServo hoodServo1n;
+    private CRServo hoodServo2n;
+
+    private CRServoEx hoodServo1 = new CRServoEx(() -> hoodServo1n);
+    private CRServoEx hoodServo2 = new CRServoEx(() -> hoodServo2n);
+
     public void onInit() {
         telemetry.addLine("Initializing Follower...");
 
@@ -202,10 +211,11 @@ public class redDefault extends NextFTCOpMode {
 
 
         spinFlyWheel1500 = new LambdaCommand()
-                .setStart(() -> shooter(1135));
+                .setStart(() -> shooter(1130));
         intakeMotorOn = new LambdaCommand()
                 .setStart(() -> intakeMotor.setPower(-1));
-
+        hoodServo1n= ActiveOpMode.hardwareMap().get(CRServo.class, "hoodServo1");
+        hoodServo2n=  ActiveOpMode.hardwareMap().get(CRServo.class, "hoodServo2");
         pathTimer = new Timer();
         actionTimer = new Timer();
         opmodeTimer = new Timer();
@@ -248,8 +258,9 @@ public class redDefault extends NextFTCOpMode {
                 transfer2.setPosition(1.25);
                 //transfer3.setPosition(0);
             });
+
     Command transferOn = new LambdaCommand()
-            .setStart(()-> transfer1.setPower(-0.9));
+            .setStart(()-> transfer1.setPower(-0.7));
     Command transferOff = new LambdaCommand()
             .setStart(() -> transfer1.setPower(0));
     /*Command shootByTag1 = new LambdaCommand()
@@ -269,17 +280,42 @@ public class redDefault extends NextFTCOpMode {
 
 
             });*/
+    ParallelGroup HoodRunUp=new ParallelGroup(
+            new SetPower(hoodServo1,1),
+            new SetPower(hoodServo2,-1)
+    );
+    public ParallelGroup HoodPowerZero=new ParallelGroup(
+            new SetPower(hoodServo1,0),
+            new SetPower(hoodServo2,0)
+    );
+
+    public SequentialGroup HoodUp=new SequentialGroup(
+            HoodRunUp,
+            new Delay(0.1),
+            HoodPowerZero
+    );
+
+    ParallelGroup HoodRunDown=new ParallelGroup(
+            new SetPower(hoodServo1,-1),
+            new SetPower(hoodServo2,1)
+    );
+
+    public SequentialGroup HoodDown=new SequentialGroup(
+            HoodRunDown,
+            new Delay(0.17),
+            HoodPowerZero
+    );
 
     public Command Auto(){
         return new SequentialGroup(
-
+                HoodUp,
                 spinFlyWheel1500,
                 intakeMotorOn,
                 new FollowPath(paths.PreLoadLaunch,true,0.8),
                 opentransfer,
                 new Delay(0.3),
                 transferOn,
-                new Delay(1.5),
+                new Delay(3),
                 transferOff,
                 //new TurnTo(Angle.fromDeg(90)),
                 //getMotif,
@@ -287,17 +323,20 @@ public class redDefault extends NextFTCOpMode {
 
 
                 intakeMotorOn,
+
+                new Delay(0.2),
                 closeTransfer,
-                new Delay(0.4),
+                new Delay(0.2),
                 transferOn,
                 new FollowPath(paths.Intake1set,false,0.8),
                 transferOff,
 
-                new FollowPath(paths.ClassifierRamp1,true,0.8),
+                /*new FollowPath(paths.ClassifierRamp1,true,0.8),
+                new Delay(0.5),
                 //transferOff,
                 //new Delay(0.1),
                 // Sorting logic all here with the order, etc
-                intakeMotorOn,
+                */intakeMotorOn,
                 new FollowPath(paths.Launch1Real,true,0.8),
 
                 opentransfer,
@@ -306,7 +345,7 @@ public class redDefault extends NextFTCOpMode {
 
 
                 // Transfer logic with transfer
-                new Delay(1.5),
+                new Delay(3),
                 transferOff,
                 closeTransfer,
                 new Delay(0.3),
@@ -331,7 +370,7 @@ public class redDefault extends NextFTCOpMode {
                 transferOn,
 
                 // Transfer logic with transfer
-                new Delay(1.5),
+                new Delay(3),
                 closeTransfer,
                 transferOff,
 
@@ -339,7 +378,7 @@ public class redDefault extends NextFTCOpMode {
 
                 intakeMotorOn,
                 transferOn,
-                new FollowPath(paths.Intake3rdSet,false,0.8),
+                /*new FollowPath(paths.Intake3rdSet,false,0.8),
 
                 transferOff,
                 new Delay(0.3),
@@ -355,7 +394,8 @@ public class redDefault extends NextFTCOpMode {
                 intakeMotorOff,
 
                 new Delay(1.5),
-                closeTransfer,
+                //closeTransfer,
+                transferOff,*/
                 transferOff,
                 stopFlywheel,
                 new FollowPath(paths.teleOp,true,0.9)
@@ -390,7 +430,7 @@ public class redDefault extends NextFTCOpMode {
     @Override
     public void onUpdate(){
 
-        shooter(1120);
+        shooter(1125);
 
 
     }
@@ -437,7 +477,7 @@ public class redDefault extends NextFTCOpMode {
                             start,
                             PreLoadLaunch1
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(51), Math.toRadians(32))
+                    .setLinearHeadingInterpolation(Math.toRadians(51), Math.toRadians(37))
                     //.setVelocityConstraint(50)
                     .build();
             Intake1set = follower.pathBuilder()
@@ -463,7 +503,7 @@ public class redDefault extends NextFTCOpMode {
                     .build();
             Launch1Real = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            ClassifierRamp,
+                            Intake1,
                             Launch1
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(33))

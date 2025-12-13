@@ -87,13 +87,14 @@ public class redDefault extends NextFTCOpMode {
 
     public Pose Launch1 = new Pose(86.2258064516129, 97.83870967741936);
 
-    public Pose ControlPoint2 = new Pose(71.99999999999999,49.60747663551402);
+    public Pose ControlPoint2 = new Pose(71.99999999999999,56.60747663551402);
 
-    public Pose Intake2 = new Pose(124.19626168224298,49.43925233644861);
+    public Pose Intake2 = new Pose(124.19626168224298,56.43925233644861);
+    public Pose ShootCP = new Pose(100,57);
 
-    public Pose ControlPoint3 = new Pose(75.3644859813084,23.77570093457944);
+    public Pose ControlPoint3 = new Pose(75.3644859813084,27.77570093457944);
 
-    public Pose ControlPoint4 = new Pose(74.46728971962617,35.439252336448604);
+    public Pose ControlPoint4 = new Pose(74.46728971962617,38.439252336448604);
 
     public Pose Intake3 = new Pose(128.2258064516129,35.12903225806451);
 
@@ -199,8 +200,9 @@ public class redDefault extends NextFTCOpMode {
         hoodservo1 = new ServoEx("hoodServo1");
         hoodservo2 = new ServoEx("hoodServo2");
 
+
         spinFlyWheel1500 = new LambdaCommand()
-                .setStart(() -> shooter(1000));
+                .setStart(() -> shooter(1135));
         intakeMotorOn = new LambdaCommand()
                 .setStart(() -> intakeMotor.setPower(-1));
 
@@ -237,13 +239,13 @@ public class redDefault extends NextFTCOpMode {
     Command opentransfer = new LambdaCommand()
             .setStart(()-> {
                 //`5transfer2.setPosition(-0.25);
-                transfer2.setPosition(0.25);
+                transfer2.setPosition(0.3);
                 //transfer3.setPosition(0.75);
             });
     Command closeTransfer = new LambdaCommand()
             .setStart(() -> {
                 //transfer2.setPosition(1);
-                transfer2.setPosition(1);
+                transfer2.setPosition(1.25);
                 //transfer3.setPosition(0);
             });
     Command transferOn = new LambdaCommand()
@@ -274,10 +276,10 @@ public class redDefault extends NextFTCOpMode {
                 spinFlyWheel1500,
                 intakeMotorOn,
                 new FollowPath(paths.PreLoadLaunch,true,0.8),
-                new Delay(0.6),
                 opentransfer,
+                new Delay(0.3),
                 transferOn,
-                new Delay(1.5),
+                new Delay(1.2),
                 transferOff,
                 //new TurnTo(Angle.fromDeg(90)),
                 //getMotif,
@@ -291,56 +293,69 @@ public class redDefault extends NextFTCOpMode {
                 new FollowPath(paths.Intake1set,false,0.8),
                 transferOff,
 
-                new FollowPath(paths.ClassifierRamp1,true,0.7),
+                new FollowPath(paths.ClassifierRamp1,true,0.8),
                 //transferOff,
-                new Delay(0.75),
+                //new Delay(0.1),
                 // Sorting logic all here with the order, etc
+                intakeMotorOn,
                 new FollowPath(paths.Launch1Real,true,0.8),
 
                 opentransfer,
+                new Delay(0.2),
                 transferOn,
 
 
                 // Transfer logic with transfer
-                new Delay(1.5),
-                closeTransfer,
+                new Delay(1.2),
                 transferOff,
-                new Delay(0.4),
+                closeTransfer,
+                new Delay(0.3),
+
                 intakeMotorOn,
                 transferOn,
-                new FollowPath(paths.Intake2ndSet,false,0.8),
-
-                intakeMotorOff,
+                new FollowPath(paths.Intake2ndSet,false,0.7),
+                new Delay(0.2),
                 transferOff,
+                new Delay(0.3),
+                opentransfer,
+
+                //intakeMotorOff,
+
                 // Sorting logic and order here
 
 
-                new FollowPath(paths.Launch2,true,0.8),
-                opentransfer,
+                new FollowPath(paths.Launch2,true,0.9),
+                intakeMotorOn,
+
+
                 transferOn,
 
                 // Transfer logic with transfer
-                new Delay(1.5),
+                new Delay(1.3),
                 closeTransfer,
                 transferOff,
-                new Delay(0.4),
+
 
 
                 intakeMotorOn,
                 transferOn,
                 new FollowPath(paths.Intake3rdSet,false,0.8),
-                intakeMotorOff,
+
                 transferOff,
+                new Delay(0.3),
+                opentransfer,
 
                 // Sorting logic here
                 new FollowPath(paths.Launch3,false,0.8),
+                new Delay(0.3),
+
                 // Transfer and shoot logic
                 opentransfer,
                 transferOn,
+                intakeMotorOff,
 
-                new Delay(1.5),
+                new Delay(1.2),
                 closeTransfer,
-                new Delay(0.4),
                 transferOff,
                 stopFlywheel,
                 new FollowPath(paths.teleOp,true,0.9)
@@ -375,7 +390,7 @@ public class redDefault extends NextFTCOpMode {
     @Override
     public void onUpdate(){
 
-        shooter(1115);
+        shooter(1120);
 
 
     }
@@ -422,7 +437,7 @@ public class redDefault extends NextFTCOpMode {
                             start,
                             PreLoadLaunch1
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(51), Math.toRadians(33))
+                    .setLinearHeadingInterpolation(Math.toRadians(51), Math.toRadians(32))
                     //.setVelocityConstraint(50)
                     .build();
             Intake1set = follower.pathBuilder()
@@ -465,11 +480,12 @@ public class redDefault extends NextFTCOpMode {
 
                     .build();
             Launch2 = follower.pathBuilder()
-                    .addPath(new BezierLine(
+                    .addPath(new BezierCurve(
                             Intake2,
+                            ShootCP,
                             Launch1
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(37))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(30))
 
                     .build();
             Intake3rdSet = follower.pathBuilder()
@@ -488,7 +504,7 @@ public class redDefault extends NextFTCOpMode {
                             Intake3,
                             Launch1
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(37))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(25))
 
                     .build();
             teleOp = follower.pathBuilder()

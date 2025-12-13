@@ -1,13 +1,18 @@
 package org.firstinspires.ftc.teamcode.opModes.TeleOp;
 
+import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
+import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
+
+import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 
+import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
-import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 import org.firstinspires.ftc.teamcode.subsystems.TempHood;
 
 import dev.nextftc.core.commands.delays.Delay;
 import dev.nextftc.core.components.SubsystemComponent;
+import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.ftc.Gamepads;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.core.components.BindingsComponent;
@@ -22,7 +27,7 @@ public class TeleOpRed extends NextFTCOpMode {
     public MotorEx transfer;
     public TeleOpRed() {
         addComponents(
-                new SubsystemComponent(TempHood.INSTANCE, DriveTrain.INSTANCE/*, Intake.INSTANCE, Spindexer.INSTANCE*/),
+                new SubsystemComponent(DistanceRed.INSTANCE, TempHood.INSTANCE, DriveTrain.INSTANCE/*, Intake.INSTANCE, Spindexer.INSTANCE*/),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE
 
@@ -89,23 +94,11 @@ public class TeleOpRed extends NextFTCOpMode {
 
     @Override
     public void onUpdate() {
-        /*if (findMotif) {
-            //tagID = MotifScanning.INSTANCE.findMotif();
-            if (tagID == 21) {
-                ball1Color = 1; //green
-                ball2Color = 2; //purple
-                ball3Color = 2;
-            } else if (tagID == 22) {
-                ball1Color = 2;
-                ball2Color = 1;
-                ball3Color = 2;
-            } else if (tagID == 23) {
-                ball1Color = 2;
-                ball2Color = 2;
-                ball3Color = 1;
-            }
-            findMotif = false;
-        }*/
+        float newtps;
+        newtps=findTPS(DistanceRed.INSTANCE.getDistanceFromTag());
+        ActiveOpMode.telemetry().addLine(String.valueOf(newtps));
+        shooter(newtps);
+        ActiveOpMode.telemetry().update();
     }
 
     public boolean shoot;
@@ -123,9 +116,9 @@ public class TeleOpRed extends NextFTCOpMode {
     public void onStartButtonPressed() {
 
         //Gamepads.gamepad1().rightTrigger().greaterThan(0.2).whenBecomesTrue(() -> DriveTrain.shoot.schedule());
-        Gamepads.gamepad2().square().whenBecomesTrue(() -> hood());
+        Gamepads.gamepad2().cross().whenBecomesTrue(() -> hood());
         Gamepads.gamepad1().circle().whenBecomesTrue(() -> TempHood.INSTANCE.HoodPowerZero.schedule());
-        Gamepads.gamepad1().rightTrigger().greaterThan(0.2).whenBecomesTrue(() -> shoot());
+        Gamepads.gamepad1().rightTrigger().greaterThan(0.4).whenBecomesTrue(() -> shoot());
     }
 
     public void onStop(){

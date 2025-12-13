@@ -67,7 +67,7 @@ public class DriveTrain implements Subsystem {
 
     private double visionYawCommand(double txDeg) {
         if (Math.abs(txDeg) < YAW_DEADBAND_DEG) return 0.0;
-        return 0.5*clip(-1*alliance*YAW_KP * txDeg, -YAW_MAX, YAW_MAX);
+        return alliance*0.5*clip(YAW_KP * txDeg, -YAW_MAX, YAW_MAX);
     }
 
     private void autolocktrue(){
@@ -258,22 +258,6 @@ public class DriveTrain implements Subsystem {
         ActiveOpMode.telemetry().addLine(String.valueOf(newtps));
         ActiveOpMode.telemetry().addLine(String.valueOf(hasTag));
         shooter(newtps);
-        if(autolock==true){
-            if(pipeset!=true){
-            if(isBlue()==true) {
-                limelight.pipelineSwitch(8);
-                ActiveOpMode.telemetry().addLine("blue");
-                pipeset=true;
-            }
-            if(isRed()==true){
-                limelight.pipelineSwitch(7);
-                ActiveOpMode.telemetry().addLine("red");
-                pipeset=true;
-            }
-            else if(isBlue()!=true && isRed()!=true) {
-                ActiveOpMode.telemetry().addLine("No pipeline set");
-            }}
-        }
         ActiveOpMode.telemetry().update();
     }
 }

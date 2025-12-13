@@ -1,13 +1,18 @@
 package org.firstinspires.ftc.teamcode.opModes.TeleOp;
 
+import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
+import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
+
+import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 
+import org.firstinspires.ftc.teamcode.subsystems.DistanceBlue;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
-import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 import org.firstinspires.ftc.teamcode.subsystems.TempHood;
 
 import dev.nextftc.core.commands.delays.Delay;
 import dev.nextftc.core.components.SubsystemComponent;
+import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.ftc.Gamepads;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.core.components.BindingsComponent;
@@ -22,7 +27,7 @@ public class TeleOpBlue extends NextFTCOpMode {
     public MotorEx transfer;
     public TeleOpBlue() {
         addComponents(
-                new SubsystemComponent(TempHood.INSTANCE, DriveTrain.INSTANCE/*, Intake.INSTANCE, Spindexer.INSTANCE*/),
+                new SubsystemComponent(TempHood.INSTANCE, DistanceBlue.INSTANCE, DriveTrain.INSTANCE/*, Intake.INSTANCE, Spindexer.INSTANCE*/),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE
 
@@ -42,6 +47,8 @@ public class TeleOpBlue extends NextFTCOpMode {
     public static int ball2Color = 0;
     public static int ball3Color = 0;
 
+    private Limelight3A limelight;
+
     public static int getBall1Color() {
         return ball1Color;
     }
@@ -56,6 +63,9 @@ public class TeleOpBlue extends NextFTCOpMode {
     private static final int APRILTAG_PIPELINE = 8;
 
     public boolean lift;
+
+    private double tx;
+    private boolean hasTag;
 
     public boolean running=false;
 
@@ -74,22 +84,13 @@ public class TeleOpBlue extends NextFTCOpMode {
         }
 
     }
-    public boolean shoot=false;
 
-    public void shoot(){
-        if(shoot==false){
-            shoot=true;
-            DriveTrain.shoot.schedule();
-            new Delay(0.2);
-            shoot=false;
-        }
-    }
     @Override
     public void onInit() {
         Limelight3A limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(APRILTAG_PIPELINE);
         limelight.start();
-        blue = true;
+        blue=true;
         intakeMotor = new MotorEx("intake").reversed();
         transfer = new MotorEx("transfer").reversed();
         Gamepads.gamepad1().leftTrigger().greaterThan(0.3).whenBecomesTrue(()-> intakeMotor.setPower(1))
@@ -97,10 +98,18 @@ public class TeleOpBlue extends NextFTCOpMode {
         Gamepads.gamepad1().leftBumper().whenBecomesTrue(()-> transfer.setPower(1))
                 .whenBecomesFalse(() -> transfer.setPower(0));
 
+
     }
 
     @Override
     public void onUpdate() {
+        //ActiveOpMode.telemetry().update();
+        float newtps;
+        newtps=findTPS(DistanceBlue.INSTANCE.getDistanceFromTag());
+        ActiveOpMode.telemetry().addLine(String.valueOf(newtps));
+        ActiveOpMode.telemetry().addLine(String.valueOf(hasTag));
+        shooter(newtps);
+        ActiveOpMode.telemetry().update();
         /*if (findMotif) {
             //tagID = MotifScanning.INSTANCE.findMotif();
             if (tagID == 21) {
@@ -120,11 +129,24 @@ public class TeleOpBlue extends NextFTCOpMode {
         }*/
     }
 
+    public boolean shoot;
+
+    public void shoot(){
+        if(shoot==false){
+            shoot=true;
+            DriveTrain.shoot.schedule();
+            new Delay(0.2);
+            shoot=false;
+        }
+    }
+
     @Override
     public void onStartButtonPressed() {
-        Gamepads.gamepad2().square().whenBecomesTrue(() -> hood());
-        Gamepads.gamepad1().circle().whenBecomesTrue(() -> TempHood.INSTANCE.HoodPowerZero.schedule());
-        Gamepads.gamepad1().rightTrigger().greaterThan(0.2).whenBecomesTrue(() -> shoot());
+
+        //Gamepads.gamepad1().rightTrigger().greaterThan(0.2).whenBecomesTrue(() -> DriveTrain.shoot.schedule());
+        Gamepads.gamepad2().cross().whenBecomesTrue(() -> hood());
+        Gamepads.gamepad2().circle().whenBecomesTrue(() -> TempHood.INSTANCE.HoodPowerZero.schedule());
+        Gamepads.gamepad1().rightTrigger().greaterThan(0.4).whenBecomesTrue(() -> shoot());
     }
     public void onStop(){
         blue=false;

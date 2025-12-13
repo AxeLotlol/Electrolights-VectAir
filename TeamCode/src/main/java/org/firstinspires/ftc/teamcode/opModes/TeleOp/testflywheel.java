@@ -81,14 +81,15 @@ public class testflywheel extends NextFTCOpMode {
     }
     @Override
     public void onUpdate(){
-        float newtps=findTPS(DistanceBlue.INSTANCE.getDistanceFromTag());
+        float newtps=findTPS(DistanceRed.INSTANCE.getDistanceFromTag());
         shooter(newtps);
         double ticksPerSecond = flywheel.getVelocity();
 
         //shooter(configvelocity);
         ActiveOpMode.telemetry().addData("Required RPM", newtps);
 
-        ActiveOpMode.telemetry().addData("Distance", DistanceRed.INSTANCE.getDistanceFromTag());
+        ActiveOpMode.telemetry().addData("DistanceBlue", DistanceRed.INSTANCE.getDistanceFromTag());
+        ActiveOpMode.telemetry().addData("DistanceRed", DistanceRed.INSTANCE.getDistanceFromTag());
 
         double rpm = (ticksPerSecond / 28) * 60.0;
 

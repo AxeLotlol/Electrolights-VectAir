@@ -4,7 +4,9 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
+import org.firstinspires.ftc.teamcode.subsystems.TempHood;
 
+import dev.nextftc.core.commands.delays.Delay;
 import dev.nextftc.core.components.SubsystemComponent;
 import dev.nextftc.ftc.Gamepads;
 import dev.nextftc.ftc.NextFTCOpMode;
@@ -20,15 +22,17 @@ public class TeleOpBlue extends NextFTCOpMode {
     public MotorEx transfer;
     public TeleOpBlue() {
         addComponents(
-                new SubsystemComponent(DriveTrain.INSTANCE/*, Intake.INSTANCE, Spindexer.INSTANCE*/),
+                new SubsystemComponent(TempHood.INSTANCE, DriveTrain.INSTANCE/*, Intake.INSTANCE, Spindexer.INSTANCE*/),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE
 
         );
     }
 
+    public static boolean blue;
+
     public static boolean isBlue(){
-        return true;
+        return blue;
     }
 
     public static int tagID;
@@ -50,11 +54,42 @@ public class TeleOpBlue extends NextFTCOpMode {
     }
 
     private static final int APRILTAG_PIPELINE = 8;
+
+    public boolean lift;
+
+    public boolean running=false;
+
+    public void hood(){
+        if(lift==false){
+            lift=true;
+            TempHood.INSTANCE.HoodUp.schedule();
+        }
+        else if (lift==true) {
+            lift=false;
+            TempHood.INSTANCE.HoodDown.schedule();
+        }
+        else if (lift!=true&&lift!=false) {
+            lift=true;
+            TempHood.INSTANCE.HoodUp.schedule();
+        }
+
+    }
+    public boolean shoot=false;
+
+    public void shoot(){
+        if(shoot==false){
+            shoot=true;
+            DriveTrain.shoot.schedule();
+            new Delay(0.2);
+            shoot=false;
+        }
+    }
     @Override
     public void onInit() {
         Limelight3A limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(APRILTAG_PIPELINE);
         limelight.start();
+        blue = true;
         intakeMotor = new MotorEx("intake").reversed();
         transfer = new MotorEx("transfer").reversed();
         Gamepads.gamepad1().leftTrigger().greaterThan(0.3).whenBecomesTrue(()-> intakeMotor.setPower(1))
@@ -66,7 +101,7 @@ public class TeleOpBlue extends NextFTCOpMode {
 
     @Override
     public void onUpdate() {
-        if (findMotif) {
+        /*if (findMotif) {
             //tagID = MotifScanning.INSTANCE.findMotif();
             if (tagID == 21) {
                 ball1Color = 1; //green
@@ -82,11 +117,20 @@ public class TeleOpBlue extends NextFTCOpMode {
                 ball3Color = 1;
             }
             findMotif = false;
-        }
+        }*/
     }
 
     @Override
     public void onStartButtonPressed() {
+<<<<<<< Updated upstream
         //Gamepads.gamepad1().rightTrigger().greaterThan(0.2).whenBecomesTrue(() -> DriveTrain.shoot.schedule());
+=======
+        Gamepads.gamepad2().square().whenBecomesTrue(() -> hood());
+        Gamepads.gamepad1().circle().whenBecomesTrue(() -> TempHood.INSTANCE.HoodPowerZero.schedule());
+        Gamepads.gamepad1().rightTrigger().greaterThan(0.2).whenBecomesTrue(() -> shoot());
+    }
+    public void onStop(){
+        blue=false;
+>>>>>>> Stashed changes
     }
 }

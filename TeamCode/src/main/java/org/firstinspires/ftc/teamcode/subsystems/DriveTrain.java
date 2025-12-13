@@ -67,7 +67,7 @@ public class DriveTrain implements Subsystem {
 
     private double visionYawCommand(double txDeg) {
         if (Math.abs(txDeg) < YAW_DEADBAND_DEG) return 0.0;
-        return alliance*0.5*clip(YAW_KP * txDeg, -YAW_MAX, YAW_MAX);
+        return 0.5*clip(-1*alliance*YAW_KP * txDeg, -YAW_MAX, YAW_MAX);
     }
 
     private void autolocktrue(){
@@ -121,13 +121,10 @@ public class DriveTrain implements Subsystem {
             ActiveOpMode.telemetry().addLine("No direction set");
         }
 
-        Gamepads.gamepad1().triangle().whenBecomesTrue(() -> autolocktrue())
-                .whenBecomesFalse(() -> autolockfalse());
-        Gamepads.gamepad1().leftBumper().whenBecomesTrue(() -> slowtrue())
-                .whenFalse(() -> slowfalse());
+
 
         if (autolock == true) {
-            limelight.pipelineSwitch(APRILTAG_PIPELINE);
+            //limelight.pipelineSwitch(APRILTAG_PIPELINE);
             LLResult result = limelight.getLatestResult();
             hasTag = (result != null) && result.isValid() && !result.getFiducialResults().isEmpty();
 
@@ -182,45 +179,57 @@ public class DriveTrain implements Subsystem {
 
     @Override
     public void initialize() {
+        if(isBlue()==true) {
+            alliance=1;
+        }
+        if(isRed()==true){
+            alliance=-1;
+        }
+        else if(isBlue()!=true && isRed()!=true) {
+            ActiveOpMode.telemetry().addLine("No direction set");
+        }
         imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
         limelight = ActiveOpMode.hardwareMap().get(Limelight3A.class, "limelight");
-        limelight.pipelineSwitch(APRILTAG_PIPELINE);
-        limelight.start();
+        //limelight.pipelineSwitch(APRILTAG_PIPELINE);
+        //limelight.start();
 
 
 
     }
     private MotorEx intakeMotor;
-    private MotorEx transfer1;
-    private ServoEx transfer2;
+    private static MotorEx transfer1;
+    private static ServoEx transfer2;
     private ServoEx transfer3;
-    Command opentransfer = new LambdaCommand()
+    static Command opentransfer = new LambdaCommand()
             .setStart(()-> {
                 //`5transfer2.setPosition(-0.25);
                 transfer2.setPosition(0.25);
             });
-    Command closeTransfer = new LambdaCommand()
+    static Command closeTransfer = new LambdaCommand()
             .setStart(() -> {
                 //transfer2.setPosition(1);
                 transfer2.setPosition(1);
             });
-    Command transferOn = new LambdaCommand()
+    static Command transferOn = new LambdaCommand()
             .setStart(()-> transfer1.setPower(-0.9));
-    Command transferOff = new LambdaCommand()
+    static Command transferOff = new LambdaCommand()
             .setStart(() -> transfer1.setPower(0));
 
     //public static SequentialGroup shoot = new SequentialGroup(opentransfer, transferOn, new Delay(1.5), transferOff, closeTransfer);
 
+    public static boolean pipeset=false;
     @Override
     public void periodic() {
         if (firsttime==true){
+            Gamepads.gamepad1().triangle().whenBecomesTrue(() -> autolocktrue())
+                    .whenBecomesFalse(() -> autolockfalse());
+            Gamepads.gamepad1().leftBumper().whenBecomesTrue(() -> slowtrue())
+                    .whenFalse(() -> slowfalse());
             intakeMotor = new MotorEx("intake");
             transfer1 = new MotorEx("transfer");
             transfer2 = new ServoEx("transferServo1");
 
             transfer3 = new ServoEx("transferServo2");
-            float tps = findTPS((float) 0.86);
-            shooter(tps);
             firsttime=false;
 
 
@@ -246,17 +255,24 @@ public class DriveTrain implements Subsystem {
         else if(isBlue()!=true && isRed()!=true) {
             newtps=findTPS(DistanceBlue.INSTANCE.getDistanceFromTag());
         }
+        ActiveOpMode.telemetry().addLine(String.valueOf(newtps));
+        ActiveOpMode.telemetry().addLine(String.valueOf(hasTag));
         shooter(newtps);
         if(autolock==true){
+            if(pipeset!=true){
             if(isBlue()==true) {
                 limelight.pipelineSwitch(8);
+                ActiveOpMode.telemetry().addLine("blue");
+                pipeset=true;
             }
             if(isRed()==true){
                 limelight.pipelineSwitch(7);
+                ActiveOpMode.telemetry().addLine("red");
+                pipeset=true;
             }
             else if(isBlue()!=true && isRed()!=true) {
                 ActiveOpMode.telemetry().addLine("No pipeline set");
-            }
+            }}
         }
         ActiveOpMode.telemetry().update();
     }

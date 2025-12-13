@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
+import static org.firstinspires.ftc.teamcode.subsystems.Calculations.lowangle;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpBlue.isBlue;
 import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpRed.isRed;
@@ -67,7 +68,7 @@ public class DriveTrain implements Subsystem {
 
     private double visionYawCommand(double txDeg) {
         if (Math.abs(txDeg) < YAW_DEADBAND_DEG) return 0.0;
-        return alliance*0.5*clip(YAW_KP * txDeg, -YAW_MAX, YAW_MAX);
+        return 0.55*clip(YAW_KP * txDeg, -YAW_MAX, YAW_MAX);
     }
 
     private void autolocktrue(){
@@ -124,6 +125,12 @@ public class DriveTrain implements Subsystem {
 
 
         if (autolock == true) {
+            if(alliance==1){
+                limelight.pipelineSwitch(8);
+            }
+            if(alliance==-1){
+                limelight.pipelineSwitch(7);
+            }
             //limelight.pipelineSwitch(APRILTAG_PIPELINE);
             LLResult result = limelight.getLatestResult();
             hasTag = (result != null) && result.isValid() && !result.getFiducialResults().isEmpty();
@@ -131,6 +138,7 @@ public class DriveTrain implements Subsystem {
             if (hasTag) {
                 tx = result.getTx(); // deg
                 ActiveOpMode.telemetry().addData("Tx", tx);
+                ActiveOpMode.telemetry().update();
             } else {
                 tx = 0.0;
             }
@@ -217,7 +225,6 @@ public class DriveTrain implements Subsystem {
 
     public static SequentialGroup shoot = new SequentialGroup(opentransfer, transferOn, new Delay(1.5), transferOff, closeTransfer);
 
-    public static boolean pipeset=false;
     @Override
     public void periodic() {
         if (firsttime==true){
@@ -235,6 +242,8 @@ public class DriveTrain implements Subsystem {
 
         }
 
+        ActiveOpMode.telemetry().addData("Lowangle:", lowangle);
+
         LLResult result = limelight.getLatestResult();
         hasTag = (result != null) && result.isValid() && !result.getFiducialResults().isEmpty();
 
@@ -245,7 +254,8 @@ public class DriveTrain implements Subsystem {
         }
         yVCtx = () -> visionYawCommand(tx);
         //ActiveOpMode.telemetry().update();
-        float newtps = 1200;
+        //IF DISTANCE DOESNT WORK ANYMORE, ADD THIS
+        /*float newtps = 1200;
         if(isBlue()==true) {
             newtps=findTPS(DistanceBlue.INSTANCE.getDistanceFromTag());
         }
@@ -257,7 +267,7 @@ public class DriveTrain implements Subsystem {
         }
         ActiveOpMode.telemetry().addLine(String.valueOf(newtps));
         ActiveOpMode.telemetry().addLine(String.valueOf(hasTag));
-        shooter(newtps);
+        shooter(newtps);*/
         ActiveOpMode.telemetry().update();
     }
 }

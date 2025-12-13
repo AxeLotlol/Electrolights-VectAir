@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opModes.TeleOp;
 
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
+import static org.firstinspires.ftc.teamcode.subsystems.Calculations.lowangle;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
@@ -73,14 +74,17 @@ public class TeleOpBlue extends NextFTCOpMode {
         if(lift==false){
             lift=true;
             TempHood.INSTANCE.HoodUp.schedule();
+            lowangle=true;
         }
         else if (lift==true) {
             lift=false;
             TempHood.INSTANCE.HoodDown.schedule();
+            lowangle=false;
         }
         else if (lift!=true&&lift!=false) {
             lift=true;
             TempHood.INSTANCE.HoodUp.schedule();
+            lowangle=true;
         }
 
     }

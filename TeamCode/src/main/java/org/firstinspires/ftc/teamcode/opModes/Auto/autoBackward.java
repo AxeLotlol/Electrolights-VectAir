@@ -87,6 +87,8 @@ public class autoBackward extends NextFTCOpMode {
     private Command forward;
     private Command stop;
 
+    private Command strafe;
+
     @Override
     public void onInit(){
         backLeft = new MotorEx("backLeft");
@@ -100,6 +102,7 @@ public class autoBackward extends NextFTCOpMode {
                     frontRight.setPower(-0.5);
                     backLeft.setPower(0.5);
                     backRight.setPower(-0.5);
+
                 });
         stop = new LambdaCommand()
                 .setStart(()-> {
@@ -116,6 +119,7 @@ public class autoBackward extends NextFTCOpMode {
 
 
 
+
         telemetry.addData("It's been initialized and nothing will happen", "WARNING TO DRIVERS: CHANGE THIS TO ANOTHER AUTO IF YOU DON'T INTEND OR IT TO DO NOTHING");
 
     }
@@ -123,7 +127,7 @@ public class autoBackward extends NextFTCOpMode {
     public Command auto(){
         return new SequentialGroup(
                 forward,
-                new Delay(1),
+                new Delay(1.5),
                 stop
 
         );

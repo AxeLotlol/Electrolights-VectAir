@@ -208,12 +208,12 @@ public class DriveTrain implements Subsystem {
     private static MotorEx transfer1;
     private static ServoEx transfer2;
     private ServoEx transfer3;
-    static Command opentransfer = new LambdaCommand()
+    public static Command opentransfer = new LambdaCommand()
             .setStart(()-> {
                 //`5transfer2.setPosition(-0.25);
                 transfer2.setPosition(0.25);
             });
-    static Command closeTransfer = new LambdaCommand()
+    public static Command closeTransfer = new LambdaCommand()
             .setStart(() -> {
                 //transfer2.setPosition(1);
                 transfer2.setPosition(1);

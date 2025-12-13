@@ -138,8 +138,7 @@ public class TeleOpBlue extends NextFTCOpMode {
     public void shoot(){
         if(shoot==false){
             shoot=true;
-            DriveTrain.shoot.schedule();
-            new Delay(0.2);
+            DriveTrain.opentransfer.schedule();
             shoot=false;
         }
     }
@@ -151,6 +150,7 @@ public class TeleOpBlue extends NextFTCOpMode {
         Gamepads.gamepad2().cross().whenBecomesTrue(() -> hood());
         Gamepads.gamepad2().circle().whenBecomesTrue(() -> TempHood.INSTANCE.HoodPowerZero.schedule());
         Gamepads.gamepad1().rightTrigger().greaterThan(0.4).whenBecomesTrue(() -> shoot());
+        Gamepads.gamepad2().rightTrigger().greaterThan(0.4).whenBecomesTrue(() -> DriveTrain.closeTransfer.schedule());
     }
     public void onStop(){
         blue=false;

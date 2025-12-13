@@ -97,9 +97,10 @@ public class autoForward extends NextFTCOpMode {
         forward = new LambdaCommand()
                 .setStart(() -> {
                     frontLeft.setPower(-0.5);
-                    frontRight.setPower(0.5);
+                    frontRight.setPower(0);
                     backLeft.setPower(-0.5);
                     backRight.setPower(0.5);
+
                 });
         stop = new LambdaCommand()
                 .setStart(()-> {

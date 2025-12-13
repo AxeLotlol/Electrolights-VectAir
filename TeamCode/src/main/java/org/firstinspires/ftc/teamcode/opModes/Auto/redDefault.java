@@ -279,7 +279,7 @@ public class redDefault extends NextFTCOpMode {
                 opentransfer,
                 new Delay(0.3),
                 transferOn,
-                new Delay(1.2),
+                new Delay(1.5),
                 transferOff,
                 //new TurnTo(Angle.fromDeg(90)),
                 //getMotif,
@@ -306,7 +306,7 @@ public class redDefault extends NextFTCOpMode {
 
 
                 // Transfer logic with transfer
-                new Delay(1.2),
+                new Delay(1.5),
                 transferOff,
                 closeTransfer,
                 new Delay(0.3),
@@ -331,7 +331,7 @@ public class redDefault extends NextFTCOpMode {
                 transferOn,
 
                 // Transfer logic with transfer
-                new Delay(1.3),
+                new Delay(1.5),
                 closeTransfer,
                 transferOff,
 
@@ -354,7 +354,7 @@ public class redDefault extends NextFTCOpMode {
                 transferOn,
                 intakeMotorOff,
 
-                new Delay(1.2),
+                new Delay(1.5),
                 closeTransfer,
                 transferOff,
                 stopFlywheel,

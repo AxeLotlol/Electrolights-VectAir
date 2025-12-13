@@ -28,7 +28,7 @@ import com.bylazar.configurables.annotations.Configurable;
 
 
 
-@Autonomous(name="AutoForward", group="Auto")
+@Autonomous(name="Auto Forward", group="Auto")
 public class autoForward extends NextFTCOpMode {
     public autoForward(){
         addComponents(
@@ -96,9 +96,9 @@ public class autoForward extends NextFTCOpMode {
 
         forward = new LambdaCommand()
                 .setStart(() -> {
-                    frontLeft.setPower(0.5);
+                    frontLeft.setPower(-0.5);
                     frontRight.setPower(0.5);
-                    backLeft.setPower(0.5);
+                    backLeft.setPower(-0.5);
                     backRight.setPower(0.5);
                 });
         stop = new LambdaCommand()
@@ -123,7 +123,7 @@ public class autoForward extends NextFTCOpMode {
     public Command auto(){
         return new SequentialGroup(
                 forward,
-                new Delay(0.5),
+                new Delay(1),
                 stop
 
         );

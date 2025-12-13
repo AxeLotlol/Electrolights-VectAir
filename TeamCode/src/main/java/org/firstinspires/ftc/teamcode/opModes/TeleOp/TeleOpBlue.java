@@ -124,8 +124,11 @@ public class TeleOpBlue extends NextFTCOpMode {
     public void onStartButtonPressed() {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         //Gamepads.gamepad1().rightTrigger().greaterThan(0.2).whenBecomesTrue(() -> DriveTrain.shoot.schedule());
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
         Gamepads.gamepad2().square().whenBecomesTrue(() -> hood());
@@ -135,6 +138,9 @@ public class TeleOpBlue extends NextFTCOpMode {
     public void onStop(){
         blue=false;
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes

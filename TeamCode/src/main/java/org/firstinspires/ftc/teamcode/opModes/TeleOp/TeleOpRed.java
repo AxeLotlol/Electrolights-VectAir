@@ -123,7 +123,13 @@ public class TeleOpRed extends NextFTCOpMode {
     public void onStartButtonPressed() {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         //Gamepads.gamepad1().rightTrigger().greaterThan(0.2).whenBecomesTrue(() -> DriveTrain.shoot.schedule());
+=======
+        Gamepads.gamepad2().square().whenBecomesTrue(() -> hood());
+        Gamepads.gamepad1().circle().whenBecomesTrue(() -> TempHood.INSTANCE.HoodPowerZero.schedule());
+        Gamepads.gamepad1().rightTrigger().greaterThan(0.2).whenBecomesTrue(() -> shoot());
+>>>>>>> Stashed changes
 =======
         Gamepads.gamepad2().square().whenBecomesTrue(() -> hood());
         Gamepads.gamepad1().circle().whenBecomesTrue(() -> TempHood.INSTANCE.HoodPowerZero.schedule());

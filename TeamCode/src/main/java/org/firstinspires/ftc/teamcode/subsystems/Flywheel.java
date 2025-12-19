@@ -4,6 +4,8 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
 
+import com.bylazar.configurables.annotations.Configurable;
+
 import dev.nextftc.bindings.*;
 import dev.nextftc.control.KineticState;
 import dev.nextftc.control.ControlSystem;
@@ -11,11 +13,17 @@ import dev.nextftc.control.ControlSystem;
 import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.hardware.impl.MotorEx;
-
+@Configurable
 public class Flywheel implements Subsystem {
     public Flywheel() {
 
     }
+    public static double kP=0.18;
+    public static double kV=0.0067;
+    public static double kA=0.18;
+
+    public static double kS=0.01;
+
 
     public static final Flywheel INSTANCE = new Flywheel();
     public static double flywheelvelocity;
@@ -27,8 +35,8 @@ public class Flywheel implements Subsystem {
     public static void velocityControlWithFeedforwardExample(KineticState currentstate, float configtps) {
         // Create a velocity controller with PID and feedforward
         ControlSystem controller = ControlSystem.builder()
-                .velPid(0.18, 0.01, 0.05) // Velocity PID with kP=0.1, kI=0.01, kD=0.05
-                .basicFF(0.0067, 0.0, 0.01) // Basic feedforward with kV=0.02, kA=0.0, kS=0.01 //pid tuning
+                .velPid(kP, 0.0, 0.00) // Velocity PID with kP=0.1, kI=0.01, kD=0.05
+                .basicFF(kV, kA, kS) // Basic feedforward with kV=0.02, kA=0.0, kS=0.01 //pid tuning
                 .build();
 
         controller.setGoal(new KineticState(0.0, configtps, 0.0));

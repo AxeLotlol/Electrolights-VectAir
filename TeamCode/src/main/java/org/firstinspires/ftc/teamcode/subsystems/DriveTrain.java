@@ -10,6 +10,7 @@ import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpRed.isRed;
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -61,10 +62,9 @@ public class DriveTrain implements Subsystem {
     }
 
 
+    double feedTime = 1.0; //adjust soon please
 
-
-
-
+    GoBildaPinpointDriver pinpoint;
 
     private double visionYawCommand(double txDeg) {
         if (Math.abs(txDeg) < YAW_DEADBAND_DEG) return 0.0;
@@ -100,14 +100,6 @@ public class DriveTrain implements Subsystem {
     public int alliance;
 
     public Supplier<Double> yVCtx;
-
-
-
-
-
-
-
-
 
     @Override
     public Command getDefaultCommand() {
@@ -201,8 +193,8 @@ public class DriveTrain implements Subsystem {
         //limelight.pipelineSwitch(APRILTAG_PIPELINE);
         //limelight.start();
 
-
-
+        pinpoint = ActiveOpMode.hardwareMap().get(GoBildaPinpointDriver.class, "pinpoint");
+        pinpoint.setOffsets(5.85, 5.5);
     }
     private MotorEx intakeMotor;
     private static MotorEx transfer1;
@@ -252,6 +244,27 @@ public class DriveTrain implements Subsystem {
         } else {
             tx = 0.0;
         }
+
+        double goalY = 144.0;
+        double goalX = 0.0;
+        double shotTime = 0.0;
+        if(isBlue()==true) {
+            goalX = 0.0;
+            shotTime = DistanceBlue.INSTANCE.getDistanceFromTag(); //EDIT THIS TO BE AIRTIME CALCULATIONS
+        }
+        else if(isRed()==true){
+            goalX = 144.0;
+            shotTime = DistanceRed.INSTANCE.getDistanceFromTag(); //EDIT THIS TO BE AIRTIME CALCULATIONS
+        }
+        double robotVelX = pinpoint.getVelX();
+        double robotVelY = pinpoint.getVelY();
+        double virtualGoalX = goalX - (robotVelX * shotTime); //use pinpoint to calculate these values
+        double virtualGoalY = goalY - (robotVelY * shotTime); //finds the location where the ball is suppose to land in order to be scored
+        double robotX = pinpoint.getPosX(); //get position of robot
+        double robotY = pinpoint.getPosY();
+        double targetHeading = Math.atan2(virtualGoalY - robotY, virtualGoalX - robotX); // calculate the heading (finds distance of opposite and adjascent and finds the inbetween angle, heading)
+        //I need you moksh to move the robot to the target heading because I do not know how I am suppose to do that.
+
         yVCtx = () -> visionYawCommand(tx);
         //ActiveOpMode.telemetry().update();
         //IF DISTANCE DOESNT WORK ANYMORE, ADD THIS

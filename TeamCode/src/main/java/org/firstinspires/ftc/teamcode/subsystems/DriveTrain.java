@@ -32,6 +32,7 @@ import dev.nextftc.hardware.impl.IMUEx;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.function.Supplier;
@@ -49,6 +50,8 @@ public class DriveTrain implements Subsystem {
     private boolean hasTag;
 
     private boolean autolock = false;
+
+    private boolean SWM = false;
 
     private boolean slow = false;
     // === AprilTag/Limelight align tuning ===
@@ -77,6 +80,14 @@ public class DriveTrain implements Subsystem {
 
     private void autolockfalse(){
         autolock = false;
+    }
+
+    private void SWMtrue(){
+        SWM = true;
+    }
+
+    private void SWMfalse(){
+        SWM = false;
     }
 
     private void slowtrue(){
@@ -116,37 +127,59 @@ public class DriveTrain implements Subsystem {
 
 
 
-        if (autolock == true) {
-            if(alliance==1){
-                limelight.pipelineSwitch(8);
-            }
-            if(alliance==-1){
-                limelight.pipelineSwitch(7);
-            }
-            //limelight.pipelineSwitch(APRILTAG_PIPELINE);
-            LLResult result = limelight.getLatestResult();
-            hasTag = (result != null) && result.isValid() && !result.getFiducialResults().isEmpty();
+        if (autolock == true||SWM==true) {
+            if (autolock==true && SWM==false)
+            {
+                if (alliance == 1) {
+                    limelight.pipelineSwitch(8);
+                }
+                if (alliance == -1) {
+                    limelight.pipelineSwitch(7);
+                }
+                //limelight.pipelineSwitch(APRILTAG_PIPELINE);
+                LLResult result = limelight.getLatestResult();
+                hasTag = (result != null) && result.isValid() && !result.getFiducialResults().isEmpty();
 
-            if (hasTag) {
-                tx = result.getTx(); // deg
-                ActiveOpMode.telemetry().addData("Tx", tx);
-                ActiveOpMode.telemetry().update();
-            } else {
-                tx = 0.0;
+                if (hasTag) {
+                    tx = result.getTx(); // deg
+                    ActiveOpMode.telemetry().addData("Tx", tx);
+                    ActiveOpMode.telemetry().update();
+                } else {
+                    tx = 0.0;
+                }
+                yVCtx = () -> visionYawCommand(tx);
+                return new MecanumDriverControlled(
+                        fL,
+                        fR,
+                        bL,
+                        bR,
+                        Gamepads.gamepad1().leftStickX().map(it -> alliance * it),
+                        Gamepads.gamepad1().leftStickY().map(it -> alliance * it),
+                        yVCtx,
+                        new FieldCentric(imu)
+                );
             }
-            yVCtx = () -> visionYawCommand(tx);
-            return new MecanumDriverControlled(
-                    fL,
-                    fR,
-                    bL,
-                    bR,
-                    Gamepads.gamepad1().leftStickX().map(it -> alliance * it),
-                    Gamepads.gamepad1().leftStickY().map(it -> alliance * it),
-                    yVCtx,
-                    new FieldCentric(imu)
-            );
+            else{
+                //SHOOTING WHILE MOVING CODE HERE
+                //I NEED TO TURN THE HEADING INPUT INTO A LIMELIGHT tx INPUT
+                //So, I can get the current heading of the robot from Pinpoint
+                //Then, I can subtract the heading input from the current heading from before to get a simulated tx value
+                //Then, that value can be fed into a modified visionYawCommand()
+                //Using that, I get a simulated controller input that will move the robot to the right direction.
+                yVCtx = () -> visionYawCommand(tx);
+                return new MecanumDriverControlled(
+                        fL,
+                        fR,
+                        bL,
+                        bR,
+                        Gamepads.gamepad1().leftStickX().map(it -> alliance * it),
+                        Gamepads.gamepad1().leftStickY().map(it -> alliance * it),
+                        yVCtx,
+                        new FieldCentric(imu)
+                );
+            }
         }
-        else // IF AUTOLOCK IS NOT ON
+        else// IF AUTOLOCK IS NOT ON
         {
             if (slow == true) {
                 return new MecanumDriverControlled(
@@ -162,7 +195,6 @@ public class DriveTrain implements Subsystem {
             }
             else //IF SLOW IS OFF
             {
-                //if doesnt work, remove else here
                 return new MecanumDriverControlled(
                         fL,
                         fR,
@@ -194,7 +226,7 @@ public class DriveTrain implements Subsystem {
         //limelight.start();
 
         pinpoint = ActiveOpMode.hardwareMap().get(GoBildaPinpointDriver.class, "pinpoint");
-        pinpoint.setOffsets(5.85, 5.5);
+        pinpoint.setOffsets(5.85, 5.5, DistanceUnit.INCH);
     }
     private MotorEx intakeMotor;
     private static MotorEx transfer1;
@@ -222,6 +254,8 @@ public class DriveTrain implements Subsystem {
         if (firsttime==true){
             Gamepads.gamepad1().triangle().whenBecomesTrue(() -> autolocktrue())
                     .whenBecomesFalse(() -> autolockfalse());
+            Gamepads.gamepad1().circle().whenBecomesTrue(() -> SWMtrue())
+                    .whenBecomesFalse(() -> SWMfalse());
             Gamepads.gamepad1().leftBumper().whenBecomesTrue(() -> slowtrue())
                     .whenFalse(() -> slowfalse());
             intakeMotor = new MotorEx("intake");
@@ -250,18 +284,18 @@ public class DriveTrain implements Subsystem {
         double shotTime = 0.0;
         if(isBlue()==true) {
             goalX = 0.0;
-            shotTime = DistanceBlue.INSTANCE.getDistanceFromTag(); //EDIT THIS TO BE AIRTIME CALCULATIONS
+            shotTime = 0.3; //EDIT THIS TO BE AIRTIME CALCULATIONS
         }
         else if(isRed()==true){
             goalX = 144.0;
-            shotTime = DistanceRed.INSTANCE.getDistanceFromTag(); //EDIT THIS TO BE AIRTIME CALCULATIONS
+            shotTime = 0.3; //EDIT THIS TO BE AIRTIME CALCULATIONS
         }
-        double robotVelX = pinpoint.getVelX();
-        double robotVelY = pinpoint.getVelY();
+        double robotVelX = pinpoint.getVelX(DistanceUnit.INCH);
+        double robotVelY = pinpoint.getVelY(DistanceUnit.INCH);
         double virtualGoalX = goalX - (robotVelX * shotTime); //use pinpoint to calculate these values
         double virtualGoalY = goalY - (robotVelY * shotTime); //finds the location where the ball is suppose to land in order to be scored
-        double robotX = pinpoint.getPosX(); //get position of robot
-        double robotY = pinpoint.getPosY();
+        double robotX = pinpoint.getPosX(DistanceUnit.INCH); //get position of robot
+        double robotY = pinpoint.getPosY(DistanceUnit.INCH);
         double targetHeading = Math.atan2(virtualGoalY - robotY, virtualGoalX - robotX); // calculate the heading (finds distance of opposite and adjascent and finds the inbetween angle, heading)
         //I need you moksh to move the robot to the target heading because I do not know how I am suppose to do that.
 

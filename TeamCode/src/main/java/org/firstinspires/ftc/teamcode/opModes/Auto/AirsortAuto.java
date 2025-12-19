@@ -29,6 +29,7 @@ import dev.nextftc.ftc.components.BulkReadComponent;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
 import dev.nextftc.hardware.positionable.SetPositions;
+import dev.nextftc.hardware.powerable.SetPower;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
@@ -39,6 +40,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 import org.firstinspires.ftc.teamcode.subsystems.TempHood;
 
 
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.bylazar.configurables.annotations.Configurable;
 
@@ -48,7 +50,7 @@ import com.bylazar.configurables.annotations.Configurable;
 public class AirsortAuto extends NextFTCOpMode {
     public AirsortAuto(){
         addComponents(
-                new SubsystemComponent(Flywheel.INSTANCE, TempHood.INSTANCE),
+                new SubsystemComponent(Flywheel.INSTANCE, TempHood.INSTANCE, DistanceRed.INSTANCE),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE
 
@@ -58,8 +60,10 @@ public class AirsortAuto extends NextFTCOpMode {
 
 
     private ServoEx transferServo1;
+    public MotorEx transfer;
     private ServoEx transferServo2;
     public static MotorEx flywheel = new MotorEx("launchingmotor");
+    public Limelight3A limelight;
 
 
 
@@ -70,7 +74,10 @@ public class AirsortAuto extends NextFTCOpMode {
 
     public void onInit() {
         transferServo1 = new ServoEx("transferServo1");
-        transferServo2 = new ServoEx("transferServo2");
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight.pipelineSwitch(7);
+        limelight.start();
+        transfer = new MotorEx("transfer").reversed();
         telemetry.addLine("Follower + IMU + Odo Pods initialized successfully!");
         telemetry.addLine("Initialization complete!");
         telemetry.update();
@@ -80,8 +87,11 @@ public class AirsortAuto extends NextFTCOpMode {
     public void onUpdate(){
         double ticksPerSecond = flywheel.getVelocity();
 
-        float newtps=findTPS(2);
+        float newtps;
+        newtps=findTPS(DistanceRed.INSTANCE.getDistanceFromTag());
+        ActiveOpMode.telemetry().addLine(String.valueOf(newtps));
         shooter(newtps);
+        ActiveOpMode.telemetry().update();
 
         //shooter(configvelocity);
         ActiveOpMode.telemetry().addData("Required RPM", newtps);
@@ -97,17 +107,17 @@ public class AirsortAuto extends NextFTCOpMode {
 
 
     public void onStartButtonPressed() {
-        float newtps=findTPS(2);
-        shooter(newtps);
         SequentialGroup onStart= new SequentialGroup(
                 new Delay(1.5),
                 new SetPositions(transferServo1.to(-0.25)),
-                new Delay(0.54),
+                new SetPower(transfer, 1),
+                new Delay(0.6),
                 TempHood.INSTANCE.HoodDown,
                 new Delay(1.0),
                 TempHood.INSTANCE.HoodUp,
                 new Delay(1.0),
-                new SetPositions(transferServo1.to(1))
+                new SetPower(transfer, 0),
+                new SetPositions(transferServo1.to(0.6))
         );
         //int tag=MotifScanning.INSTANCE.findMotif();
         onStart.schedule();

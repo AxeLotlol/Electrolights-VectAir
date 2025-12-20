@@ -18,12 +18,6 @@ public class Flywheel implements Subsystem {
     public Flywheel() {
 
     }
-    public static double kP=0.18;
-    public static double kV=0.0067;
-    public static double kA=0.18;
-
-    public static double kS=0.01;
-
 
     public static final Flywheel INSTANCE = new Flywheel();
     public static double flywheelvelocity;
@@ -35,8 +29,8 @@ public class Flywheel implements Subsystem {
     public static void velocityControlWithFeedforwardExample(KineticState currentstate, float configtps) {
         // Create a velocity controller with PID and feedforward
         ControlSystem controller = ControlSystem.builder()
-                .velPid(kP, 0.0, 0.00) // Velocity PID with kP=0.1, kI=0.01, kD=0.05
-                .basicFF(kV, kA, kS) // Basic feedforward with kV=0.02, kA=0.0, kS=0.01 //pid tuning
+                .velPid(0.12, 0.005, 0.00) // Velocity PID with kP=0.1, kI=0.01, kD=0.05
+                .basicFF(0.0067, 0, 0.01) // Basic feedforward with kV=0.02, kA=0.0, kS=0.01 //pid tuning
                 .build();
 
         controller.setGoal(new KineticState(0.0, configtps, 0.0));
@@ -56,10 +50,6 @@ public class Flywheel implements Subsystem {
         double rpm = (flywheelvelocity / 28) * 60.0;
         ActiveOpMode.telemetry().addData("Flywheel RPM", rpm);
 
-        //} // if this doesnt work remove if statement
-        //motor.setPower(kP * error + kV * targetVelocity)
-        //where error is (targetVelocity - motor.getVelocity())
-        //tune kP until error is small enough (graph error)
     }
     @Override public void initialize() {
 
@@ -68,17 +58,5 @@ public class Flywheel implements Subsystem {
     @Override public void periodic() {
 
     }
-    /*@Override public void onUpdate() {
-        configvelocity=findTPS(4.03);
-        shooter(configvelocity);
-        double ticksPerSecond = flywheel.getVelocity();
-
-        double rpm = (ticksPerSecond / 28) * 60.0;
-        double goal = ShooterCalculations.requiredRPM;
-        double goal2 = ShooterCalculations.requiredTPS;
-        PanelsTelemetry.INSTANCE.getTelemetry().addData("Motor RPM", rpm);
-        PanelsTelemetry.INSTANCE.getTelemetry().addData("Required RPM", goal);
-        PanelsTelemetry.INSTANCE.getTelemetry().addData("Required TPS", goal2);
-        PanelsTelemetry.INSTANCE.getTelemetry().update(telemetry);*/
 }
 

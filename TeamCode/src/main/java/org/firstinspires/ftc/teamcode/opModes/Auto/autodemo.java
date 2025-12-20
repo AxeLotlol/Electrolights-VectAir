@@ -52,6 +52,8 @@ public class autodemo extends NextFTCOpMode{
     private ServoEx transfer2;
     private ServoEx transfer3;
 
+    private MotorEx transfer;
+
     Command opentransfer = new LambdaCommand()
             .setStart(()-> {
                 //`5transfer2.setPosition(-0.25);
@@ -65,14 +67,15 @@ public class autodemo extends NextFTCOpMode{
                 transfer3.setPosition(0.2);
             });
 
-
+    Command transferOn = new LambdaCommand()
+            .setStart(()-> transfer.setPower(0.9));
     @Override
-    public void onInit(){
+   public void onInit(){
 
         transfer2 = new ServoEx("transferServo1");
 
         transfer3 = new ServoEx("transferServo2");
-
+        transfer = new MotorEx("transfer");
 
 
 
@@ -80,9 +83,8 @@ public class autodemo extends NextFTCOpMode{
 
     public Command Auto(){
         return new SequentialGroup(
-                opentransfer,
-                new Delay(1)
-                //closeTransfer
+
+                transferOn
 
         );
     }
@@ -93,7 +95,7 @@ public class autodemo extends NextFTCOpMode{
     }
     @Override
     public void onUpdate(){
-        float newtps=findTPS(1.2);
-        shooter(newtps);
+        //float newtps=findTPS(1.2);
+        //shooter(newtps);
     }
 }

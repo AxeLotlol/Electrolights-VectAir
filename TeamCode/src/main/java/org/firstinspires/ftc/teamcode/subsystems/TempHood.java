@@ -35,8 +35,8 @@ public class TempHood implements Subsystem {
 
 
     ParallelGroup HoodRunUp=new ParallelGroup(
-            new SetPower(hoodServo1,1),
-            new SetPower(hoodServo2,-1)
+            new SetPower(hoodServo1,-1),
+            new SetPower(hoodServo2,1)
     );
 
     public ParallelGroup HoodPowerZero=new ParallelGroup(
@@ -51,8 +51,8 @@ public class TempHood implements Subsystem {
     );
 
     ParallelGroup HoodRunDown=new ParallelGroup(
-            new SetPower(hoodServo1,-1),
-            new SetPower(hoodServo2,1)
+            new SetPower(hoodServo1,1),
+            new SetPower(hoodServo2,-1)
     );
 
     public SequentialGroup HoodDown=new SequentialGroup(

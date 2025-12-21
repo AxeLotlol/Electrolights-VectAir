@@ -88,7 +88,7 @@ public class AirsortAuto extends NextFTCOpMode {
         double ticksPerSecond = flywheel.getVelocity();
 
         float newtps;
-        newtps=findTPS(DistanceRed.INSTANCE.getDistanceFromTag());
+        newtps=findTPS(2.2);
         ActiveOpMode.telemetry().addLine(String.valueOf(newtps));
         shooter(newtps);
         ActiveOpMode.telemetry().update();
@@ -109,15 +109,14 @@ public class AirsortAuto extends NextFTCOpMode {
     public void onStartButtonPressed() {
         SequentialGroup onStart= new SequentialGroup(
                 new Delay(1.5),
-                new SetPositions(transferServo1.to(-0.25)),
-                new SetPower(transfer, 1),
-                new Delay(0.6),
-                TempHood.INSTANCE.HoodDown,
-                new Delay(1.0),
+                new SetPower(transfer, 0.7),
+                new Delay(0.1),
+                TempHood.INSTANCE.HoodUp,
                 TempHood.INSTANCE.HoodUp,
                 new Delay(1.0),
-                new SetPower(transfer, 0),
-                new SetPositions(transferServo1.to(0.6))
+                TempHood.INSTANCE.HoodDown,
+                new Delay(1.0),
+                new SetPower(transfer, 0)
         );
         //int tag=MotifScanning.INSTANCE.findMotif();
         onStart.schedule();

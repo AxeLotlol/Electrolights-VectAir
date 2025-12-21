@@ -75,30 +75,38 @@ public class redDefault extends NextFTCOpMode {
 
 
     private Paths paths;
-    public Pose start = new Pose(118.45161290322581,126, Math.toRadians(51));
 
-    public Pose PreLoadLaunch1 = new Pose(86.2258064516129,97.83870967741936);
+    public Pose start = new Pose(120,125, Math.toRadians(51));
 
-    public Pose ControlPoint1 = new Pose(61.00934579439252,82.76635514018692 );
+    public Pose PreloadCP = new Pose(96,96);
 
-    public Pose Intake1 = new Pose(129.4018691588785,83.66355140186916);
+    public Pose PreLoadLaunch1 = new Pose(77,77);
 
-    public Pose ClassifierRampPoint = new Pose(63.58064516129032,74.32258064516128);
+    public Pose intake1CP1 = new Pose(86,87);
 
-    public Pose ClassifierRamp = new Pose(124.74766355140187,75.14018691588785);
+    public Pose intake1CP2 = new Pose(125,79.5);
 
-    public Pose Launch1 = new Pose(86.2258064516129, 97.83870967741936);
+    public Pose Intake1stSetClassifier = new Pose(131,80);
 
-    public Pose ControlPoint2 = new Pose(71.99999999999999,56.60747663551402);
+    public Pose launchCP1 = new Pose(86,86.5);
 
-    public Pose Intake2 = new Pose(124.19626168224298,56.43925233644861);
-    public Pose ShootCP = new Pose(100,57);
+    public Pose Launch1 = new Pose(77,77);
 
-    public Pose ControlPoint3 = new Pose(75.3644859813084,27.77570093457944);
+    public Pose intake2CP = new Pose(86,60);
 
-    public Pose ControlPoint4 = new Pose(74.46728971962617,38.439252336448604);
+    public Pose intake2 = new Pose(130,58);
 
-    public Pose Intake3 = new Pose(128.2258064516129,35.12903225806451);
+    public Pose launch2Cp = new Pose(86,86.5);
+
+    public Pose launch2 = new Pose(77,77);
+
+    public Pose intake3CP = new Pose(90,35);
+
+    public Pose intake3 = new Pose(130,35);
+
+    public Pose launch3CP = new Pose(88,87.5);
+
+    public Pose launch3 = new Pose(77,77);
 
     public Pose Teleop1 = new Pose(100.11214953271028,80.009345794392516);
 
@@ -139,10 +147,10 @@ public class redDefault extends NextFTCOpMode {
 
 
 
-    Command pathCommand = new LambdaCommand()
+    /*Command pathCommand = new LambdaCommand()
             .setStart(() -> follower.followPath(paths.Intake1set))
             .setIsDone(() -> !follower.isBusy())
-            .named("Path2 Command");
+            .named("Path2 Command");*/
     Command pathCommand2 = new LambdaCommand()
             .setStart(() -> follower.followPath(paths.Intake2ndSet))
             .setIsDone(() -> !follower.isBusy())
@@ -174,14 +182,18 @@ public class redDefault extends NextFTCOpMode {
     private ServoEx transfer3;
     private ServoEx hoodservo1;
     private ServoEx hoodservo2;
-    private Command spinFlyWheel1500;
+    private Command shootClose;
     private Command intakeMotorOn;
+
+    private Command shootFar;
 
     private CRServo hoodServo1n;
     private CRServo hoodServo2n;
 
     private CRServoEx hoodServo1 = new CRServoEx(() -> hoodServo1n);
     private CRServoEx hoodServo2 = new CRServoEx(() -> hoodServo2n);
+
+    private boolean shootClose1;
 
     public void onInit() {
         telemetry.addLine("Initializing Follower...");
@@ -210,8 +222,18 @@ public class redDefault extends NextFTCOpMode {
         hoodservo2 = new ServoEx("hoodServo2");
 
 
-        spinFlyWheel1500 = new LambdaCommand()
-                .setStart(() -> shooter(1130));
+        shootClose = new LambdaCommand()
+                .setStart(() -> {
+                    shooter(1125);
+                     shootClose1 = true;
+
+
+                });
+        shootFar = new LambdaCommand()
+                .setStart(()->{
+                    shooter(1330);
+                     shootClose1 = false;
+                });
         intakeMotorOn = new LambdaCommand()
                 .setStart(() -> intakeMotor.setPower(-1));
         hoodServo1n= ActiveOpMode.hardwareMap().get(CRServo.class, "hoodServo1");
@@ -226,6 +248,11 @@ public class redDefault extends NextFTCOpMode {
         telemetry.addLine("Follower + IMU + Odo Pods initialized successfully!");
         telemetry.addLine("Initialization complete!");
         telemetry.update();
+        shootClose1 = false;
+
+        follower.update();
+
+
     }
 
 
@@ -249,20 +276,21 @@ public class redDefault extends NextFTCOpMode {
     Command opentransfer = new LambdaCommand()
             .setStart(()-> {
                 //`5transfer2.setPosition(-0.25);
-                transfer2.setPosition(0.3);
+                transfer2.setPosition(0.4);
                 //transfer3.setPosition(0.75);
             });
     Command closeTransfer = new LambdaCommand()
             .setStart(() -> {
                 //transfer2.setPosition(1);
-                transfer2.setPosition(1.25);
+                transfer2.setPosition(0.7);
                 //transfer3.setPosition(0);
             });
 
     Command transferOn = new LambdaCommand()
-            .setStart(()-> transfer1.setPower(-0.7));
+            .setStart(()-> transfer1.setPower(-1));
     Command transferOff = new LambdaCommand()
             .setStart(() -> transfer1.setPower(0));
+
     /*Command shootByTag1 = new LambdaCommand()
                 .setStart(() -> {
                 if (tagId == 21) {
@@ -309,27 +337,30 @@ public class redDefault extends NextFTCOpMode {
     public Command Auto(){
         return new SequentialGroup(
                 HoodUp,
-                spinFlyWheel1500,
+                shootClose,
                 intakeMotorOn,
                 new FollowPath(paths.PreLoadLaunch,true,0.8),
                 opentransfer,
                 new Delay(0.3),
                 transferOn,
-                new Delay(3),
+                new Delay(1),
                 transferOff,
                 //new TurnTo(Angle.fromDeg(90)),
                 //getMotif,
+                shootFar,
+                closeTransfer,
 
 
 
                 intakeMotorOn,
 
                 new Delay(0.2),
-                closeTransfer,
+
                 new Delay(0.2),
                 transferOn,
-                new FollowPath(paths.Intake1set,false,0.8),
+                new FollowPath(paths.IntakeandClassifier,false,0.7),
                 transferOff,
+                new Delay(1.0),
 
                 /*new FollowPath(paths.ClassifierRamp1,true,0.8),
                 new Delay(0.5),
@@ -337,7 +368,7 @@ public class redDefault extends NextFTCOpMode {
                 //new Delay(0.1),
                 // Sorting logic all here with the order, etc
                 */intakeMotorOn,
-                new FollowPath(paths.Launch1Real,true,0.8),
+                new FollowPath(paths.Launch1Real,true,0.7),
 
                 opentransfer,
                 new Delay(0.2),
@@ -345,7 +376,7 @@ public class redDefault extends NextFTCOpMode {
 
 
                 // Transfer logic with transfer
-                new Delay(3),
+                new Delay(1),
                 transferOff,
                 closeTransfer,
                 new Delay(0.3),
@@ -363,14 +394,14 @@ public class redDefault extends NextFTCOpMode {
                 // Sorting logic and order here
 
 
-                new FollowPath(paths.Launch2,true,0.9),
+                new FollowPath(paths.Launch2,true,0.7),
                 intakeMotorOn,
 
 
                 transferOn,
 
                 // Transfer logic with transfer
-                new Delay(3),
+                new Delay(1),
                 closeTransfer,
                 transferOff,
 
@@ -378,14 +409,14 @@ public class redDefault extends NextFTCOpMode {
 
                 intakeMotorOn,
                 transferOn,
-                /*new FollowPath(paths.Intake3rdSet,false,0.8),
+                new FollowPath(paths.Intake3rdSet,false,0.7),
 
                 transferOff,
                 new Delay(0.3),
                 opentransfer,
 
                 // Sorting logic here
-                new FollowPath(paths.Launch3,false,0.8),
+                new FollowPath(paths.Launch3,false,0.7),
                 new Delay(0.3),
 
                 // Transfer and shoot logic
@@ -393,9 +424,9 @@ public class redDefault extends NextFTCOpMode {
                 transferOn,
                 intakeMotorOff,
 
-                new Delay(1.5),
+                new Delay(1),
                 //closeTransfer,
-                transferOff,*/
+                transferOff,
                 transferOff,
                 stopFlywheel,
                 new FollowPath(paths.teleOp,true,0.9)
@@ -430,7 +461,17 @@ public class redDefault extends NextFTCOpMode {
     @Override
     public void onUpdate(){
 
-        shooter(1125);
+        //if(shootClose1){
+            //shooter(1125);
+
+        //}
+        //else if(!shootClose1){
+            shooter(1300);
+        //}
+
+
+
+        follower.update();
 
 
     }
@@ -447,9 +488,9 @@ public class redDefault extends NextFTCOpMode {
 
     public class Paths {
         public PathChain PreLoadLaunch;
-        public PathChain Intake1set;
+        public PathChain IntakeandClassifier;
 
-        public PathChain ClassifierRamp1;
+        //public PathChain ClassifierRamp1;
 
         public PathChain Launch1Real;
 
@@ -473,24 +514,26 @@ public class redDefault extends NextFTCOpMode {
             //.build();
 
             PreLoadLaunch = follower.pathBuilder()
-                    .addPath(new BezierLine(
+                    .addPath(new BezierCurve(
                             start,
+                            PreloadCP,
                             PreLoadLaunch1
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(51), Math.toRadians(37))
+                    .setTangentHeadingInterpolation().setReversed()
                     //.setVelocityConstraint(50)
                     .build();
-            Intake1set = follower.pathBuilder()
+            IntakeandClassifier = follower.pathBuilder()
                     .addPath(new BezierCurve(
                             PreLoadLaunch1,
-                            ControlPoint1,
-                            Intake1
+                            intake1CP1,
+                            intake1CP2,
+                            Intake1stSetClassifier
 
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(56), Math.toRadians(0))
+                    .setTangentHeadingInterpolation()
 
                     .build();
-            ClassifierRamp1 = follower.pathBuilder()
+           /* ClassifierRamp1 = follower.pathBuilder()
                     .addPath(new BezierCurve(
                             Intake1,
                             ClassifierRampPoint,
@@ -500,56 +543,58 @@ public class redDefault extends NextFTCOpMode {
                     ))
                     .setConstantHeadingInterpolation(Math.toRadians(0))
 
-                    .build();
+                    .build();*/
             Launch1Real = follower.pathBuilder()
-                    .addPath(new BezierLine(
-                            Intake1,
+                    .addPath(new BezierCurve(
+                            Intake1stSetClassifier,
+                            launchCP1,
                             Launch1
+
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(33))
+                    .setTangentHeadingInterpolation().setReversed()
 
                     .build();
             Intake2ndSet = follower.pathBuilder()
                     .addPath(new BezierCurve(
                             Launch1,
-                            ControlPoint2,
-                            Intake2
+                            intake2CP,
+                            intake2
 
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(50), Math.toRadians(0))
+                    .setTangentHeadingInterpolation()
 
                     .build();
             Launch2 = follower.pathBuilder()
                     .addPath(new BezierCurve(
-                            Intake2,
-                            ShootCP,
-                            Launch1
+                            intake2,
+                            launch2Cp,
+                            launch2
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(30))
+                    .setTangentHeadingInterpolation().setReversed()
 
                     .build();
             Intake3rdSet = follower.pathBuilder()
                     .addPath(new BezierCurve(
-                            Launch1,
-                            ControlPoint3,
-                            ControlPoint4,
-                            Intake3
+                            launch2,
+                            intake3CP,
+                            intake3
 
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(60), Math.toRadians(0))
+                    .setTangentHeadingInterpolation()
 
                     .build();
             Launch3 = follower.pathBuilder()
-                    .addPath(new BezierLine(
-                            Intake3,
-                            Launch1
+                    .addPath(new BezierCurve(
+                            intake3,
+                            launch3CP,
+                            launch3
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(25))
+                    .setTangentHeadingInterpolation().setReversed()
 
                     .build();
             teleOp = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            Launch1,
+                            launch3,
                             Teleop1
 
                     ))

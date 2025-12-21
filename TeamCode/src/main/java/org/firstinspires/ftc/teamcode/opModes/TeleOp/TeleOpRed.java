@@ -63,14 +63,17 @@ public class TeleOpRed extends NextFTCOpMode {
         if(lift==false){
             lift=true;
             TempHood.INSTANCE.HoodUp.schedule();
+            ActiveOpMode.telemetry().addLine("HoodUp");
         }
         else if (lift==true) {
             lift=false;
             TempHood.INSTANCE.HoodDown.schedule();
+            ActiveOpMode.telemetry().addLine("HoodDown");
         }
         else if (lift!=true&&lift!=false) {
             lift=true;
             TempHood.INSTANCE.HoodUp.schedule();
+            ActiveOpMode.telemetry().addLine("HoodUp");
         }
 
     }

@@ -1,56 +1,39 @@
 
 
-package org.firstinspires.ftc.teamcode.opModes.Auto;
+package org.firstinspires.ftc.teamcode.opModes.TeleOp;
 
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 
-import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierCurve;
-import com.pedropathing.geometry.BezierLine;
-import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.PathChain;
-import com.pedropathing.util.Timer;
-
-import dev.nextftc.bindings.BindingManager;
-import dev.nextftc.control.ControlSystem;
-import dev.nextftc.control.KineticState;
-import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
-import dev.nextftc.core.commands.groups.ParallelGroup;
 import dev.nextftc.core.commands.groups.SequentialGroup;
-import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
-import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
-import dev.nextftc.hardware.positionable.SetPositions;
 import dev.nextftc.hardware.powerable.SetPower;
 
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-
-import org.firstinspires.ftc.teamcode.subsystems.DistanceBlue;
 import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
+import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 import org.firstinspires.ftc.teamcode.subsystems.TempHood;
 
 
 import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.bylazar.configurables.annotations.Configurable;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 
-@Autonomous(name = "Airsort Auto", group = "Autonomous")
+@TeleOp(name = "Airsort")
 @Configurable
 public class AirsortAuto extends NextFTCOpMode {
     public AirsortAuto(){
         addComponents(
-                new SubsystemComponent(Flywheel.INSTANCE, TempHood.INSTANCE, DistanceRed.INSTANCE),
+                new SubsystemComponent(Flywheel.INSTANCE, DriveTrain.INSTANCE, TempHood.INSTANCE, DistanceRed.INSTANCE),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE
 
@@ -88,7 +71,7 @@ public class AirsortAuto extends NextFTCOpMode {
         double ticksPerSecond = flywheel.getVelocity();
 
         float newtps;
-        newtps=findTPS(2.2);
+        newtps=findTPS(DistanceRed.INSTANCE.getDistanceFromTag());
         ActiveOpMode.telemetry().addLine(String.valueOf(newtps));
         shooter(newtps);
         ActiveOpMode.telemetry().update();
@@ -108,9 +91,10 @@ public class AirsortAuto extends NextFTCOpMode {
 
     public void onStartButtonPressed() {
         SequentialGroup onStart= new SequentialGroup(
-                new Delay(1.5),
+                new Delay(2),
+                //TempHood.INSTANCE.HoodUp,
                 new SetPower(transfer, 0.7),
-                new Delay(0.1),
+                new Delay(0.0000),
                 TempHood.INSTANCE.HoodUp,
                 TempHood.INSTANCE.HoodUp,
                 new Delay(1.0),

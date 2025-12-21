@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
 import org.firstinspires.ftc.teamcode.subsystems.TempHood;
 
 import dev.nextftc.core.commands.delays.Delay;
+import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.components.SubsystemComponent;
 import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.ftc.Gamepads;
@@ -18,6 +19,7 @@ import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.ftc.components.BulkReadComponent;
 import dev.nextftc.hardware.impl.MotorEx;
+import dev.nextftc.hardware.powerable.SetPower;
 
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOpRed")
@@ -122,7 +124,23 @@ public class TeleOpRed extends NextFTCOpMode {
         Gamepads.gamepad2().circle().whenBecomesTrue(() -> TempHood.INSTANCE.HoodPowerZero.schedule());
         Gamepads.gamepad1().rightTrigger().greaterThan(0.4).whenBecomesTrue(() -> shoot());
         Gamepads.gamepad2().rightTrigger().greaterThan(0.4).whenBecomesTrue(() -> DriveTrain.closeTransfer.schedule());
+        SequentialGroup onStart= new SequentialGroup(
+                new Delay(2),
+                //TempHood.INSTANCE.HoodUp,
+                new SetPower(transfer, 0.25),
+                TempHood.INSTANCE.HoodUp,
+                new SetPower(transfer, 0),
+                TempHood.INSTANCE.HoodUp,
+                new SetPower(transfer, 1),
+                new Delay(1.0),
+                TempHood.INSTANCE.HoodDown,
+                new Delay(1.0),
+                new SetPower(transfer, 0)
+        );
+        //int tag=MotifScanning.INSTANCE.findMotif();
+        onStart.schedule();
     }
+
 
     public void onStop(){
         red=false;

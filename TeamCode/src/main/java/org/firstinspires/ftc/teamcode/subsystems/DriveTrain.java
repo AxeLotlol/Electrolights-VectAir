@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.INCH;
+import static org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit.DEGREES;
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.lowangle;
@@ -23,6 +25,7 @@ import dev.nextftc.core.commands.delays.Delay;
 import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.subsystems.Subsystem;
+import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.ftc.Gamepads;
 import dev.nextftc.hardware.driving.FieldCentric;
@@ -32,7 +35,9 @@ import dev.nextftc.hardware.impl.IMUEx;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.function.Supplier;
@@ -52,6 +57,8 @@ public class DriveTrain implements Subsystem {
     private boolean autolock = false;
 
     private boolean SWM = false;
+
+    private Follower follower;
 
     private boolean slow = false;
     // === AprilTag/Limelight align tuning ===
@@ -147,7 +154,16 @@ public class DriveTrain implements Subsystem {
                 } else {
                     tx = 0.0;
                 }
-                yVCtx = () -> visionYawCommand(tx);
+                double robotVelX = pinpoint.getVelX(INCH);
+                double robotVelY = pinpoint.getVelY(INCH);
+                double virtualGoalX = goalX - (robotVelX * 0.3); //use pinpoint to calculate these values
+                double virtualGoalY = goalY - (robotVelY * 0.3); //finds the location where the ball is suppose to land in order to be scored
+                double robotX = pinpoint.getPosX(INCH); //get position of robot
+                double robotY = pinpoint.getPosY(INCH);
+                double targetHeading = Math.atan2(virtualGoalY - robotY, virtualGoalX - robotX); // calculate the heading (finds distance of opposite and adjascent and finds the inbetween angle, heading)
+                double robotHeading = pinpoint.getHeading(DEGREES);
+                anglechange = Math.toDegrees(targetHeading)-robotHeading;
+                yVCtx = () -> visionYawCommand(anglechange);
                 return new MecanumDriverControlled(
                         fL,
                         fR,
@@ -166,7 +182,16 @@ public class DriveTrain implements Subsystem {
                 //Then, I can subtract the heading input from the current heading from before to get a simulated tx value
                 //Then, that value can be fed into a modified visionYawCommand()
                 //Using that, I get a simulated controller input that will move the robot to the right direction.
-                yVCtx = () -> visionYawCommand(tx);
+                double robotVelX = pinpoint.getVelX(INCH);
+                double robotVelY = pinpoint.getVelY(INCH);
+                double virtualGoalX = goalX - (robotVelX * 0.3); //use pinpoint to calculate these values
+                double virtualGoalY = goalY - (robotVelY * 0.3); //finds the location where the ball is suppose to land in order to be scored
+                double robotX = pinpoint.getPosX(INCH); //get position of robot
+                double robotY = pinpoint.getPosY(INCH);
+                double targetHeading = Math.atan2(virtualGoalY - robotY, virtualGoalX - robotX); // calculate the heading (finds distance of opposite and adjascent and finds the inbetween angle, heading)
+                double robotHeading = pinpoint.getHeading(DEGREES);
+                anglechange = Math.toDegrees(targetHeading)-robotHeading;
+                yVCtx = () -> visionYawCommand(anglechange);
                 return new MecanumDriverControlled(
                         fL,
                         fR,
@@ -222,12 +247,14 @@ public class DriveTrain implements Subsystem {
         }
         imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
         limelight = ActiveOpMode.hardwareMap().get(Limelight3A.class, "limelight");
-        //limelight.pipelineSwitch(APRILTAG_PIPELINE);
-        //limelight.start();
+        follower = PedroComponent.follower();
+        Pose startingpose=new Pose (72, 72, 90);
+        follower.setStartingPose(startingpose);
+        follower.update();
 
-        pinpoint = ActiveOpMode.hardwareMap().get(GoBildaPinpointDriver.class, "pinpoint");
-        pinpoint.setOffsets(5.85, 5.5, DistanceUnit.INCH);
     }
+
+    public double anglechange;
     private MotorEx intakeMotor;
     private static MotorEx transfer1;
     private static ServoEx transfer2;
@@ -246,6 +273,9 @@ public class DriveTrain implements Subsystem {
             .setStart(()-> transfer1.setPower(-0.9));
     static Command transferOff = new LambdaCommand()
             .setStart(() -> transfer1.setPower(0));
+
+    double goalY = 137.64;
+    double goalX = 13.63;
 
     public static SequentialGroup shoot = new SequentialGroup(opentransfer, transferOn, new Delay(1.5), transferOff, closeTransfer);
 
@@ -267,6 +297,7 @@ public class DriveTrain implements Subsystem {
 
 
         }
+        follower.update();
 
         ActiveOpMode.telemetry().addData("Lowangle:", lowangle);
 
@@ -279,27 +310,46 @@ public class DriveTrain implements Subsystem {
             tx = 0.0;
         }
 
-        double goalY = 144.0;
-        double goalX = 0.0;
-        double shotTime = 0.0;
+
+
+        double shotTime = 0.3;
         if(isBlue()==true) {
-            goalX = 0.0;
+            goalX = 130.37;
             shotTime = 0.3; //EDIT THIS TO BE AIRTIME CALCULATIONS
         }
-        else if(isRed()==true){
-            goalX = 144.0;
+        if(isRed()==true){
+            goalX = 13.63;
             shotTime = 0.3; //EDIT THIS TO BE AIRTIME CALCULATIONS
         }
-        double robotVelX = pinpoint.getVelX(DistanceUnit.INCH);
-        double robotVelY = pinpoint.getVelY(DistanceUnit.INCH);
+        double robotVelX = follower.getVelocity().getXComponent();
+        double robotVelY = follower.getVelocity().getYComponent();
         double virtualGoalX = goalX - (robotVelX * shotTime); //use pinpoint to calculate these values
         double virtualGoalY = goalY - (robotVelY * shotTime); //finds the location where the ball is suppose to land in order to be scored
-        double robotX = pinpoint.getPosX(DistanceUnit.INCH); //get position of robot
-        double robotY = pinpoint.getPosY(DistanceUnit.INCH);
-        double targetHeading = Math.atan2(virtualGoalY - robotY, virtualGoalX - robotX); // calculate the heading (finds distance of opposite and adjascent and finds the inbetween angle, heading)
+        double robotX = follower.getPose().getX(); //get position of robot
+        double robotY = follower.getPose().getY();
+
+        //Pose currPose =
+        double targetHeading = Math.atan2(virtualGoalX - robotX, virtualGoalY - robotY); // calculate the heading (finds distance of opposite and adjascent and finds the inbetween angle, heading)
+        double robotHeading = follower.getPose().getHeading();
+        double distance = follower.getPose().distanceFrom(new Pose(goalX, goalY));
+        ActiveOpMode.telemetry().addData("RobotVelX", robotVelX);
+        ActiveOpMode.telemetry().addData("RobotVelY", robotVelY);
+        ActiveOpMode.telemetry().addData("RobotX", robotX);
+        ActiveOpMode.telemetry().addData("RobotY", robotY);
+        ActiveOpMode.telemetry().addData("virtualGoalX", virtualGoalX);
+        ActiveOpMode.telemetry().addData("virtualGoalY", virtualGoalY);
+        ActiveOpMode.telemetry().addData("goalX", goalX);
+        ActiveOpMode.telemetry().addData("goalY", goalY);
+        ActiveOpMode.telemetry().addData("targetHeading", targetHeading);
+        ActiveOpMode.telemetry().addData("robotHeading", robotHeading);
+        ActiveOpMode.telemetry().addData("distance", distance);
+        shooter(findTPS(distance /  39.37));
+        anglechange = Math.toDegrees(targetHeading)-robotHeading;
+
         //I need you moksh to move the robot to the target heading because I do not know how I am suppose to do that.
 
-        yVCtx = () -> visionYawCommand(tx);
+        yVCtx = () -> visionYawCommand(anglechange);
+
         //ActiveOpMode.telemetry().update();
         //IF DISTANCE DOESNT WORK ANYMORE, ADD THIS
         /*float newtps = 1200;

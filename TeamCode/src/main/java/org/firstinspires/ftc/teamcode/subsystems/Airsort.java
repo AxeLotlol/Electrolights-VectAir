@@ -56,7 +56,16 @@ public class Airsort implements Subsystem {
     SequentialGroup PPGtoPGP = new SequentialGroup();
     SequentialGroup GPPtoPGP = new SequentialGroup();
     SequentialGroup PGPtoPPG = new SequentialGroup();
-    SequentialGroup GPPtoPPG = new SequentialGroup();
+    SequentialGroup GPPtoPPG = new SequentialGroup(
+            new SetPower(transfer, 0.25),
+            TempHood.INSTANCE.HoodUp,
+            new SetPower(transfer, 0),
+            TempHood.INSTANCE.HoodUp,
+            new SetPower(transfer, 1),
+            new Delay(0.5),
+            TempHood.INSTANCE.HoodDown,
+            new SetPower(transfer, 0)
+    );
     SequentialGroup PPGtoGPP = new SequentialGroup();
     SequentialGroup PGPtoGPP = new SequentialGroup();
 

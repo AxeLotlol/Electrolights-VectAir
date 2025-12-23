@@ -3,9 +3,12 @@ package org.firstinspires.ftc.teamcode.opModes.TeleOp;
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
 import org.firstinspires.ftc.teamcode.subsystems.TempHood;
@@ -13,6 +16,7 @@ import org.firstinspires.ftc.teamcode.subsystems.TempHood;
 import dev.nextftc.core.commands.delays.Delay;
 import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.components.SubsystemComponent;
+import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.ftc.Gamepads;
 import dev.nextftc.ftc.NextFTCOpMode;
@@ -61,6 +65,7 @@ public class TeleOpRed extends NextFTCOpMode {
 
     public boolean running=false;
 
+
     public void hood(){
         if(lift==false){
             lift=true;
@@ -79,6 +84,8 @@ public class TeleOpRed extends NextFTCOpMode {
         }
 
     }
+
+
 
     private static final int APRILTAG_PIPELINE = 7;
     @Override
@@ -99,11 +106,11 @@ public class TeleOpRed extends NextFTCOpMode {
 
     @Override
     public void onUpdate() {
-        float newtps;
+        /*float newtps;
         newtps=findTPS(DistanceRed.INSTANCE.getDistanceFromTag());
         ActiveOpMode.telemetry().addLine(String.valueOf(newtps));
         shooter(newtps);
-        ActiveOpMode.telemetry().update();
+        ActiveOpMode.telemetry().update();*/
     }
 
     public boolean shoot;
@@ -132,9 +139,8 @@ public class TeleOpRed extends NextFTCOpMode {
                 new SetPower(transfer, 0),
                 TempHood.INSTANCE.HoodUp,
                 new SetPower(transfer, 1),
-                new Delay(1.0),
+                new Delay(0.5),
                 TempHood.INSTANCE.HoodDown,
-                new Delay(1.0),
                 new SetPower(transfer, 0)
         );
         //int tag=MotifScanning.INSTANCE.findMotif();

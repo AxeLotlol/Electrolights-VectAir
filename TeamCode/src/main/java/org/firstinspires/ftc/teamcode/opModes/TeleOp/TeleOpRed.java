@@ -100,7 +100,7 @@ public class TeleOpRed extends NextFTCOpMode {
         red=true;
         intakeMotor = new MotorEx("intake").reversed();
         transfer = new MotorEx("transfer").reversed();
-        follower = PedroComponent.follower();
+        //follower = PedroComponent.follower();
         Gamepads.gamepad1().leftTrigger().greaterThan(0.3).whenBecomesTrue(()-> intakeMotor.setPower(1))
                 .whenBecomesFalse(() -> intakeMotor.setPower(0));
         Gamepads.gamepad1().leftBumper().whenBecomesTrue(()-> transfer.setPower(1))

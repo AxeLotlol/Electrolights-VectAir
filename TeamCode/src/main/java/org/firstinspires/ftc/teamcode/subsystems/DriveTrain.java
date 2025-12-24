@@ -70,7 +70,7 @@ public class DriveTrain implements Subsystem {
 
     private double visionYawCommand(double txDeg) {
         if (Math.abs(txDeg) < YAW_DEADBAND_DEG) return 0.0;
-        return 0.55*clip(YAW_KP * txDeg, -YAW_MAX, YAW_MAX);
+        return -1*0.4*clip(YAW_KP * txDeg, -YAW_MAX, YAW_MAX);
     }
 
     private void autolocktrue(){
@@ -182,10 +182,11 @@ public class DriveTrain implements Subsystem {
             ActiveOpMode.telemetry().addLine("No direction set");
         }
         imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
-        Pose startingpose=new Pose (72, 72, 90);
+        Pose startingpose=new Pose (72, 72, Math.toRadians(90));
         follower = PedroComponent.follower();
         follower.setStartingPose(startingpose);
         follower.update();
+
 
     }
 
@@ -208,8 +209,8 @@ public class DriveTrain implements Subsystem {
     static Command transferOff = new LambdaCommand()
             .setStart(() -> transfer1.setPower(0));
 
-    double goalY = 137.64;
-    double goalX = 13.63;
+    double goalY = 127;
+    double goalX = 20;
 
     double shotTime = 0.4;
 
@@ -235,11 +236,11 @@ public class DriveTrain implements Subsystem {
 
 
         if(isBlue()==true) {
-            goalX = 13.63;
+            goalX = 17;
             //shotTime = 0.3; //EDIT THIS TO BE AIRTIME CALCULATIONS
         }
         if(isRed()==true){
-            goalX =  130.37;
+            goalX =  127;
             //shotTime = 0.3; //EDIT THIS TO BE AIRTIME CALCULATIONS
         }
         double robotVelX = follower.getVelocity().getXComponent();
@@ -260,6 +261,8 @@ public class DriveTrain implements Subsystem {
         double distance = follower.getPose().distanceFrom(virtualGoal);
         shooter(findTPS(distance /  39.37));
 
+        double error = follower.getHeadingError();
+
 
         ActiveOpMode.telemetry().addData("RobotVelX", robotVelX);
         ActiveOpMode.telemetry().addData("RobotVelY", robotVelY);
@@ -273,6 +276,8 @@ public class DriveTrain implements Subsystem {
         ActiveOpMode.telemetry().addData("robotHeading", robotHeading);
         ActiveOpMode.telemetry().addData("headingError", headingError);
         ActiveOpMode.telemetry().addData("distance", distance);
+        ActiveOpMode.telemetry().addData("yVCtx", visionYawCommand(headingError));
+        ActiveOpMode.telemetry().addData("getHeadingError", error);
         ActiveOpMode.telemetry().update();
     }
 }

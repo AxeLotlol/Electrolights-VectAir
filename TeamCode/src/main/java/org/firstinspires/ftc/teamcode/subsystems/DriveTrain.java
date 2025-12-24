@@ -135,36 +135,16 @@ public class DriveTrain implements Subsystem {
 
 
 
-        if (autolock == true||SWM==true) {
-            if (autolock==true && SWM==false)
-            {
-                if (alliance == 1) {
-                    limelight.pipelineSwitch(8);
-                }
-                if (alliance == -1) {
-                    limelight.pipelineSwitch(7);
-                }
-                //limelight.pipelineSwitch(APRILTAG_PIPELINE);
-                LLResult result = limelight.getLatestResult();
-                hasTag = (result != null) && result.isValid() && !result.getFiducialResults().isEmpty();
-
-                if (hasTag) {
-                    tx = result.getTx(); // deg
-                    ActiveOpMode.telemetry().addData("Tx", tx);
-                    ActiveOpMode.telemetry().update();
-                } else {
-                    tx = 0.0;
-                }
-                double robotVelX = pinpoint.getVelX(INCH);
-                double robotVelY = pinpoint.getVelY(INCH);
-                double virtualGoalX = goalX - (robotVelX * 0.3); //use pinpoint to calculate these values
-                double virtualGoalY = goalY - (robotVelY * 0.3); //finds the location where the ball is suppose to land in order to be scored
-                double robotX = pinpoint.getPosX(INCH); //get position of robot
-                double robotY = pinpoint.getPosY(INCH);
-                double targetHeading = Math.atan2(virtualGoalY - robotY, virtualGoalX - robotX); // calculate the heading (finds distance of opposite and adjascent and finds the inbetween angle, heading)
-                double robotHeading = pinpoint.getHeading(DEGREES);
-                anglechange = Math.toDegrees(targetHeading)-robotHeading;
-                yVCtx = () -> visionYawCommand(anglechange);
+        if (autolock == true) {
+                Pose currPose = follower.getPose();
+                Vector OrthogonalVector = new Vector(1, -1*follower.getVelocity().getTheta());
+                Vector vectorProjected = OrthogonalVector.times((follower.getVelocity().dot(OrthogonalVector))/(OrthogonalVector.dot(OrthogonalVector)));
+                Vector vP = vectorProjected.times(0.4);
+                Pose virtualGoal = new Pose(goalX+vP.getXComponent(), goalY+vP.getYComponent());
+                double targetHeading = Math.atan2(virtualGoal.getX() - currPose.getX(), virtualGoal.getY() - currPose.getY()); // calculate the heading (finds distance of opposite and adjascent and finds the inbetween angle, heading)
+                double robotHeading = follower.getPose().getHeading();
+                double headingError = Math.toDegrees(targetHeading) - robotHeading;
+                yVCtx = () -> visionYawCommand(headingError);
                 return new MecanumDriverControlled(
                         fL,
                         fR,
@@ -175,35 +155,6 @@ public class DriveTrain implements Subsystem {
                         yVCtx,
                         new FieldCentric(imu)
                 );
-            }
-            else{
-                //SHOOTING WHILE MOVING CODE HERE
-                //I NEED TO TURN THE HEADING INPUT INTO A LIMELIGHT tx INPUT
-                //So, I can get the current heading of the robot from Pinpoint
-                //Then, I can subtract the heading input from the current heading from before to get a simulated tx value
-                //Then, that value can be fed into a modified visionYawCommand()
-                //Using that, I get a simulated controller input that will move the robot to the right direction.
-                double robotVelX = pinpoint.getVelX(INCH);
-                double robotVelY = pinpoint.getVelY(INCH);
-                double virtualGoalX = goalX - (robotVelX * 0.3); //use pinpoint to calculate these values
-                double virtualGoalY = goalY - (robotVelY * 0.3); //finds the location where the ball is suppose to land in order to be scored
-                double robotX = pinpoint.getPosX(INCH); //get position of robot
-                double robotY = pinpoint.getPosY(INCH);
-                double targetHeading = Math.atan2(virtualGoalY - robotY, virtualGoalX - robotX); // calculate the heading (finds distance of opposite and adjascent and finds the inbetween angle, heading)
-                double robotHeading = pinpoint.getHeading(DEGREES);
-                anglechange = Math.toDegrees(targetHeading)-robotHeading;
-                yVCtx = () -> visionYawCommand(anglechange);
-                return new MecanumDriverControlled(
-                        fL,
-                        fR,
-                        bL,
-                        bR,
-                        Gamepads.gamepad1().leftStickX().map(it -> alliance * it),
-                        Gamepads.gamepad1().leftStickY().map(it -> alliance * it),
-                        yVCtx,
-                        new FieldCentric(imu)
-                );
-            }
         }
         else// IF AUTOLOCK IS NOT ON
         {
@@ -325,9 +276,9 @@ public class DriveTrain implements Subsystem {
         Pose virtualGoal = new Pose(goalX+vP.getXComponent(), goalY+vP.getYComponent());
         double targetHeading = Math.atan2(virtualGoal.getX() - currPose.getX(), virtualGoal.getY() - currPose.getY()); // calculate the heading (finds distance of opposite and adjascent and finds the inbetween angle, heading)
         double robotHeading = follower.getPose().getHeading();
-        //double headingError = Math.toDegrees(targetHeading) - robotHeading;
+        double headingError = Math.toDegrees(targetHeading) - robotHeading;
 
-        //yVCtx = () -> visionYawCommand(headingError);*/
+        yVCtx = () -> visionYawCommand(headingError);
         double distance = follower.getPose().distanceFrom(virtualGoal);
         shooter(findTPS(distance /  39.37));
         //goal = actual goal - k * projected velocity vector
@@ -341,8 +292,9 @@ public class DriveTrain implements Subsystem {
         ActiveOpMode.telemetry().addData("goalY", goalY);
         ActiveOpMode.telemetry().addData("virtualGoalX", virtualGoal.getX());
         ActiveOpMode.telemetry().addData("virtualGoalY", virtualGoal.getY());
-        //ActiveOpMode.telemetry().addData("targetHeading", targetHeading);
-        //ActiveOpMode.telemetry().addData("robotHeading", robotHeading);
+        ActiveOpMode.telemetry().addData("targetHeading", targetHeading);
+        ActiveOpMode.telemetry().addData("robotHeading", robotHeading);
+        ActiveOpMode.telemetry().addData("headingError", headingError);
         ActiveOpMode.telemetry().addData("distance", distance);
         ActiveOpMode.telemetry().update();
     }

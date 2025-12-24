@@ -35,7 +35,8 @@ public class TeleOpRed extends NextFTCOpMode {
         addComponents(
                 new SubsystemComponent(DistanceRed.INSTANCE, TempHood.INSTANCE, DriveTrain.INSTANCE/*, Intake.INSTANCE, Spindexer.INSTANCE*/),
                 BulkReadComponent.INSTANCE,
-                BindingsComponent.INSTANCE
+                BindingsComponent.INSTANCE,
+                new PedroComponent(hwMap -> Constants.createFollower(hwMap))
 
         );
     }

@@ -7,12 +7,14 @@ import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.DistanceBlue;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
 import org.firstinspires.ftc.teamcode.subsystems.TempHood;
 
 import dev.nextftc.core.commands.delays.Delay;
 import dev.nextftc.core.components.SubsystemComponent;
+import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.ftc.Gamepads;
 import dev.nextftc.ftc.NextFTCOpMode;
@@ -30,7 +32,8 @@ public class TeleOpBlue extends NextFTCOpMode {
         addComponents(
                 new SubsystemComponent(TempHood.INSTANCE, DistanceBlue.INSTANCE, DriveTrain.INSTANCE/*, Intake.INSTANCE, Spindexer.INSTANCE*/),
                 BulkReadComponent.INSTANCE,
-                BindingsComponent.INSTANCE
+                BindingsComponent.INSTANCE,
+                new PedroComponent(hwMap -> Constants.createFollower(hwMap))
 
         );
     }

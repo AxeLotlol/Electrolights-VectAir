@@ -54,14 +54,7 @@ public class DriveTrain implements Subsystem {
     public DriveTrain() {
     }
 
-    private Limelight3A limelight;
-    public static boolean spinstop = false;
-    private double tx;
-    private boolean hasTag;
-
     private boolean autolock = false;
-
-    private boolean SWM = false;
 
     private boolean slow = false;
     // === AprilTag/Limelight align tuning ===
@@ -74,10 +67,6 @@ public class DriveTrain implements Subsystem {
         return Math.max(lo, Math.min(hi, v));
     }
 
-
-    double feedTime = 1.0; //adjust soon please
-
-    GoBildaPinpointDriver pinpoint;
 
     private double visionYawCommand(double txDeg) {
         if (Math.abs(txDeg) < YAW_DEADBAND_DEG) return 0.0;
@@ -92,13 +81,6 @@ public class DriveTrain implements Subsystem {
         autolock = false;
     }
 
-    private void SWMtrue(){
-        SWM = true;
-    }
-
-    private void SWMfalse(){
-        SWM = false;
-    }
 
     private void slowtrue(){
         slow = true;
@@ -143,9 +125,9 @@ public class DriveTrain implements Subsystem {
                 Vector vectorProjected = OrthogonalVector.times((follower.getVelocity().dot(OrthogonalVector))/(OrthogonalVector.dot(OrthogonalVector)));
                 Vector vP = vectorProjected.times(0.4);
                 Pose virtualGoal = new Pose(goalX-vP.getXComponent(), goalY-vP.getYComponent());
-                double targetHeading = Math.atan2(virtualGoal.getY() - currPose.getY(), virtualGoal.getX() - currPose.getX());
-                double robotHeading = follower.getPose().getHeading();
-                double headingError = Math.toDegrees(targetHeading) - robotHeading;
+                double targetHeading = Math.toDegrees(Math.atan2(virtualGoal.getY() - currPose.getY(), virtualGoal.getX() - currPose.getX()));
+                double robotHeading = Math.toDegrees(follower.getPose().getHeading());
+                double headingError = targetHeading - robotHeading;
                 yVCtx = () -> visionYawCommand(headingError);
                 return new MecanumDriverControlled(
                         fL,
@@ -200,7 +182,6 @@ public class DriveTrain implements Subsystem {
             ActiveOpMode.telemetry().addLine("No direction set");
         }
         imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
-        limelight = ActiveOpMode.hardwareMap().get(Limelight3A.class, "limelight");
         Pose startingpose=new Pose (72, 72, 90);
         follower = PedroComponent.follower();
         follower.setStartingPose(startingpose);
@@ -212,7 +193,7 @@ public class DriveTrain implements Subsystem {
     private MotorEx intakeMotor;
     private static MotorEx transfer1;
     private static ServoEx transfer2;
-    private ServoEx transfer3;
+
     public static Command opentransfer = new LambdaCommand()
             .setStart(()-> {
                 //`5transfer2.setPosition(-0.25);
@@ -220,7 +201,6 @@ public class DriveTrain implements Subsystem {
             });
     public static Command closeTransfer = new LambdaCommand()
             .setStart(() -> {
-                //transfer2.setPosition(1);
                 transfer2.setPosition(1);
             });
     static Command transferOn = new LambdaCommand()
@@ -240,15 +220,11 @@ public class DriveTrain implements Subsystem {
         if (firsttime==true){
             Gamepads.gamepad1().triangle().whenBecomesTrue(() -> autolocktrue())
                     .whenBecomesFalse(() -> autolockfalse());
-            Gamepads.gamepad1().circle().whenBecomesTrue(() -> SWMtrue())
-                    .whenBecomesFalse(() -> SWMfalse());
             Gamepads.gamepad1().leftBumper().whenBecomesTrue(() -> slowtrue())
                     .whenFalse(() -> slowfalse());
             intakeMotor = new MotorEx("intake");
             transfer1 = new MotorEx("transfer");
             transfer2 = new ServoEx("transferServo1");
-
-            transfer3 = new ServoEx("transferServo2");
             firsttime=false;
 
 
@@ -259,11 +235,11 @@ public class DriveTrain implements Subsystem {
 
 
         if(isBlue()==true) {
-            goalX = 130.37;
+            goalX = 13.63;
             //shotTime = 0.3; //EDIT THIS TO BE AIRTIME CALCULATIONS
         }
         if(isRed()==true){
-            goalX =  13.63;
+            goalX =  130.37;
             //shotTime = 0.3; //EDIT THIS TO BE AIRTIME CALCULATIONS
         }
         double robotVelX = follower.getVelocity().getXComponent();
@@ -276,14 +252,13 @@ public class DriveTrain implements Subsystem {
         Vector vectorProjected = OrthogonalVector.times((follower.getVelocity().dot(OrthogonalVector))/(OrthogonalVector.dot(OrthogonalVector)));
         Vector vP = vectorProjected.times(0.4);
         Pose virtualGoal = new Pose(goalX-vP.getXComponent(), goalY-vP.getYComponent());
-        double targetHeading = Math.atan2(virtualGoal.getY() - currPose.getY(), virtualGoal.getX() - currPose.getX());
-        double robotHeading = follower.getPose().getHeading();
-        double headingError = Math.toDegrees(targetHeading) - robotHeading;
+        double targetHeading = Math.toDegrees(Math.atan2(virtualGoal.getY() - currPose.getY(), virtualGoal.getX() - currPose.getX()));
+        double robotHeading = Math.toDegrees(follower.getPose().getHeading());
+        double headingError = robotHeading - targetHeading;
 
         yVCtx = () -> visionYawCommand(headingError);
         double distance = follower.getPose().distanceFrom(virtualGoal);
         shooter(findTPS(distance /  39.37));
-        //goal = actual goal - k * projected velocity vector
 
 
         ActiveOpMode.telemetry().addData("RobotVelX", robotVelX);

@@ -53,24 +53,83 @@ public class Airsort implements Subsystem {
             HoodPowerZero
     );
 
-    SequentialGroup PPGtoPGP = new SequentialGroup();
-    SequentialGroup GPPtoPGP = new SequentialGroup();
-    SequentialGroup PGPtoPPG = new SequentialGroup();
+    SequentialGroup PPGtoPGP /*SAME AS PGP TO PPG*/= new SequentialGroup(
+            new SetPower(transfer, 0.25),
+            TempHood.INSTANCE.HoodUp, //USED AS A DELAY HERE
+            new SetPower(transfer, 0),
+            new Delay(0.18),
+            new SetPower(transfer, 0.25),
+            TempHood.INSTANCE.HoodUp,
+            new SetPower(transfer, 0),
+            TempHood.INSTANCE.HoodUp,
+            new SetPower(transfer, 0.4),
+            new Delay(0.2),
+            TempHood.INSTANCE.HoodDown,
+            new SetPower(transfer, 0)
+    );
+    SequentialGroup GPPtoPGP /*SAME AS PGPtoGPP*/= new SequentialGroup(
+            new SetPower(transfer, 0.25),
+            TempHood.INSTANCE.HoodUp,
+            new SetPower(transfer, 0),
+            TempHood.INSTANCE.HoodUp,
+            new SetPower(transfer, 0.25),
+            new Delay(0.05),
+            new SetPower(transfer, 0),
+            TempHood.INSTANCE.HoodDown,
+            new Delay(0.18),
+            new SetPower(transfer, 1),
+            new Delay(0.2),
+            new SetPower(transfer, 0)
+    );
+    SequentialGroup PGPtoPPG /*SAME AS PPG TO PGP*/ = new SequentialGroup(
+            new SetPower(transfer, 0.25),
+            TempHood.INSTANCE.HoodUp, //USED AS A DELAY HERE
+            new SetPower(transfer, 0),
+            new Delay(0.18),
+            new SetPower(transfer, 0.25),
+            TempHood.INSTANCE.HoodUp,
+            new SetPower(transfer, 0),
+            TempHood.INSTANCE.HoodUp,
+            new SetPower(transfer, 0.4),
+            new Delay(0.2),
+            TempHood.INSTANCE.HoodDown,
+            new SetPower(transfer, 0)
+    );
     SequentialGroup GPPtoPPG = new SequentialGroup(
             new SetPower(transfer, 0.25),
             TempHood.INSTANCE.HoodUp,
             new SetPower(transfer, 0),
             TempHood.INSTANCE.HoodUp,
             new SetPower(transfer, 1),
-            new Delay(0.5),
+            new Delay(0.35),
             TempHood.INSTANCE.HoodDown,
             new SetPower(transfer, 0)
     );
-    SequentialGroup PPGtoGPP = new SequentialGroup();
-    SequentialGroup PGPtoGPP = new SequentialGroup();
+    SequentialGroup PPGtoGPP = new SequentialGroup(
+            new SetPower(transfer, 1),
+            TempHood.INSTANCE.HoodUp,
+            TempHood.INSTANCE.HoodUp,
+            new Delay(0.35),
+            TempHood.INSTANCE.HoodDown,
+            new SetPower(transfer, 0)
+    );
+    SequentialGroup PGPtoGPP /*SAME AS GPPtoPGP*/ = new SequentialGroup(
+            new SetPower(transfer, 0.25),
+            TempHood.INSTANCE.HoodUp,
+            new SetPower(transfer, 0),
+            TempHood.INSTANCE.HoodUp,
+            new SetPower(transfer, 0.25),
+            new Delay(0.05),
+            new SetPower(transfer, 0),
+            TempHood.INSTANCE.HoodDown,
+            new Delay(0.18),
+            new SetPower(transfer, 1),
+            new Delay(0.2),
+            new SetPower(transfer, 0)
+    );
 
 
-    SwitchCommand autoAirsortRed = new SwitchCommand(() -> "")
+    SwitchCommand autoAirsort = new SwitchCommand(() -> "text")
             .withCase("PGP1", PPGtoPGP)
             .withCase("PGP3", GPPtoPGP)
             .withCase("PPG2", PGPtoPPG)

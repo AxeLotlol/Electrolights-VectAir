@@ -4,6 +4,8 @@ import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.lowangle;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 
@@ -30,14 +32,14 @@ public class TeleOpBlue extends NextFTCOpMode {
     public MotorEx transfer;
     public TeleOpBlue() {
         addComponents(
+                new PedroComponent(Constants::createFollower),
                 new SubsystemComponent(TempHood.INSTANCE, DistanceBlue.INSTANCE, DriveTrain.INSTANCE/*, Intake.INSTANCE, Spindexer.INSTANCE*/),
                 BulkReadComponent.INSTANCE,
-                BindingsComponent.INSTANCE,
-                new PedroComponent(hwMap -> Constants.createFollower(hwMap))
+                BindingsComponent.INSTANCE
 
         );
     }
-
+    private Follower follower;
     public static boolean blue;
 
     public static boolean isBlue(){
@@ -100,6 +102,7 @@ public class TeleOpBlue extends NextFTCOpMode {
         blue=true;
         intakeMotor = new MotorEx("intake").reversed();
         transfer = new MotorEx("transfer").reversed();
+        follower = PedroComponent.follower();
         Gamepads.gamepad1().leftTrigger().greaterThan(0.3).whenBecomesTrue(()-> intakeMotor.setPower(1))
                 .whenBecomesFalse(() -> intakeMotor.setPower(0));
         Gamepads.gamepad1().leftBumper().whenBecomesTrue(()-> transfer.setPower(1))

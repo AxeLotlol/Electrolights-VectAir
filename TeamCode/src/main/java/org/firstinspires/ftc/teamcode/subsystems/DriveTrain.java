@@ -10,7 +10,6 @@ import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpBlue.isBlue;
 import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpRed.isRed;
 
 import com.bylazar.configurables.annotations.Configurable;
-import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.Vector;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
@@ -25,16 +24,20 @@ import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
 import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.commands.utility.LambdaCommand;
+import dev.nextftc.core.components.BindingsComponent;
+import dev.nextftc.core.components.SubsystemComponent;
 import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.ftc.Gamepads;
+import dev.nextftc.ftc.components.BulkReadComponent;
 import dev.nextftc.hardware.driving.FieldCentric;
 import dev.nextftc.hardware.driving.MecanumDriverControlled;
 import dev.nextftc.hardware.impl.Direction;
 import dev.nextftc.hardware.impl.IMUEx;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
+import static dev.nextftc.extensions.pedro.PedroComponent.follower;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -48,7 +51,8 @@ import java.util.function.Supplier;
 public class DriveTrain implements Subsystem {
 
     public static final DriveTrain INSTANCE = new DriveTrain();
-    private DriveTrain() { }
+    public DriveTrain() {
+    }
 
     private Limelight3A limelight;
     public static boolean spinstop = false;
@@ -58,8 +62,6 @@ public class DriveTrain implements Subsystem {
     private boolean autolock = false;
 
     private boolean SWM = false;
-
-    private Follower follower;
 
     private boolean slow = false;
     // === AprilTag/Limelight align tuning ===
@@ -105,9 +107,9 @@ public class DriveTrain implements Subsystem {
     private void slowfalse(){
         slow = false;
     }
-    public static final MotorEx fL = new MotorEx("frontLeft").brakeMode().reversed();
+    public static final MotorEx fL = new MotorEx("frontLeft").brakeMode();
     public static final MotorEx fR = new MotorEx("frontRight").brakeMode();
-    public static final MotorEx bL = new MotorEx("backLeft").brakeMode().reversed();
+    public static final MotorEx bL = new MotorEx("backLeft").brakeMode();
     public static final MotorEx bR = new MotorEx("backRight").brakeMode();
 
     public static double sensistivity = 1;
@@ -199,8 +201,8 @@ public class DriveTrain implements Subsystem {
         }
         imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
         limelight = ActiveOpMode.hardwareMap().get(Limelight3A.class, "limelight");
-        follower = PedroComponent.follower();
         Pose startingpose=new Pose (72, 72, 90);
+        follower = PedroComponent.follower();
         follower.setStartingPose(startingpose);
         follower.update();
 

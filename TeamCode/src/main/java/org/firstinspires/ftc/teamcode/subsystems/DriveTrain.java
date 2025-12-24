@@ -142,8 +142,8 @@ public class DriveTrain implements Subsystem {
                 Vector OrthogonalVector = new Vector(1, -1*follower.getVelocity().getTheta());
                 Vector vectorProjected = OrthogonalVector.times((follower.getVelocity().dot(OrthogonalVector))/(OrthogonalVector.dot(OrthogonalVector)));
                 Vector vP = vectorProjected.times(0.4);
-                Pose virtualGoal = new Pose(goalX+vP.getXComponent(), goalY+vP.getYComponent());
-                double targetHeading = Math.atan2(virtualGoal.getX() - currPose.getX(), virtualGoal.getY() - currPose.getY()); // calculate the heading (finds distance of opposite and adjascent and finds the inbetween angle, heading)
+                Pose virtualGoal = new Pose(goalX-vP.getXComponent(), goalY-vP.getYComponent());
+                double targetHeading = Math.atan2(virtualGoal.getY() - currPose.getY(), virtualGoal.getX() - currPose.getX());
                 double robotHeading = follower.getPose().getHeading();
                 double headingError = Math.toDegrees(targetHeading) - robotHeading;
                 yVCtx = () -> visionYawCommand(headingError);
@@ -275,8 +275,8 @@ public class DriveTrain implements Subsystem {
         Vector OrthogonalVector = new Vector(1, -1*follower.getVelocity().getTheta());
         Vector vectorProjected = OrthogonalVector.times((follower.getVelocity().dot(OrthogonalVector))/(OrthogonalVector.dot(OrthogonalVector)));
         Vector vP = vectorProjected.times(0.4);
-        Pose virtualGoal = new Pose(goalX+vP.getXComponent(), goalY+vP.getYComponent());
-        double targetHeading = Math.atan2(virtualGoal.getX() - currPose.getX(), virtualGoal.getY() - currPose.getY()); // calculate the heading (finds distance of opposite and adjascent and finds the inbetween angle, heading)
+        Pose virtualGoal = new Pose(goalX-vP.getXComponent(), goalY-vP.getYComponent());
+        double targetHeading = Math.atan2(virtualGoal.getY() - currPose.getY(), virtualGoal.getX() - currPose.getX());
         double robotHeading = follower.getPose().getHeading();
         double headingError = Math.toDegrees(targetHeading) - robotHeading;
 

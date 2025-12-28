@@ -199,14 +199,14 @@ public class DriveTrain implements Subsystem {
     public static Command opentransfer = new LambdaCommand()
             .setStart(()-> {
                 //`5transfer2.setPosition(-0.25);
-                transfer2.setPosition(0.4);
+                transfer2.setPosition(0.3);
             });
     public static Command closeTransfer = new LambdaCommand()
             .setStart(() -> {
-                transfer2.setPosition(0.7);
+                transfer2.setPosition(0.6);
             });
     static Command transferOn = new LambdaCommand()
-            .setStart(()-> transfer1.setPower(-1));
+            .setStart(()-> transfer1.setPower(-0.75));
     static Command transferOff = new LambdaCommand()
             .setStart(() -> transfer1.setPower(0));
 
@@ -222,7 +222,7 @@ public class DriveTrain implements Subsystem {
 
 
 
-    public static SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.3), transferOn, new Delay(0.5), transferOff, closeTransfer, shootFalse);
+    public static SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.4), transferOn, new Delay(0.5), transferOff, closeTransfer, shootFalse);
 
     public static void shoot(){
         if(shooting == false){
@@ -272,7 +272,8 @@ public class DriveTrain implements Subsystem {
 
         yVCtx = () -> visionYawCommand(headingError);
         double distance = follower.getPose().distanceFrom(virtualGoal);
-        shooter(findTPS(0.85*(distance /  39.37)));
+        float bro = findTPS(0.86 * (distance / 39.37));
+        shooter(findTPS(0.86*(distance /  39.37)));
 
         double error = follower.getHeadingError();
 
@@ -291,6 +292,7 @@ public class DriveTrain implements Subsystem {
         ActiveOpMode.telemetry().addData("distance", distance);
         ActiveOpMode.telemetry().addData("yVCtx", visionYawCommand(headingError));
         ActiveOpMode.telemetry().addData("getHeadingError", error);
+        ActiveOpMode.telemetry().addData("bro", bro);
         ActiveOpMode.telemetry().update();
     }
 }

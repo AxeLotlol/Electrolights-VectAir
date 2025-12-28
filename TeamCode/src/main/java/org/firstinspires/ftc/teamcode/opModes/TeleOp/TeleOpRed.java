@@ -103,7 +103,7 @@ public class TeleOpRed extends NextFTCOpMode {
         //follower = PedroComponent.follower();
         Gamepads.gamepad1().leftTrigger().greaterThan(0.3).whenBecomesTrue(()-> intakeMotor.setPower(1))
                 .whenBecomesFalse(() -> intakeMotor.setPower(0));
-        Gamepads.gamepad1().leftBumper().whenBecomesTrue(()-> transfer.setPower(1))
+        Gamepads.gamepad1().leftBumper().whenBecomesTrue(()-> transfer.setPower(0.3))
                 .whenBecomesFalse(() -> transfer.setPower(0));
 
 
@@ -136,7 +136,7 @@ public class TeleOpRed extends NextFTCOpMode {
         Gamepads.gamepad2().circle().whenBecomesTrue(() -> TempHood.INSTANCE.HoodPowerZero.schedule());
         Gamepads.gamepad1().rightTrigger().greaterThan(0.4).whenBecomesTrue(() -> shoot());
         Gamepads.gamepad2().rightTrigger().greaterThan(0.4).whenBecomesTrue(() -> DriveTrain.closeTransfer.schedule());
-        SequentialGroup onStart= new SequentialGroup(
+        /*SequentialGroup onStart= new SequentialGroup(
                 new Delay(2),
                 //TempHood.INSTANCE.HoodUp,
                 new SetPower(transfer, 0.25),
@@ -149,7 +149,7 @@ public class TeleOpRed extends NextFTCOpMode {
                 new SetPower(transfer, 0)
         );
         //int tag=MotifScanning.INSTANCE.findMotif();
-        onStart.schedule();
+        onStart.schedule();*/
     }
 
 

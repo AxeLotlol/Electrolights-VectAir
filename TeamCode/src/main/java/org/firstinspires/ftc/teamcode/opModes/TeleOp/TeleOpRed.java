@@ -140,7 +140,7 @@ public class TeleOpRed extends NextFTCOpMode {
                 new Delay(2),
                 //TempHood.INSTANCE.HoodUp,
                 new SetPower(transfer, 0.25),
-                TempHood.INSTANCE.HoodUp,
+                new Delay(0.01),
                 new SetPower(transfer, 0),
                 TempHood.INSTANCE.HoodUp,
                 new SetPower(transfer, 1),

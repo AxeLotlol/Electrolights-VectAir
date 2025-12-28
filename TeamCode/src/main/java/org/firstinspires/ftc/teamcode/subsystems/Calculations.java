@@ -29,7 +29,7 @@ public class Calculations implements Subsystem {
             numerator = 9.81 * Math.pow(dist, 2);
             denominator = (2 * Math.pow(Math.cos(1.09956), 2) * (dist * Math.tan(1.09956) - 0.85125));
             v0 = Math.sqrt(numerator / denominator);
-            requiredRPM = 0.5 * (13.628 * v0 * v0 * v0 - 49.443 * v0 * v0 + 624.39 * v0 + 1106.4);
+            requiredRPM = (2.1029* v0 * v0 * v0 * v0 * v0 -91.982*v0*v0*v0*v0 + 1571 * v0 * v0 * v0 - 13065 * v0 * v0 + 53323 * v0 + 83356);
             requiredTPS = (28 * requiredRPM) / 60;
             return (float) requiredTPS;
 
@@ -39,7 +39,7 @@ public class Calculations implements Subsystem {
             numerator = 9.81 * Math.pow(dist, 2);
             denominator = (2 * Math.pow(Math.cos(0.87266), 2) * (dist * Math.tan(0.87266) - 0.85125));
             v0 = Math.sqrt(numerator / denominator);
-            requiredRPM = 0.5 * (13.628 * v0 * v0 * v0 - 49.443 * v0 * v0 + 624.39 * v0 + 1106.4);
+            requiredRPM = (1.7035 * v0 * v0 * v0 - 12.361 * v0 * v0 + 312.19 * v0 + 1106.4);
             requiredTPS = (28 * requiredRPM) / 60;
             return (float) requiredTPS;
         }
@@ -47,7 +47,7 @@ public class Calculations implements Subsystem {
             numerator = 9.81 * Math.pow(dist, 2);
             denominator = (2 * Math.pow(Math.cos(1.09956), 2) * (dist * Math.tan(1.09956) - 0.85125));
             v0 = Math.sqrt(numerator / denominator);
-            requiredRPM = 0.5 * (13.628 * v0 * v0 * v0 - 49.443 * v0 * v0 + 624.39 * v0 + 1106.4);
+            requiredRPM = (1.7035 * v0 * v0 * v0 - 12.361 * v0 * v0 + 312.19 * v0 + 1106.4);
             requiredTPS = (28 * requiredRPM) / 60;
             return (float) requiredTPS;
         }

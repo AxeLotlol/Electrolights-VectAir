@@ -70,7 +70,7 @@ public class DriveTrain implements Subsystem {
 
     private double visionYawCommand(double txDeg) {
         if (Math.abs(txDeg) < YAW_DEADBAND_DEG) return 0.0;
-        return -1*0.4*clip(YAW_KP * txDeg, -YAW_MAX, YAW_MAX);
+        return -1*0.425*clip(YAW_KP * txDeg, -YAW_MAX, YAW_MAX);
     }
 
     private void autolocktrue(){
@@ -123,7 +123,7 @@ public class DriveTrain implements Subsystem {
                 Pose currPose = follower.getPose();
                 Vector OrthogonalVector = new Vector(1, -1*follower.getVelocity().getTheta());
                 Vector vectorProjected = OrthogonalVector.times((follower.getVelocity().dot(OrthogonalVector))/(OrthogonalVector.dot(OrthogonalVector)));
-                Vector vP = vectorProjected.times(0.4);
+                Vector vP = vectorProjected.times(0.6);
                 Pose virtualGoal = new Pose(goalX-vP.getXComponent(), goalY-vP.getYComponent());
                 double targetHeading = Math.toDegrees(Math.atan2(virtualGoal.getY() - currPose.getY(), virtualGoal.getX() - currPose.getX()));
                 double robotHeading = Math.toDegrees(follower.getPose().getHeading());
@@ -183,6 +183,7 @@ public class DriveTrain implements Subsystem {
         }
         imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
         Pose startingpose=new Pose (72, 72, Math.toRadians(90));
+
         follower = PedroComponent.follower();
         follower.setStartingPose(startingpose);
         follower.update();
@@ -198,31 +199,43 @@ public class DriveTrain implements Subsystem {
     public static Command opentransfer = new LambdaCommand()
             .setStart(()-> {
                 //`5transfer2.setPosition(-0.25);
-                transfer2.setPosition(0.25);
+                transfer2.setPosition(0.4);
             });
     public static Command closeTransfer = new LambdaCommand()
             .setStart(() -> {
-                transfer2.setPosition(1);
+                transfer2.setPosition(0.7);
             });
     static Command transferOn = new LambdaCommand()
-            .setStart(()-> transfer1.setPower(-0.9));
+            .setStart(()-> transfer1.setPower(-1));
     static Command transferOff = new LambdaCommand()
             .setStart(() -> transfer1.setPower(0));
 
-    double goalY = 127;
-    double goalX = 20;
+    double goalY = 144;
+    double goalX = 144;
 
     double shotTime = 0.4;
 
-    public static SequentialGroup shoot = new SequentialGroup(opentransfer, transferOn, new Delay(1.5), transferOff, closeTransfer);
+    static boolean shooting = false;
+
+    static Command shootFalse = new LambdaCommand()
+            .setStart(() -> shooting=false);
+
+
+
+    public static SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.3), transferOn, new Delay(0.5), transferOff, closeTransfer, shootFalse);
+
+    public static void shoot(){
+        if(shooting == false){
+            shoot.schedule();
+        }
+    }
 
     @Override
     public void periodic() {
         if (firsttime==true){
             Gamepads.gamepad1().triangle().whenBecomesTrue(() -> autolocktrue())
                     .whenBecomesFalse(() -> autolockfalse());
-            Gamepads.gamepad1().leftBumper().whenBecomesTrue(() -> slowtrue())
-                    .whenFalse(() -> slowfalse());
+            Gamepads.gamepad1().rightTrigger().greaterThan(0.8).whenBecomesTrue(()-> shoot());
             intakeMotor = new MotorEx("intake");
             transfer1 = new MotorEx("transfer");
             transfer2 = new ServoEx("transferServo1");
@@ -236,11 +249,11 @@ public class DriveTrain implements Subsystem {
 
 
         if(isBlue()==true) {
-            goalX = 17;
+            goalX = 0;
             //shotTime = 0.3; //EDIT THIS TO BE AIRTIME CALCULATIONS
         }
         if(isRed()==true){
-            goalX =  127;
+            goalX =  144;
             //shotTime = 0.3; //EDIT THIS TO BE AIRTIME CALCULATIONS
         }
         double robotVelX = follower.getVelocity().getXComponent();
@@ -251,7 +264,7 @@ public class DriveTrain implements Subsystem {
         Pose currPose = follower.getPose();
         Vector OrthogonalVector = new Vector(1, -1*follower.getVelocity().getTheta());
         Vector vectorProjected = OrthogonalVector.times((follower.getVelocity().dot(OrthogonalVector))/(OrthogonalVector.dot(OrthogonalVector)));
-        Vector vP = vectorProjected.times(0.4);
+        Vector vP = vectorProjected.times(0.6);
         Pose virtualGoal = new Pose(goalX-vP.getXComponent(), goalY-vP.getYComponent());
         double targetHeading = Math.toDegrees(Math.atan2(virtualGoal.getY() - currPose.getY(), virtualGoal.getX() - currPose.getX()));
         double robotHeading = Math.toDegrees(follower.getPose().getHeading());
@@ -259,7 +272,7 @@ public class DriveTrain implements Subsystem {
 
         yVCtx = () -> visionYawCommand(headingError);
         double distance = follower.getPose().distanceFrom(virtualGoal);
-        shooter(findTPS(distance /  39.37));
+        shooter(findTPS(0.85*(distance /  39.37)));
 
         double error = follower.getHeadingError();
 

@@ -42,7 +42,7 @@ import dev.nextftc.hardware.impl.ServoEx;
 import dev.nextftc.hardware.powerable.SetPower;
 
 
-@Autonomous(name = "Red Auto Sorted Default Position", group = "Auto+nomous")
+@Autonomous(name = "Red Auto REVERTED BACK TO DECEMBER 23RD Default Position", group = "Auto+nomous")
 @Configurable
 public class autoRevertes extends NextFTCOpMode {
     public autoRevertes() {

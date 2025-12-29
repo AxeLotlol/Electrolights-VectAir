@@ -3,6 +3,7 @@
 package org.firstinspires.ftc.teamcode.opModes.Auto;
 
 
+import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 
@@ -11,6 +12,7 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.Vector;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -66,38 +68,38 @@ public class redSORTEDDefault extends NextFTCOpMode {
 
     private Paths paths;
 
-    public Pose start = new Pose(125.79827045231767,125.69678743996302, Math.toRadians(39));
+    public Pose start = new Pose(120.14654507177205,126.80588312577113, Math.toRadians(50));
 
-    public Pose PreloadCP = new Pose(118.82561804849406,122.21046123805121);
+    //public Pose PreloadCP = new Pose(118.82561804849406,122.21046123805121);
 
-    public Pose PreLoadLaunch1 = new Pose(110.78558507577333,115.9135913662864);
+    public Pose PreLoadLaunch1 = new Pose(90.85286447123399,91.99310328165343);
 
-    public Pose intake1CP1 = new Pose(108.89607353678281,84.44081612930407);
+    public Pose intake1CP1 = new Pose(85.75831132331433,87.53536927722372);
 
     //public Pose intake1CP2 = new Pose(125,79.5);
 
-    public Pose Intake1stSetClassifier = new Pose(129.86565102121477,84.24612836558748);
+    public Pose Intake1stSetClassifier = new Pose(127.15155565016161,87.11082318156376);
 
-    public Pose launchCP1 = new Pose(98.46728971962617,103.40186915887851   );
+    public Pose launchCP1 = new Pose(95.31059847566371,98.573567764383);
 
-    public Pose Launch1 = new Pose(89.15468008859412,93.26674156863335);
+    public Pose Launch1 = new Pose(88.51786094510416,90.08264585118357);
 
-    public Pose intake2CP = new Pose(101.39398703893502,66.13871482396966);
-    public Pose intake2CP2 = new Pose(111.27191127768515,59.96606242014606);
+    public Pose intake2CP = new Pose(55.19099243579635,57.817142581025706);
+    public Pose intake2CP2 = new Pose(99.34378638443346,62.536241824605324);
 
-    public Pose intake2 = new Pose(128.99406947073683,63.78080707157992);
+    public Pose intake2 = new Pose(130,67,Math.toRadians(6.0));
 
-    public Pose launch2Cp = new Pose(90.64448124970694,92.57668852180086);
+    public Pose launch2Cp = new Pose(86.81967656246427,88.59673451637366);
 
-    public Pose launch2 = new Pose(77.60747663551402,79.17757009345794);
+    public Pose launch2 = new Pose(81.51285036671462,80.10581260317423);
 
-    public Pose intake3CP = new Pose(86.57710068080985,30.984925621358947);
+    public Pose intake3CP = new Pose(87.6687687537842,32.34437684142739);
 
-    public Pose intake3 = new Pose(123.189868489156,30.113344070881013);
+    public Pose intake3 = new Pose(128.21292088931153,41.047571802456794);
 
-    public Pose launch3CP = new Pose(92.96869871764815,100.42092247610242);
+    public Pose launch3CP = new Pose(92.97559494953384,93.47901461646335);
 
-    public Pose launch3 = new Pose(80.60747663551402,80.17757009345794,Math.toRadians(58));
+    public Pose launch3 = new Pose(81.51285036671462,79.89353955534423,Math.toRadians(47));
 
     public Pose loadingZoneCP1 = new Pose(116.11335716300232,75.43580555091452);
 
@@ -227,7 +229,7 @@ public class redSORTEDDefault extends NextFTCOpMode {
 
         shootClose = new LambdaCommand()
                 .setStart(() -> {
-                    shooter(1250);
+                    shooter(1200);
                      shootClose1 = true;
 
 
@@ -298,6 +300,13 @@ public class redSORTEDDefault extends NextFTCOpMode {
     Command shootCloseyipeee = new LambdaCommand()
             .setStart(()-> shooter(1250));
 
+    public Command turnTo(Pose targetPose, double timeoutSeconds) {
+        return new LambdaCommand("Turn to " + targetPose.getHeading())
+                .setStart(() -> follower.holdPoint(targetPose))
+                .setIsDone(() -> false)
+                .raceWith(new Delay(timeoutSeconds));
+    }
+
     /*Command shootByTag1 = new LambdaCommand()
                 .setStart(() -> {
                 if (tagId == 21) {
@@ -346,129 +355,59 @@ public class redSORTEDDefault extends NextFTCOpMode {
 
     public Command Auto(){
         return new SequentialGroup(
-
-
-
-
-                spinUp,
-                new Delay(0.3),
-                //shootCloseyipeee,
                 shootClose,
-                //intakeMotorOn,
                 opentransfer,
-                //new Delay(1.5),
                 new FollowPath(paths.PreLoadLaunch,true,0.99),
-
-
                 transferOn,
-                new Delay(1.5),
-
-                transferOff,
-                //new TurnTo(Angle.fromDeg(90)),
-                //getMotif,
-                //shootFar,
-                closeTransfer,
-
-
-
-                intakeMotorOn,
-
-
-
-                new Delay(0.2),
-                transferOnIntake,
-                intakeMotorOn,
-                new FollowPath(paths.IntakeandClassifier,false,0.9),
-                transferOff,
-                //new Delay(1.0),
-
-                /*new FollowPath(paths.ClassifierRamp1,true,0.8),
-                new Delay(0.5),
-                //transferOff,
-                //new Delay(0.1),
-                // Sorting logic all here with the order, etc
-                */
-                //intakeMotorOn,
-                new FollowPath(paths.Launch1Real,true,0.9),
-
-                opentransfer,
-                new Delay(0.2),
-                transferOn,
-
-
-                // Transfer logic with transfer
-                new Delay(1.5),
+                new Delay(1.0),
                 transferOff,
                 closeTransfer,
-                new Delay(0.3),
-
                 intakeMotorOn,
-                transferOnIntake,
-                shootFar,
-                new FollowPath(paths.Intake2ndSet,false,0.8),
-
-                transferOff,
-                new Delay(0.3),
-                //opentransfer,
-
-                //intakeMotorOff,
-
-                // Sorting logic and order here
-
-
-                new FollowPath(paths.Launch2,true,0.9),
-                opentransfer,
-                intakeMotorOn,
-
-
                 transferOn,
-
-                // Transfer logic with transfer
-                new Delay(1.75),
-                closeTransfer,
-                transferOff,
-
-
-
-                intakeMotorOn,
-                transferOnIntake,
-                new FollowPath(paths.Intake3rdSet,false,0.9),
-
-                transferOff,
-
-
-
-                // Sorting logic here
-                new FollowPath(paths.Launch3,false,0.9),
-                opentransfer,
-                new Delay(0.3),
-
-                // Transfer and shoot logic
-                opentransfer,
-                transferOn,
+                new FollowPath(paths.IntakeandClassifier,false,0.99),
                 intakeMotorOff,
-
-                new Delay(1.5),
-                //closeTransfer,
                 transferOff,
-                closeTransfer,
 
+                new FollowPath(paths.Launch1Real,true,0.99),
+                opentransfer,
+                transferOn,
+                intakeMotorOn,
+                new Delay(1.0),
+                closeTransfer,
+                transferOff,
                 intakeMotorOn,
                 transferOn,
-
-                new FollowPath(paths.LoadingZone,false,0.9),
+                shootFar,
+                new FollowPath(paths.Intake2ndSet,true,0.9),
+                intakeMotorOff,
                 transferOff,
-                new Delay(0.4),
-
-
-                new FollowPath(paths.LoadingZoneLaunch,true,0.9),
+                new FollowPath(paths.Launch2,true,0.99),
+                opentransfer,
+                new Delay(0.5),
+                transferOn,
+                new Delay(1.0),
+                closeTransfer,
+                transferOff,
+                intakeMotorOn,
+                transferOn,
+                new FollowPath(paths.Intake3rdSet,false,0.99),
+                transferOff,
+                intakeMotorOff,
+                new FollowPath(paths.Launch3,true,0.99),
                 opentransfer,
                 transferOn,
-                new Delay(1.5),
-                opentransfer,
-                transferOff,
-                stopFlywheel,
-                new FollowPath(paths.teleOp,true,0.9)
+                new Delay(1.0),
+                closeTransfer,
+                transferOff
+
+
+
+
+
+
+
+
+
 
 
 
@@ -501,17 +440,24 @@ public class redSORTEDDefault extends NextFTCOpMode {
     public void onUpdate(){
 
         if(shootClose1){
-            shooter(1250);
-
-        }
-        else if(!shootClose1){
             shooter(1300);
         }
+        else{
+            Pose goalRed = new Pose(133,136);
+            double distance = follower.getPose().distanceFrom(goalRed);
+            shooter(findTPS(distance /  39.37));
+            follower.update();
+
+        }
 
 
 
 
-        follower.update();
+
+
+
+
+
 
 
     }
@@ -562,7 +508,7 @@ public class redSORTEDDefault extends NextFTCOpMode {
             PreLoadLaunch = follower.pathBuilder()
                     .addPath(new BezierCurve(
                             start,
-                            PreloadCP,
+                            //PreloadCP,
                             PreLoadLaunch1
                     ))
                     .setTangentHeadingInterpolation().setReversed()
@@ -608,6 +554,7 @@ public class redSORTEDDefault extends NextFTCOpMode {
 
                     ))
                     .setTangentHeadingInterpolation()
+
 
                     .build();
             Launch2 = follower.pathBuilder()

@@ -206,7 +206,7 @@ public class DriveTrain implements Subsystem {
                 transfer2.setPosition(0.6);
             });
     static Command transferOn = new LambdaCommand()
-            .setStart(()-> transfer1.setPower(-0.75));
+            .setStart(()-> transfer1.setPower(-1));
     static Command transferOff = new LambdaCommand()
             .setStart(() -> transfer1.setPower(0));
 
@@ -272,8 +272,8 @@ public class DriveTrain implements Subsystem {
 
         yVCtx = () -> visionYawCommand(headingError);
         double distance = follower.getPose().distanceFrom(virtualGoal);
-        float bro = findTPS(0.86 * (distance / 39.37));
-        shooter(findTPS(0.86*(distance /  39.37)));
+        //float bro = findTPS(0.86 * (distance / 39.37));
+        shooter(findTPS(0.9*(distance /  39.37)));
 
         double error = follower.getHeadingError();
 
@@ -292,7 +292,7 @@ public class DriveTrain implements Subsystem {
         ActiveOpMode.telemetry().addData("distance", distance);
         ActiveOpMode.telemetry().addData("yVCtx", visionYawCommand(headingError));
         ActiveOpMode.telemetry().addData("getHeadingError", error);
-        ActiveOpMode.telemetry().addData("bro", bro);
+        //ActiveOpMode.telemetry().addData("bro", bro);
         ActiveOpMode.telemetry().update();
     }
 }

@@ -310,7 +310,7 @@ public class red15Spam extends NextFTCOpMode {
                     .pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(72.000, 72.000),
+                                    new Pose(76.000, 76.000),
                                     new Pose(85.000, 87.000),
                                     new Pose(85.000, 59.000),
                                     new Pose(127.000, 59.000)
@@ -326,7 +326,7 @@ public class red15Spam extends NextFTCOpMode {
                                     new Pose(127.000, 59.000),
                                     new Pose(85.000, 59.000),
                                     new Pose(85.000, 87.000),
-                                    new Pose(72.000, 72.000)
+                                    new Pose(76.000, 76.000)
                             )
                     )
                     .setTangentHeadingInterpolation()
@@ -337,7 +337,7 @@ public class red15Spam extends NextFTCOpMode {
                     .pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(72.000, 72.000),
+                                    new Pose(76.000, 76.000),
                                     new Pose(80.400, 86.400),
                                     new Pose(97.200, 56.200),
                                     new Pose(106.300, 61.000),
@@ -362,7 +362,7 @@ public class red15Spam extends NextFTCOpMode {
                                     new Pose(133.500, 60.000),
                                     new Pose(112.000, 48.000),
                                     new Pose(81.000, 82.500),
-                                    new Pose(72.000, 72.000)
+                                    new Pose(76.000, 76.000)
                             )
                     )
                     .setTangentHeadingInterpolation()
@@ -373,7 +373,7 @@ public class red15Spam extends NextFTCOpMode {
                     .pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(72.000, 72.000),
+                                    new Pose(76.000, 76.000),
                                     new Pose(82.000, 87.000),
                                     new Pose(125.000, 84.000)
                             )
@@ -387,7 +387,7 @@ public class red15Spam extends NextFTCOpMode {
                             new BezierCurve(
                                     new Pose(125.000, 84.000),
                                     new Pose(86.000, 87.000),
-                                    new Pose(72.000, 72.000)
+                                    new Pose(76.000, 76.000)
                             )
                     )
                     .setTangentHeadingInterpolation()
@@ -398,10 +398,10 @@ public class red15Spam extends NextFTCOpMode {
                     .pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(72.000, 72.000),
+                                    new Pose(76.000, 76.000),
                                     new Pose(88.000, 89.000),
-                                    new Pose(84.000, 36.000),
-                                    new Pose(125.000, 35.500)
+                                    new Pose(84.000, 40.000),
+                                    new Pose(125.000, 39.500)
                             )
                     )
                     .setTangentHeadingInterpolation()
@@ -411,10 +411,10 @@ public class red15Spam extends NextFTCOpMode {
                     .pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(125.000, 35.500),
+                                    new Pose(125.000, 39.500),
                                     new Pose(84.000, 36.000),
                                     new Pose(88.000, 89.500),
-                                    new Pose(72.000, 72.000)
+                                    new Pose(76.000, 76.000)
                             )
                     )
                     .setTangentHeadingInterpolation()
@@ -424,7 +424,7 @@ public class red15Spam extends NextFTCOpMode {
             teleOpPar = follower
                     .pathBuilder()
                     .addPath(
-                            new BezierLine(new Pose(72.000, 72.000), new Pose(84.000, 60.000))
+                            new BezierLine(new Pose(76.000, 76.000), new Pose(84.000, 60.000))
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(90))
                     .build();

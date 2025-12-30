@@ -52,34 +52,63 @@ public class BlueDefault extends NextFTCOpMode {
 
 
     private Paths paths;
-    public Pose start = new Pose(24.677419354838708,125.70967741935485, Math.toRadians(125));
+    public Pose start = new Pose(23.485714285714288,126.68571428571428, Math.toRadians(125));
+
 
     public Pose PreLoadLaunch1 = new Pose(57.6,101.27472527472527);
 
-    public Pose ControlPoint1 = new Pose(50.225806451612904,80.41935483870968 );
+    public Pose ControlPoint1 = new Pose(73.71428571428571,82.11428571428571 );
 
-    public Pose Intake1 = new Pose(15.25233644859813,83.66355140186916);
+    public Pose Intake1 = new Pose(17.142857142857142,80.91428571428571);
+
+
+    public Pose Launch1 = new Pose(72, 72);
+
+    public Pose ControlPoint2 = new Pose(59,86);
+
+    public Pose Intake2 = new Pose(17.485714285714284,57.94285714285714);
+
+    public Pose ControlPoint3 = new Pose(54.68571428571428,52.28571428571429);
 
     public Pose ClassifierRampPoint = new Pose(69.38709677419355,69.67741935483872);
+    //NOT SURE WHAT THIS IS -DEB
 
-    public Pose ClassifierRamp = new Pose(14.579439252336448,74.89719626168224);
+    public Pose ClassifierRamp = new Pose(12,61.71428571428572);
 
-    public Pose Launch1 = new Pose(62.12903225806452, 96.67741935483872);
+    public Pose ControlPoint4 = new Pose(103,42);
+    public Pose Launch2 = new Pose(72, 72);
 
-    public Pose ControlPoint2 = new Pose(63.87096774193548,53.70967741935483);
+    public Pose Intake3 = new Pose(23.82857142857143,32.74285714285714);
+    public Pose ControlPoint5 = new Pose(78.5142857142857,31.028571428571432);
 
-    public Pose Intake2 = new Pose(12.11214953271028,60.11214953271029);
+    public Pose Launch3 = new Pose(72, 72);
+    public Pose ControlPoint6 = new Pose(53.48571428571429,91.37142857142857);
 
-    public Pose ControlPoint3 = new Pose(72.87096774193549,25.258064516129032);
+    public Pose Teleop1 = new Pose(60.68571428571428,36.17142857142857);
+    public Pose ControlPoint7 = new Pose(60,68.57142857142857);
 
-
-
-    public Pose Intake3 = new Pose(11.214953271028037,25.258064516129032);
-
-    public Pose Teleop1 = new Pose(59.88785046728972,35.88785046728974);
-
-
-
+    /*
+    second auto values in order:
+    START:(24.342857142857145,125.4857142857143)
+    (ALL LUANCHES ARE 72, 72 ON PEDROPATHING VISUALIZER)
+    PRELOAD LAUNCH: (72,72)
+    INTAKE 1:(19.02857142857143,81.77142857142857)
+    CONTROL POINT 1: (60.17142857142857,83.82857142857142)
+    INTAKE 2: (23.82857142857143,57.08571428571429)
+    CONTROL POINT 2: (77.82857142857142,57.6)
+    RAMP: (13.542857142857143,61.71428571428572)
+    CONTROL POINT 3: ( 62.74285714285715,39.25714285714286)
+    BACK: (20.74285714285714,55.54285714285714)
+    INTAKE 3:(24.342857142857145,32.4)
+    CONTROL POINT 4:(69.94285714285714,30.34285714285715)
+    TELEOP:(36.68571428571428,59.14285714285714)
+    CONTROL POINT 5:(36.51428571428571,80.74285714285715)
+    LAUNCH CONTROL POINTS IN ORDER:
+    (36.68571428571428,114.85714285714286)
+    (24.514285714285716,110.39999999999999)
+    (52.114285714285714,96.51428571428572)
+    (93.77142857142857,52.45714285714286)
+     */
 
 
 

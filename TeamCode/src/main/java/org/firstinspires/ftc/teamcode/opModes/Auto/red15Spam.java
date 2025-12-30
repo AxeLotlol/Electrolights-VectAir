@@ -70,7 +70,7 @@ public class red15Spam extends NextFTCOpMode {
 
 
     private Paths paths;
-    public Pose start = new Pose(120,125, Math.toRadians(51));
+    public Pose start = new Pose(119.4,126.4, Math.toRadians(49));
 
     private static final int APRILTAG_PIPELINE = 8;
 
@@ -181,7 +181,7 @@ public class red15Spam extends NextFTCOpMode {
             });
 
     Command transferOn = new LambdaCommand()
-            .setStart(()-> transfer1.setPower(-1));
+            .setStart(()-> transfer1.setPower(-0.67));
     Command transferOff = new LambdaCommand()
             .setStart(() -> transfer1.setPower(0));
     /*Command shootByTag1 = new LambdaCommand()
@@ -231,15 +231,18 @@ public class red15Spam extends NextFTCOpMode {
 
     public Command Auto(){
         return new SequentialGroup(
+                intakeMotorOn,
                 new FollowPath(paths.PreloadLaunch,true,0.8),
                 new Delay(0.4),
                 new FollowPath(paths.intakeSet2,true,0.8),
                 new Delay(0.4),
                 new FollowPath(paths.launchSet2,true,0.8),
                 new Delay(0.4),
+                transferOn,
                 new FollowPath(paths.resetHelper,true,0.8),
-                new FollowPath(paths.resetIntakeSpam,true,0.8),
-                new Delay(0.4),
+                new FollowPath(paths.resetIntakeSpam, true, 1.0),
+                new Delay(1),
+                transferOff,
                 new FollowPath(paths.launchSpam,true,0.8),
                 new Delay(0.4),
                 new FollowPath(paths.intakeSet1,true,0.8),
@@ -250,7 +253,7 @@ public class red15Spam extends NextFTCOpMode {
                 new Delay(0.4),
                 new FollowPath(paths.launchSet3,true,0.8),
                 new Delay(0.4),
-                new FollowPath(paths.teleOpPark,true,0.8)
+                new FollowPath(paths.teleOpPar,true,0.8)
         );
     }
 
@@ -291,13 +294,13 @@ public class red15Spam extends NextFTCOpMode {
         public PathChain launchSet1;
         public PathChain intakeSet3;
         public PathChain launchSet3;
-        public PathChain teleOpPark;
+        public PathChain teleOpPar;
 
         public Paths(Follower follower) {
             PreloadLaunch = follower
                     .pathBuilder()
                     .addPath(
-                            new BezierLine(new Pose(120.200, 126.600), new Pose(72.000, 72.000))
+                            new BezierLine(new Pose(119.4,126.4), new Pose(76.000, 76.000))
                     )
                     .setTangentHeadingInterpolation()
                     .setReversed()
@@ -337,8 +340,8 @@ public class red15Spam extends NextFTCOpMode {
                                     new Pose(72.000, 72.000),
                                     new Pose(80.400, 86.400),
                                     new Pose(97.200, 56.200),
-                                    new Pose(115.300, 51.000),
-                                    new Pose(130.600, 60.000)
+                                    new Pose(106.300, 61.000),
+                                    new Pose(123.000, 65.000)
                             )
                     )
                     .setTangentHeadingInterpolation()
@@ -347,9 +350,9 @@ public class red15Spam extends NextFTCOpMode {
             resetIntakeSpam = follower
                     .pathBuilder()
                     .addPath(
-                            new BezierLine(new Pose(130.600, 60.000), new Pose(133.500, 60.000))
+                            new BezierLine(new Pose(123.000, 65.000), new Pose(126.000, 60.000))
                     )
-                    .setConstantHeadingInterpolation(Math.toRadians(30))
+                    .setConstantHeadingInterpolation(Math.toRadians(40))
                     .build();
 
             launchSpam = follower
@@ -418,7 +421,7 @@ public class red15Spam extends NextFTCOpMode {
                     .setReversed()
                     .build();
 
-            teleOpPark = follower
+            teleOpPar = follower
                     .pathBuilder()
                     .addPath(
                             new BezierLine(new Pose(72.000, 72.000), new Pose(84.000, 60.000))

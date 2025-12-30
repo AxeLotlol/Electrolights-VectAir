@@ -273,6 +273,7 @@ public class DriveTrain implements Subsystem {
         yVCtx = () -> visionYawCommand(headingError);
         double distance = follower.getPose().distanceFrom(virtualGoal);
         //float bro = findTPS(0.86 * (distance / 39.37));
+        //gay?
         shooter(findTPS(0.9*(distance /  39.37)));
 
         double error = follower.getHeadingError();

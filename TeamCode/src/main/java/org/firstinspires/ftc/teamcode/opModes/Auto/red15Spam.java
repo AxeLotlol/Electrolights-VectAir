@@ -73,34 +73,75 @@ public class red15Spam extends NextFTCOpMode {
     public Pose start = new Pose(119.4,126.4, Math.toRadians(49));
 
     private static final int APRILTAG_PIPELINE = 8;
-
-
-
-
-
-
-
-
-    private MotorEx intakeMotor;
-
+    private static MotorEx intakeMotor;
     int tagId = 0;
 
 
 
 
-    private MotorEx transfer1;
+    private static MotorEx transfer1;
     private static ServoEx transfer2;
     private ServoEx transfer3;
     private ServoEx hoodservo1;
     private ServoEx hoodservo2;
     private Command spinFlyWheel1500;
-    private Command intakeMotorOn;
+    private static Command intakeMotorOn;
 
     private CRServo hoodServo1n;
     private CRServo hoodServo2n;
 
     private CRServoEx hoodServo1 = new CRServoEx(() -> hoodServo1n);
     private CRServoEx hoodServo2 = new CRServoEx(() -> hoodServo2n);
+
+    static Command intakeMotorOff = new LambdaCommand()
+            .setStart(() -> intakeMotor.setPower(0));
+
+    static Command transferOn = new LambdaCommand()
+            .setStart(()-> transfer1.setPower(-0.67));
+    static Command transferOff = new LambdaCommand()
+            .setStart(() -> transfer1.setPower(0));
+    ParallelGroup HoodRunUp=new ParallelGroup(
+            new SetPower(hoodServo1,1),
+            new SetPower(hoodServo2,-1)
+    );
+    public ParallelGroup HoodPowerZero=new ParallelGroup(
+            new SetPower(hoodServo1,0),
+            new SetPower(hoodServo2,0)
+    );
+
+    public SequentialGroup HoodUp=new SequentialGroup(
+            HoodRunUp,
+            new Delay(0.1),
+            HoodPowerZero
+    );
+
+    ParallelGroup HoodRunDown=new ParallelGroup(
+            new SetPower(hoodServo1,-1),
+            new SetPower(hoodServo2,1)
+    );
+
+    public SequentialGroup HoodDown=new SequentialGroup(
+            HoodRunDown,
+            new Delay(0.17),
+            HoodPowerZero
+    );
+
+    public static Command opentransfer = new LambdaCommand()
+            .setStart(()-> {
+                //`5transfer2.setPosition(-0.25);
+                transfer2.setPosition(0.3);
+            });
+
+    public static Command closeTransfer = new LambdaCommand()
+            .setStart(() -> {
+                transfer2.setPosition(0.6);
+            });
+
+    public static SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.4), transferOn, new Delay(0.5), transferOff, closeTransfer);
+
+    public static SequentialGroup intakeStart = new SequentialGroup(intakeMotorOn, transferOn);
+
+    public static SequentialGroup intakeStop = new SequentialGroup(intakeMotorOff, transferOn);
 
 
 
@@ -154,105 +195,38 @@ public class red15Spam extends NextFTCOpMode {
         telemetry.update();
     }
 
-    Command stopFlywheel = new LambdaCommand()
-            .setStart(() -> shooter(0));
-
-    Command intakeMotorOff = new LambdaCommand()
-            .setStart(() -> intakeMotor.setPower(0));
-    Command hoodUp = new LambdaCommand()
-            .setStart(() -> hoodservo1.setPosition(0.2));
-    Command hoodup2 = new LambdaCommand()
-            .setStart(() -> hoodservo2.setPosition(0.2));
-    Command getMotif = new LambdaCommand()
-            .setStart(() -> tagId = MotifScanning.INSTANCE.findMotif());
-
-    Command distance = new LambdaCommand()
-            .setStart(()-> findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
-
-    public static Command openTransfer = new LambdaCommand()
-            .setStart(()-> {
-                //`5transfer2.setPosition(-0.25);
-                transfer2.setPosition(0.25);
-            });
-    public static Command closeTransfer = new LambdaCommand()
-            .setStart(() -> {
-                //transfer2.setPosition(1);
-                transfer2.setPosition(1);
-            });
-
-    Command transferOn = new LambdaCommand()
-            .setStart(()-> transfer1.setPower(-0.67));
-    Command transferOff = new LambdaCommand()
-            .setStart(() -> transfer1.setPower(0));
-    /*Command shootByTag1 = new LambdaCommand()
-                .setStart(() -> {
-                if (tagId == 21) {
-                    opentransfer.schedule();
-                    transfer1.setPower(0.5);
-                    new Delay(0.4);
-                    new ParallelGroup(
-                            hoodUp,
-                            hoodup2+
-
-                    );
 
 
-                }
 
-
-            });*/
-    ParallelGroup HoodRunUp=new ParallelGroup(
-            new SetPower(hoodServo1,1),
-            new SetPower(hoodServo2,-1)
-    );
-    public ParallelGroup HoodPowerZero=new ParallelGroup(
-            new SetPower(hoodServo1,0),
-            new SetPower(hoodServo2,0)
-    );
-
-    public SequentialGroup HoodUp=new SequentialGroup(
-            HoodRunUp,
-            new Delay(0.1),
-            HoodPowerZero
-    );
-
-    ParallelGroup HoodRunDown=new ParallelGroup(
-            new SetPower(hoodServo1,-1),
-            new SetPower(hoodServo2,1)
-    );
-
-    public SequentialGroup HoodDown=new SequentialGroup(
-            HoodRunDown,
-            new Delay(0.17),
-            HoodPowerZero
-    );
 
 
 
     public Command Auto(){
         return new SequentialGroup(
-                intakeMotorOn,
                 new FollowPath(paths.PreloadLaunch,true,0.8),
-                new Delay(0.4),
+                shoot,
+                intakeStart,
                 new FollowPath(paths.intakeSet2,true,0.8),
-                new Delay(0.4),
+                intakeStop,
                 new FollowPath(paths.launchSet2,true,0.8),
-                new Delay(0.4),
-                transferOn,
+                shoot,
+                intakeStart,
                 new FollowPath(paths.resetHelper,true,0.8),
                 new FollowPath(paths.resetIntakeSpam, true, 1.0),
                 new Delay(1),
                 transferOff,
                 new FollowPath(paths.launchSpam,true,0.8),
-                new Delay(0.4),
+                shoot,
+                intakeStart,
                 new FollowPath(paths.intakeSet1,true,0.8),
-                new Delay(0.4),
+                intakeStop,
                 new FollowPath(paths.launchSet1,true,0.8),
-                new Delay(0.4),
+                shoot,
+                intakeStart,
                 new FollowPath(paths.intakeSet3,true,0.8),
-                new Delay(0.4),
+                intakeStop,
                 new FollowPath(paths.launchSet3,true,0.8),
-                new Delay(0.4),
+                shoot,
                 new FollowPath(paths.teleOpPar,true,0.8)
         );
     }
@@ -359,7 +333,7 @@ public class red15Spam extends NextFTCOpMode {
                     .pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(133.500, 60.000),
+                                    new Pose(126.000, 60.000), //IF DOESNT WORK CHANGE BACK TO 133.500 and 60.000
                                     new Pose(112.000, 48.000),
                                     new Pose(81.000, 82.500),
                                     new Pose(76.000, 76.000)

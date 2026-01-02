@@ -53,10 +53,10 @@ public class Calculations implements Subsystem {
         }*/
 
         numerator = 9.81 * Math.pow(dist, 2);
-        denominator = (2 * Math.pow(Math.cos(1.09956), 2) * (dist * Math.tan(1.09956) - 0.85125));
+        denominator = (2 * Math.pow(Math.cos(Math.toRadians(44.2)), 2) * (dist * Math.tan(Math.toRadians(44.2)) - 0.85125));
         v0 = Math.sqrt(numerator / denominator);
-        //requiredRPM = 2.1029* Math.pow(v0, 5) - 91.982*Math.pow(v0, 4) + 1571*Math.pow(v0, 3) - 13065*Math.pow(v0, 2) + 53323*v0 - 83356;
-        requiredRPM = 0.5 * (13.628 * v0 * v0 * v0 - 49.443 * v0 * v0 + 624.39 * v0 + 1106.4);
+        requiredRPM = 2.1029* Math.pow(v0, 5) - 91.982*Math.pow(v0, 4) + 1571*Math.pow(v0, 3) - 13065*Math.pow(v0, 2) + 53323*v0 - 83356;
+        //requiredRPM = 0.5 * (13.628 * v0 * v0 * v0 - 49.443 * v0 * v0 + 624.39 * v0 + 1106.4);
         requiredTPS = (28 * requiredRPM) / 60;
         return (float) requiredTPS;
 

@@ -210,8 +210,8 @@ public class DriveTrain implements Subsystem {
     static Command transferOff = new LambdaCommand()
             .setStart(() -> transfer1.setPower(0));
 
-    double goalY = 144;
-    double goalX = 144;
+    double goalY = 130.4;
+    double goalX = 127.6;
 
     double shotTime = 0.4;
 
@@ -249,11 +249,11 @@ public class DriveTrain implements Subsystem {
 
 
         if(isBlue()==true) {
-            goalX = 0;
+            goalX = 16.4;
             //shotTime = 0.3; //EDIT THIS TO BE AIRTIME CALCULATIONS
         }
         if(isRed()==true){
-            goalX =  144;
+            goalX =  127.6;
             //shotTime = 0.3; //EDIT THIS TO BE AIRTIME CALCULATIONS
         }
         double robotVelX = follower.getVelocity().getXComponent();
@@ -274,7 +274,7 @@ public class DriveTrain implements Subsystem {
         double distance = follower.getPose().distanceFrom(virtualGoal);
         //float bro = findTPS(0.86 * (distance / 39.37));
         //gay?
-        shooter(findTPS(0.9*(distance /  39.37)));
+        shooter(findTPS((distance /  39.37)));
 
         double error = follower.getHeadingError();
 

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opModes.TeleOp;
 
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
+import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS44;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 
 import com.pedropathing.follower.Follower;
@@ -9,6 +10,7 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.subsystems.DistanceBlue;
 import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
 import org.firstinspires.ftc.teamcode.subsystems.TempHood;
@@ -64,25 +66,24 @@ public class TeleOpRed extends NextFTCOpMode {
         return ball3Color;
     }
     public boolean lift;
-
-    public boolean running=false;
-
-    private Follower follower;
-
+    boolean lowerangle = false;
 
     public void hood(){
         if(lift==false){
             lift=true;
+            lowerangle=true;
             TempHood.INSTANCE.HoodUp.schedule();
             ActiveOpMode.telemetry().addLine("HoodUp");
         }
         else if (lift==true) {
             lift=false;
+            lowerangle=false;
             TempHood.INSTANCE.HoodDown.schedule();
             ActiveOpMode.telemetry().addLine("HoodDown");
         }
         else if (lift!=true&&lift!=false) {
             lift=true;
+            lowerangle=true;
             TempHood.INSTANCE.HoodUp.schedule();
             ActiveOpMode.telemetry().addLine("HoodUp");
         }
@@ -100,7 +101,6 @@ public class TeleOpRed extends NextFTCOpMode {
         red=true;
         intakeMotor = new MotorEx("intake").reversed();
         transfer = new MotorEx("transfer").reversed();
-        //follower = PedroComponent.follower();
         Gamepads.gamepad1().leftTrigger().greaterThan(0.3).whenBecomesTrue(()-> intakeMotor.setPower(1))
                 .whenBecomesFalse(() -> intakeMotor.setPower(0));
         Gamepads.gamepad1().leftBumper().whenBecomesTrue(()-> transfer.setPower(0.6))
@@ -111,11 +111,19 @@ public class TeleOpRed extends NextFTCOpMode {
 
     @Override
     public void onUpdate() {
-        /*float newtps;
-        newtps=findTPS(DistanceRed.INSTANCE.getDistanceFromTag());
-        ActiveOpMode.telemetry().addLine(String.valueOf(newtps));
-        shooter(newtps);
-        ActiveOpMode.telemetry().update();*/
+        float newtps=1000;
+        if(lowerangle==true){
+            newtps = findTPS44(DistanceRed.INSTANCE.getDistanceFromTag());
+            ActiveOpMode.telemetry().addData("Lowerangle:", lowerangle);
+        }
+        else if(lowerangle==false) {
+            newtps = findTPS(DistanceRed.INSTANCE.getDistanceFromTag());
+            ActiveOpMode.telemetry().addData("Lowerangle:", lowerangle);
+        }
+        if (DistanceRed.INSTANCE.getDistanceFromTag() != 0) {
+            shooter(newtps);
+            ActiveOpMode.telemetry().addData("newtps", newtps);
+        }
     }
 
     public boolean shoot;
@@ -133,7 +141,6 @@ public class TeleOpRed extends NextFTCOpMode {
 
         //Gamepads.gamepad1().rightTrigger().greaterThan(0.2).whenBecomesTrue(() -> DriveTrain.shoot.schedule());
         Gamepads.gamepad2().cross().whenBecomesTrue(() -> hood());
-        Gamepads.gamepad2().circle().whenBecomesTrue(() -> TempHood.INSTANCE.HoodPowerZero.schedule());
         Gamepads.gamepad2().rightTrigger().greaterThan(0.4).whenBecomesTrue(() -> DriveTrain.closeTransfer.schedule());
         /*SequentialGroup onStart= new SequentialGroup(
                 new Delay(2),

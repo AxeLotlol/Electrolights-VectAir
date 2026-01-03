@@ -15,9 +15,13 @@ import dev.nextftc.ftc.ActiveOpMode;
 public class DistanceRed implements Subsystem {
 
     private Limelight3A limelight3A;
-    double ta;
+    static double ta;
+
+    static double tx;
 
     private IMU imu;
+
+    public static boolean hasTag;
 
     public DistanceRed() {}
 
@@ -31,16 +35,35 @@ public class DistanceRed implements Subsystem {
     }
 
     public void periodic() {
+        LLResult result = limelight3A.getLatestResult();
+        hasTag = (result != null) && result.isValid() && !result.getFiducialResults().isEmpty();
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
         limelight3A.updateRobotOrientation(orientation.getYaw(AngleUnit.DEGREES));
         LLResult llResult = limelight3A.getLatestResult();
         if (llResult != null && llResult.isValid()) {
             ta = llResult.getTa();
+            tx = llResult.getTa();
         }
+        ActiveOpMode.telemetry().addData("hasTag:", hasTag);
+        ActiveOpMode.telemetry().update();
     }
 
     public double getDistanceFromTag() {
-        double distance = 1.892*Math.pow(ta, -0.513) + 0.08;
-        return distance;
+        if (hasTag) {
+            double distance = 1.892 * Math.pow(ta, -0.513) + 0.08;
+            return distance;
+        }
+        else {
+            return 0.00;
+        }
+    }
+    public static double getTx() {
+        if (hasTag) {
+            return tx;
+        }
+        else {
+            return 0.00;
+        }
+
     }
 }

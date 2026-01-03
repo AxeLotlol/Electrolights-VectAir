@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opModes.TeleOp;
 
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
+import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS44;
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.lowangle;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 
@@ -11,6 +12,7 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.DistanceBlue;
+import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
 import org.firstinspires.ftc.teamcode.subsystems.TempHood;
 
@@ -74,22 +76,26 @@ public class TeleOpBlue extends NextFTCOpMode {
     private boolean hasTag;
 
     public boolean running=false;
+    boolean lowerangle = false;
 
     public void hood(){
         if(lift==false){
             lift=true;
+            lowerangle=true;
             TempHood.INSTANCE.HoodUp.schedule();
-            lowangle=true;
+            ActiveOpMode.telemetry().addLine("HoodUp");
         }
         else if (lift==true) {
             lift=false;
+            lowerangle=false;
             TempHood.INSTANCE.HoodDown.schedule();
-            lowangle=false;
+            ActiveOpMode.telemetry().addLine("HoodDown");
         }
         else if (lift!=true&&lift!=false) {
             lift=true;
+            lowerangle=true;
             TempHood.INSTANCE.HoodUp.schedule();
-            lowangle=true;
+            ActiveOpMode.telemetry().addLine("HoodUp");
         }
 
     }
@@ -113,30 +119,19 @@ public class TeleOpBlue extends NextFTCOpMode {
 
     @Override
     public void onUpdate() {
-        //ActiveOpMode.telemetry().update();
-        float newtps;
-        newtps=findTPS(DistanceBlue.INSTANCE.getDistanceFromTag());
-        ActiveOpMode.telemetry().addLine(String.valueOf(newtps));
-        ActiveOpMode.telemetry().addLine(String.valueOf(hasTag));
-        shooter(newtps);
-        ActiveOpMode.telemetry().update();
-        /*if (findMotif) {
-            //tagID = MotifScanning.INSTANCE.findMotif();
-            if (tagID == 21) {
-                ball1Color = 1; //green
-                ball2Color = 2; //purple
-                ball3Color = 2;
-            } else if (tagID == 22) {
-                ball1Color = 2;
-                ball2Color = 1;
-                ball3Color = 2;
-            } else if (tagID == 23) {
-                ball1Color = 2;
-                ball2Color = 2;
-                ball3Color = 1;
-            }
-            findMotif = false;
-        }*/
+        float newtps=1000;
+        if(lowerangle==true){
+            newtps = findTPS44(DistanceRed.INSTANCE.getDistanceFromTag());
+            ActiveOpMode.telemetry().addData("Lowerangle:", lowerangle);
+        }
+        else if(lowerangle==false) {
+            newtps = findTPS(DistanceRed.INSTANCE.getDistanceFromTag());
+            ActiveOpMode.telemetry().addData("Lowerangle:", lowerangle);
+        }
+        if (DistanceBlue.INSTANCE.getDistanceFromTag() != 0) {
+            ActiveOpMode.telemetry().addLine(String.valueOf(newtps));
+            shooter(newtps);
+        }
     }
 
     public boolean shoot;

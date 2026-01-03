@@ -25,42 +25,26 @@ public class Calculations implements Subsystem {
     public static double requiredTPS = (28*requiredRPM)/60;
 
     public static float findTPS(double dist){
-        /*if (lowangle==false) {
-            numerator = 9.81 * Math.pow(dist, 2);
-            denominator = (2 * Math.pow(Math.cos(1.09956), 2) * (dist * Math.tan(1.09956) - 0.85125));
-            v0 = Math.sqrt(numerator / denominator);
-            requiredRPM = 2.1029* Math.pow(v0, 5) - 91.982*Math.pow(v0, 4) + 1571*Math.pow(v0, 3) - 13065*Math.pow(v0, 2) + 53323*v0 - 83356;
-            requiredTPS = (28 * requiredRPM) / 60;
-            return (float) requiredTPS;
-
-        }
-        if (lowangle==true)
-        {
-            numerator = 9.81 * Math.pow(dist, 2);
-            denominator = (2 * Math.pow(Math.cos(0.87266), 2) * (dist * Math.tan(0.87266) - 0.85125));
-            v0 = Math.sqrt(numerator / denominator);
-            requiredRPM = (2.1029* v0 * v0 * v0 * v0 * v0 -91.982*v0*v0*v0*v0 + 1571 * v0 * v0 * v0 - 13065 * v0 * v0 + 53323 * v0 + 83356);
-            requiredTPS = (28 * requiredRPM) / 60;
-            return (float) requiredTPS;
-        }
-        else{
-            numerator = 9.81 * Math.pow(dist, 2);
-            denominator = (2 * Math.pow(Math.cos(1.09956), 2) * (dist * Math.tan(1.09956) - 0.85125));
-            v0 = Math.sqrt(numerator / denominator);
-            requiredRPM = (2.1029* v0 * v0 * v0 * v0 * v0 -91.982*v0*v0*v0*v0 + 1571 * v0 * v0 * v0 - 13065 * v0 * v0 + 53323 * v0 + 83356);
-            requiredTPS = (28 * requiredRPM) / 60;
-            return (float) requiredTPS;
-        }*/
-
         numerator = 9.81 * Math.pow(dist, 2);
-        denominator = (2 * Math.pow(Math.cos(Math.toRadians(44.2)), 2) * (dist * Math.tan(Math.toRadians(44.2)) - 0.85125));
+        denominator = (2 * Math.pow(Math.cos(Math.toRadians(63)), 2) * (dist * Math.tan(Math.toRadians(63)) - 0.85125));
         v0 = Math.sqrt(numerator / denominator);
-        requiredRPM = 2.1029* Math.pow(v0, 5) - 91.982*Math.pow(v0, 4) + 1571*Math.pow(v0, 3) - 13065*Math.pow(v0, 2) + 53323*v0 - 83356;
+        requiredRPM = 1.0617* Math.pow(v0, 5) - 49.087*Math.pow(v0, 4) + 884.71*Math.pow(v0, 3) - 7751.5*Math.pow(v0, 2) + 33463*v0 - 54686;
         //requiredRPM = 0.5 * (13.628 * v0 * v0 * v0 - 49.443 * v0 * v0 + 624.39 * v0 + 1106.4);
         requiredTPS = (28 * requiredRPM) / 60;
         return (float) requiredTPS;
 
     }
+    public static float findTPS44(double dist){
+        numerator = 9.81 * Math.pow(dist, 2);
+        denominator = (2 * Math.pow(Math.cos(Math.toRadians(44.2)), 2) * (dist * Math.tan(Math.toRadians(44.2)) - 0.85125));
+        v0 = Math.sqrt(numerator / denominator);
+        requiredRPM = 1.0617* Math.pow(v0, 5) - 49.087*Math.pow(v0, 4) + 884.71*Math.pow(v0, 3) - 7751.5*Math.pow(v0, 2) + 33463*v0 - 54686;
+        //requiredRPM = 0.5 * (13.628 * v0 * v0 * v0 - 49.443 * v0 * v0 + 624.39 * v0 + 1106.4);
+        requiredTPS = (28 * requiredRPM) / 60;
+        return (float) requiredTPS;
+
+    }
+
 
 
 }

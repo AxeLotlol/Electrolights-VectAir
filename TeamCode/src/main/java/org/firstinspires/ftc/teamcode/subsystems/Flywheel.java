@@ -54,6 +54,7 @@ public class Flywheel implements Subsystem {
         velocityControlWithFeedforwardExample(currentState, tps);
         double rpm = (flywheelvelocity / 28) * 60.0;
         ActiveOpMode.telemetry().addData("Flywheel RPM", rpm);
+        ActiveOpMode.telemetry().addData("Flywheel Goal RPM", tps*60/28);
 
     }
     @Override public void initialize() {

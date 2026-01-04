@@ -83,6 +83,8 @@ public class Red15BallSpam extends NextFTCOpMode {
 
     private ServoEx transfer2;
 
+    public static MotorEx flywheel = new MotorEx("launchingmotor");
+
 
     public void onInit() {
         telemetry.addLine("Initializing Follower...");
@@ -142,13 +144,19 @@ public class Red15BallSpam extends NextFTCOpMode {
                 transfer2.setPosition(0.7);
             });
 
-    public SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.35), transferOn, new Delay(0.6), transferOff, closeTransfer);
+    public SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.35), transferOn, new Delay(0.65), transferOff, closeTransfer);
 
-
+    public boolean spinup = true;
+    public Command spinupfalse = new LambdaCommand()
+            .setStart(()-> {
+                spinup=false;
+            });
     public Command Auto(){
         return new SequentialGroup(
             new FollowPath(paths.PreloadLaunch,true,1.0),
+            spinupfalse,
             intakeMotorOn,
+            new Delay(1),
             shoot,
             transferOn,
             new FollowPath(paths.intakeSet2,true,1.0),
@@ -158,7 +166,7 @@ public class Red15BallSpam extends NextFTCOpMode {
             transferOn,
             new FollowPath(paths.resetHelper,true,1.0),
             new FollowPath(paths.resetIntakeSpam, true, 1.0),
-            new Delay(1),
+            new Delay(0.8),
             transferOff,
             new FollowPath(paths.launchSpam,true,1.0),
             shoot,
@@ -187,10 +195,12 @@ public class Red15BallSpam extends NextFTCOpMode {
 
     @Override
     public void onUpdate(){
-
-        shooter(1135);
-
-
+        if(spinup==true){
+            flywheel.setPower(1);
+        }
+        else if(spinup==false){
+            shooter(1140);
+        }
 
         follower.update();
 

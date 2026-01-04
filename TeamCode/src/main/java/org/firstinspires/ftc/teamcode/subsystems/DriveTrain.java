@@ -332,7 +332,7 @@ public class DriveTrain implements Subsystem {
             aimMultiplier = 0.425;
         }
         else{
-                aimMultiplier = 0.425;
+            aimMultiplier = 0.425;
         }
         double finalHeadingError = headingError;
         yVCtx = () -> visionYawCommand(finalHeadingError);

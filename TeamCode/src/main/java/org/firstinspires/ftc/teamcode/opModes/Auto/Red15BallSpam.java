@@ -168,7 +168,7 @@ public class Red15BallSpam extends NextFTCOpMode {
             new FollowPath(paths.resetHelper,true,1.0),
             new Delay(0.15),
             new FollowPath(paths.resetIntakeSpam, true, 1.0),
-            new Delay(1.8),
+            new Delay(1.3),
             transferOff,
             new FollowPath(paths.launchSpam,true,1.0),
             shoot,
@@ -179,6 +179,7 @@ public class Red15BallSpam extends NextFTCOpMode {
             shoot,
             transferOn,
             new FollowPath(paths.intakeSet3,true,1.0),
+
             transferOff,
             new FollowPath(paths.launchSet3,true,1.0),
             shoot,
@@ -250,7 +251,7 @@ public class Red15BallSpam extends NextFTCOpMode {
                                     new Pose(82.600, 87.200),
                                     new Pose(85.000, 87.000),
                                     new Pose(84.000, 61.000),
-                                    new Pose(127.000, 59.000)
+                                    new Pose(124.000, 59.000)
                             )
                     )
                     .setTangentHeadingInterpolation()
@@ -278,7 +279,7 @@ public class Red15BallSpam extends NextFTCOpMode {
                                     new Pose(80.400, 86.400),
                                     new Pose(97.200, 56.200),
                                     new Pose(106.300, 62.000),
-                                    new Pose(125, 67)
+                                    new Pose(125, 68.5)
                             )
                     )
                     .setTangentHeadingInterpolation()
@@ -313,7 +314,7 @@ public class Red15BallSpam extends NextFTCOpMode {
                                     new Pose(82.600, 87.200),
                                     new Pose(91.500, 97.300),
                                     new Pose(101.500, 87.000),
-                                    new Pose(125.000, 88.000)
+                                    new Pose(125.665, 86.898)
                             )
                     )
                     .setTangentHeadingInterpolation()
@@ -352,7 +353,7 @@ public class Red15BallSpam extends NextFTCOpMode {
                             new BezierCurve(
                                     new Pose(120.000, 40.000),
                                     new Pose(100.000, 43.000),
-                                    new Pose(99.768, 106.427),
+                                    new Pose(96.584, 106.639),
                                     new Pose(82.600, 87.200)
                             )
                     )

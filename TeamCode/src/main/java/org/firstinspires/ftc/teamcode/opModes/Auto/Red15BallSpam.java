@@ -144,7 +144,7 @@ public class Red15BallSpam extends NextFTCOpMode {
                 transfer2.setPosition(0.7);
             });
 
-    public SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.35), transferOn, new Delay(0.65), transferOff, closeTransfer);
+    public SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.35), transferOn, new Delay(0.8), transferOff, closeTransfer);
 
     public boolean spinup = true;
     public Command spinupfalse = new LambdaCommand()
@@ -310,8 +310,8 @@ public class Red15BallSpam extends NextFTCOpMode {
                             new BezierCurve(
                                     new Pose(82.600, 87.200),
                                     new Pose(91.500, 97.300),
-                                    new Pose(101.500, 84.000),
-                                    new Pose(125.000, 84.000)
+                                    new Pose(101.500, 87.000),
+                                    new Pose(125.000, 88.000)
                             )
                     )
                     .setTangentHeadingInterpolation()

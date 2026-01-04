@@ -129,7 +129,7 @@ public class Red15BallSpam extends NextFTCOpMode {
             .setStart(()-> findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
 
     Command transferOn = new LambdaCommand()
-            .setStart(()-> transfer1.setPower(-0.5));
+            .setStart(()-> transfer1.setPower(-0.75));
     Command transferOff = new LambdaCommand()
             .setStart(() -> transfer1.setPower(0));
 
@@ -196,7 +196,7 @@ public class Red15BallSpam extends NextFTCOpMode {
     @Override
     public void onUpdate(){
         if(spinup==true){
-            flywheel.setPower(1);
+            flywheel.setPower(-1);
         }
         else if(spinup==false){
             shooter(1140);

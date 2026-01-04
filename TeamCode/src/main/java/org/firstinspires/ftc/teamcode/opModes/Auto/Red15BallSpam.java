@@ -127,7 +127,7 @@ public class Red15BallSpam extends NextFTCOpMode {
             .setStart(()-> findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
 
     Command transferOn = new LambdaCommand()
-            .setStart(()-> transfer1.setPower(-0.7));
+            .setStart(()-> transfer1.setPower(-0.5));
     Command transferOff = new LambdaCommand()
             .setStart(() -> transfer1.setPower(0));
 
@@ -139,10 +139,10 @@ public class Red15BallSpam extends NextFTCOpMode {
 
     public Command closeTransfer = new LambdaCommand()
             .setStart(() -> {
-                transfer2.setPosition(0.6);
+                transfer2.setPosition(0.7);
             });
 
-    public SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.4), transferOn, new Delay(0.5), transferOff, closeTransfer);
+    public SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.35), transferOn, new Delay(0.6), transferOff, closeTransfer);
 
 
     public Command Auto(){
@@ -188,7 +188,7 @@ public class Red15BallSpam extends NextFTCOpMode {
     @Override
     public void onUpdate(){
 
-        shooter(1300);
+        shooter(1135);
 
 
 
@@ -327,8 +327,8 @@ public class Red15BallSpam extends NextFTCOpMode {
                             new BezierCurve(
                                     new Pose(82.600, 87.200),
                                     new Pose(88.000, 89.500),
-                                    new Pose(84.000, 36.500),
-                                    new Pose(120.000, 36.000)
+                                    new Pose(84.000, 39.500),
+                                    new Pose(120.000, 40.000)
                             )
                     )
                     .setTangentHeadingInterpolation()
@@ -338,7 +338,7 @@ public class Red15BallSpam extends NextFTCOpMode {
                     .pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(120.000, 36.000),
+                                    new Pose(120.000, 40.000),
                                     new Pose(100.000, 43.000),
                                     new Pose(95.000, 101.000),
                                     new Pose(82.600, 87.200)

@@ -58,13 +58,13 @@ public class autodemo extends NextFTCOpMode{
             .setStart(()-> {
                 //`5transfer2.setPosition(-0.25);
                 //transfer2.setPosition(0.3);
-                transfer3.setPosition(-0.7);
+                transfer2.setPosition(0.3);
             });
     Command closeTransfer = new LambdaCommand()
             .setStart(() -> {
                 //transfer2.setPosition(1);
                 //transfer2.setPosition(1.25);
-                transfer3.setPosition(0.2);
+                transfer2.setPosition(0.7);
             });
 
     Command transferOn = new LambdaCommand()
@@ -84,7 +84,9 @@ public class autodemo extends NextFTCOpMode{
     public Command Auto(){
         return new SequentialGroup(
 
-                transferOn
+                opentransfer,
+                new Delay(1.0),
+                closeTransfer
 
         );
     }

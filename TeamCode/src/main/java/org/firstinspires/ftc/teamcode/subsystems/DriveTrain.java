@@ -212,7 +212,7 @@ public class DriveTrain implements Subsystem {
             });
     public static Command closeTransfer = new LambdaCommand()
             .setStart(() -> {
-                transfer2.setPosition(0.6);
+                transfer2.setPosition(0.7);
             });
     static Command transferOn = new LambdaCommand()
             .setStart(()-> transfer1.setPower(-0.7));

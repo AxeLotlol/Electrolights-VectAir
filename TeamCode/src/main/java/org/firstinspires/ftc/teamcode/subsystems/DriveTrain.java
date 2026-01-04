@@ -209,15 +209,17 @@ public class DriveTrain implements Subsystem {
             .setStart(()-> {
                 //`5transfer2.setPosition(-0.25);
                 transfer2.setPosition(0.3);
-            });
+            }).setIsDone(() -> true);
     public static Command closeTransfer = new LambdaCommand()
             .setStart(() -> {
                 transfer2.setPosition(0.7);
-            });
+            }).setIsDone(() -> true);
     static Command transferOn = new LambdaCommand()
-            .setStart(()-> transfer1.setPower(-0.7));
+            .setStart(()-> transfer1.setPower(-0.7))
+            .setIsDone(() -> true);
     static Command transferOff = new LambdaCommand()
-            .setStart(() -> transfer1.setPower(0));
+            .setStart(() -> transfer1.setPower(0))
+            .setIsDone(() -> true);
 
     double goalY = 144;
     double goalX = 144;
@@ -230,19 +232,23 @@ public class DriveTrain implements Subsystem {
     static boolean shooting = false;
 
     static Command shootFalse = new LambdaCommand()
+            .setStart(() -> shooting=true);
+
+    static Command shootTrue = new LambdaCommand()
             .setStart(() -> shooting=false);
 
     static boolean lowerangle = false;
 
+    static boolean didFirst = false;
 
+    public static SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.4), transferOn, new Delay(0.6), transferOff, closeTransfer);
 
-    public static SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.4), transferOn, new Delay(0.6), transferOff, closeTransfer, shootFalse);
-
-    public static void shoot(){
-        if(shooting == false){
-            shoot.schedule();
-        }
-    }
+//    public static void shoot(){
+//        if(shoot.isDone() || !didFirst){
+//            didFirst = true;
+//            shoot.schedule();
+//        }
+//    }
 
     public boolean lift;
 
@@ -274,7 +280,7 @@ public class DriveTrain implements Subsystem {
             Gamepads.gamepad1().triangle().whenBecomesTrue(() -> autolocktrue())
                     .whenBecomesFalse(() -> autolockfalse());
             Gamepads.gamepad2().cross().whenBecomesTrue(() -> hood());
-            Gamepads.gamepad1().rightTrigger().greaterThan(0.8).whenBecomesTrue(() -> shoot());
+            Gamepads.gamepad1().rightTrigger().greaterThan(0.5).whenBecomesTrue(shoot);
             intakeMotor = new MotorEx("intake");
             transfer1 = new MotorEx("transfer");
             transfer2 = new ServoEx("transferServo1");

@@ -41,7 +41,7 @@ public class Calculations implements Subsystem {
         requiredRPM = 1.0617* Math.pow(v0, 5) - 49.087*Math.pow(v0, 4) + 884.71*Math.pow(v0, 3) - 7751.5*Math.pow(v0, 2) + 33463*v0 - 54686;
         //requiredRPM = 0.5 * (13.628 * v0 * v0 * v0 - 49.443 * v0 * v0 + 624.39 * v0 + 1106.4);
         requiredTPS = (28 * requiredRPM) / 60;
-        return (float) (0.9*requiredTPS);
+        return (float) (0.975*requiredTPS);
 
     }
 

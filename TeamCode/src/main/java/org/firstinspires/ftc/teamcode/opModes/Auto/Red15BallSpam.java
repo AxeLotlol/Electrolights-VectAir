@@ -144,34 +144,32 @@ public class Red15BallSpam extends NextFTCOpMode {
 
     public SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.4), transferOn, new Delay(0.5), transferOff, closeTransfer);
 
-    public SequentialGroup intakeStart = new SequentialGroup(intakeMotorOn, transferOn);
-
-    public SequentialGroup intakeStop = new SequentialGroup(intakeMotorOff, transferOff);
 
     public Command Auto(){
         return new SequentialGroup(
             new FollowPath(paths.PreloadLaunch,true,1.0),
+            intakeMotorOn,
             shoot,
-            intakeStart,
+            transferOn,
             new FollowPath(paths.intakeSet2,true,1.0),
-            intakeStop,
+            transferOff,
             new FollowPath(paths.launchSet2,true,1.0),
             shoot,
-            intakeStart,
+            transferOn,
             new FollowPath(paths.resetHelper,true,1.0),
             new FollowPath(paths.resetIntakeSpam, true, 1.0),
             new Delay(1),
             transferOff,
             new FollowPath(paths.launchSpam,true,1.0),
             shoot,
-            intakeStart,
+            transferOn,
             new FollowPath(paths.intakeSet1,true,1.0),
-            intakeStop,
+            transferOff,
             new FollowPath(paths.launchSet1,true,1.0),
             shoot,
-            intakeStart,
+            transferOn,
             new FollowPath(paths.intakeSet3,true,1.0),
-            intakeStop,
+            transferOff,
             new FollowPath(paths.launchSet3,true,1.0),
             shoot,
             new FollowPath(paths.teleOpPar,true,1.0)

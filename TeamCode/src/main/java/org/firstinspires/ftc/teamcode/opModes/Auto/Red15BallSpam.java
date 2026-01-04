@@ -144,7 +144,7 @@ public class Red15BallSpam extends NextFTCOpMode {
                 transfer2.setPosition(0.7);
             });
 
-    public SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.35), transferOn, new Delay(0.8), transferOff, closeTransfer);
+    public SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.35), transferOn, new Delay(1), transferOff, closeTransfer);
 
     public boolean spinup = true;
     public Command spinupfalse = new LambdaCommand()

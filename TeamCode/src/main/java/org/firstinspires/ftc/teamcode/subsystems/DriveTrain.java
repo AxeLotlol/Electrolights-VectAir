@@ -38,6 +38,10 @@ import dev.nextftc.hardware.impl.Direction;
 import dev.nextftc.hardware.impl.IMUEx;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
+import dev.nextftc.hardware.positionable.SetPosition;
+import dev.nextftc.hardware.positionable.SetPositions;
+import dev.nextftc.hardware.powerable.SetPower;
+
 import static dev.nextftc.extensions.pedro.PedroComponent.follower;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -205,22 +209,6 @@ public class DriveTrain implements Subsystem {
     private static MotorEx transfer1;
     private static ServoEx transfer2;
 
-    public static Command opentransfer = new LambdaCommand()
-            .setStart(()-> {
-                //`5transfer2.setPosition(-0.25);
-                transfer2.setPosition(0.3);
-            }).setIsDone(() -> true);
-    public static Command closeTransfer = new LambdaCommand()
-            .setStart(() -> {
-                transfer2.setPosition(0.7);
-            }).setIsDone(() -> true);
-    static Command transferOn = new LambdaCommand()
-            .setStart(()-> transfer1.setPower(-0.7))
-            .setIsDone(() -> true);
-    static Command transferOff = new LambdaCommand()
-            .setStart(() -> transfer1.setPower(0))
-            .setIsDone(() -> true);
-
     double goalY = 144;
     double goalX = 144;
 
@@ -241,7 +229,7 @@ public class DriveTrain implements Subsystem {
 
     static boolean didFirst = false;
 
-    public static SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.4), transferOn, new Delay(0.6), transferOff, closeTransfer);
+    public static SequentialGroup shoot = new SequentialGroup(new SetPosition(transfer2, 0.3), new Delay(0.4), new SetPower(transfer1, -0.75), new Delay(0.75), new SetPower(transfer1, 0), new SetPosition(transfer2, 0.7));
 
 //    public static void shoot(){
 //        if(shoot.isDone() || !didFirst){

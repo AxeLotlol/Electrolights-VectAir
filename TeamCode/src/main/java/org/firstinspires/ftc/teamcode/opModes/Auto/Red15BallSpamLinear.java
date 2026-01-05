@@ -6,58 +6,39 @@ package org.firstinspires.ftc.teamcode.opModes.Auto;
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import dev.nextftc.bindings.BindingManager;
-import dev.nextftc.control.ControlSystem;
-import dev.nextftc.control.KineticState;
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
+import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
+
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
-import dev.nextftc.core.commands.groups.ParallelGroup;
 import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
-import dev.nextftc.core.units.Angle;
-import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.extensions.pedro.FollowPath;
-import dev.nextftc.extensions.pedro.TurnTo;
-import dev.nextftc.ftc.ActiveOpMode;
+import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
-import dev.nextftc.hardware.impl.CRServoEx;
 import dev.nextftc.hardware.impl.Direction;
 import dev.nextftc.hardware.impl.IMUEx;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
-import dev.nextftc.hardware.powerable.SetPower;
-
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-
-import org.firstinspires.ftc.teamcode.subsystems.DistanceBlue;
-import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
-
-
-import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
-import org.firstinspires.ftc.teamcode.subsystems.MotifScanning;
-import org.jetbrains.annotations.Async;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
-
-
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.bylazar.configurables.annotations.Configurable;
-import com.qualcomm.robotcore.hardware.CRServo;
 
 
 @Autonomous(name = "Red Auto 15 Ball Spam Moksh", group = "Autonomous")
 @Configurable
-public class Red15BallSpam extends NextFTCOpMode {
-    public Red15BallSpam(){
+public class Red15BallSpamLinear extends NextFTCOpMode {
+    public Red15BallSpamLinear(){
         addComponents(
                 new SubsystemComponent(Flywheel.INSTANCE,DistanceRed.INSTANCE),
                 BulkReadComponent.INSTANCE,
@@ -221,7 +202,6 @@ public class Red15BallSpam extends NextFTCOpMode {
     }
 
     public static class Paths {
-
         public PathChain PreloadLaunch;
         public PathChain intakeSet2;
         public PathChain launchSet2;
@@ -235,138 +215,119 @@ public class Red15BallSpam extends NextFTCOpMode {
         public PathChain teleOpPar;
 
         public Paths(Follower follower) {
-            PreloadLaunch = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierLine(new Pose(119.400, 126.400), new Pose(82.600, 87.200))
-                    )
-                    .setTangentHeadingInterpolation()
+            PreloadLaunch = follower.pathBuilder().addPath(
+                            new BezierLine(
+                                    new Pose(119.400, 126.400),
+
+                                    new Pose(82.600, 87.200)
+                            )
+                    ).setTangentHeadingInterpolation()
                     .setReversed()
                     .build();
 
-            intakeSet2 = follower
-                    .pathBuilder()
-                    .addPath(
+            intakeSet2 = follower.pathBuilder().addPath(
                             new BezierCurve(
                                     new Pose(82.600, 87.200),
                                     new Pose(85.000, 87.000),
                                     new Pose(84.000, 61.000),
                                     new Pose(124.000, 59.000)
                             )
-                    )
-                    .setTangentHeadingInterpolation()
+                    ).setTangentHeadingInterpolation()
+
                     .build();
 
-            launchSet2 = follower
-                    .pathBuilder()
-                    .addPath(
+            launchSet2 = follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(127.000, 59.000),
+                                    new Pose(124.000, 59.000),
                                     new Pose(87.700, 55.500),
-                                    new Pose(97.500, 103.500),
                                     new Pose(82.600, 87.200)
                             )
-                    )
-                    .setTangentHeadingInterpolation()
+                    ).setLinearHeadingInterpolation(Math.toRadians(-3), Math.toRadians(46))
                     .setReversed()
                     .build();
 
-            resetHelper = follower
-                    .pathBuilder()
-                    .addPath(
+            resetHelper = follower.pathBuilder().addPath(
                             new BezierCurve(
                                     new Pose(82.600, 87.200),
                                     new Pose(80.400, 86.400),
                                     new Pose(97.200, 56.200),
                                     new Pose(106.300, 62.000),
-                                    new Pose(125, 68.5)
+                                    new Pose(125.000, 68.500)
                             )
-                    )
-                    .setTangentHeadingInterpolation()
+                    ).setTangentHeadingInterpolation()
+
                     .build();
 
-            resetIntakeSpam = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierLine(new Pose(125.000, 68.500), new Pose(127.000, 62.000))
-                    )
-                    .setConstantHeadingInterpolation(Math.toRadians(40))
+            resetIntakeSpam = follower.pathBuilder().addPath(
+                            new BezierLine(
+                                    new Pose(125.000, 68.500),
+
+                                    new Pose(127.000, 60.000)
+                            )
+                    ).setConstantHeadingInterpolation(Math.toRadians(40))
+
                     .build();
 
-            launchSpam = follower
-                    .pathBuilder()
-                    .addPath(
+            launchSpam = follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(127.000, 62.000),
+                                    new Pose(127.000, 60.000),
                                     new Pose(107.400, 50.000),
-                                    new Pose(96.000, 102.500),
                                     new Pose(82.600, 87.200)
                             )
-                    )
-                    .setTangentHeadingInterpolation()
+                    ).setLinearHeadingInterpolation(Math.toRadians(29), Math.toRadians(46))
                     .setReversed()
                     .build();
 
-            intakeSet1 = follower
-                    .pathBuilder()
-                    .addPath(
+            intakeSet1 = follower.pathBuilder().addPath(
                             new BezierCurve(
                                     new Pose(82.600, 87.200),
                                     new Pose(91.500, 97.300),
                                     new Pose(101.500, 87.000),
                                     new Pose(125.665, 86.898)
                             )
-                    )
-                    .setTangentHeadingInterpolation()
+                    ).setTangentHeadingInterpolation()
+
                     .build();
 
-            launchSet1 = follower
-                    .pathBuilder()
-                    .addPath(
+            launchSet1 = follower.pathBuilder().addPath(
                             new BezierCurve(
                                     new Pose(125.665, 86.898),
                                     new Pose(101.500, 84.000),
-                                    new Pose(92.100, 97.700),
                                     new Pose(82.600, 87.200)
                             )
-                    )
-                    .setTangentHeadingInterpolation()
+                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(46))
                     .setReversed()
                     .build();
 
-            intakeSet3 = follower
-                    .pathBuilder()
-                    .addPath(
+            intakeSet3 = follower.pathBuilder().addPath(
                             new BezierCurve(
                                     new Pose(82.600, 87.200),
                                     new Pose(88.000, 89.500),
                                     new Pose(84.000, 39.500),
                                     new Pose(124.000, 40.000)
                             )
-                    )
-                    .setTangentHeadingInterpolation()
+                    ).setTangentHeadingInterpolation()
+
                     .build();
 
-            launchSet3 = follower
-                    .pathBuilder()
-                    .addPath(
+            launchSet3 = follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(120.000, 40.000),
+                                    new Pose(124.000, 40.000),
                                     new Pose(100.000, 43.000),
-                                    new Pose(96.584, 106.639),
                                     new Pose(82.600, 87.200)
                             )
-                    )
-                    .setTangentHeadingInterpolation()
+                    ).setLinearHeadingInterpolation(Math.toRadians(1), Math.toRadians(46))
                     .setReversed()
                     .build();
 
-            teleOpPar = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierLine(new Pose(82.600, 87.200), new Pose(108.000, 72.000))
-                    )
-                    .setConstantHeadingInterpolation(Math.toRadians(90))
+            teleOpPar = follower.pathBuilder().addPath(
+                            new BezierLine(
+                                    new Pose(82.600, 87.200),
+
+                                    new Pose(108.000, 72.000)
+                            )
+                    ).setConstantHeadingInterpolation(Math.toRadians(90))
+
                     .build();
         }
     }

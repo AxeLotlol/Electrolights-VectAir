@@ -35,7 +35,7 @@ import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
 
 
-@Autonomous(name = "Red Auto 15 Ball Spam Moksh", group = "Autonomous")
+@Autonomous(name = "Red Auto 15 Ball Spam Moksh Linear", group = "Autonomous")
 @Configurable
 public class Red15BallSpamLinear extends NextFTCOpMode {
     public Red15BallSpamLinear(){

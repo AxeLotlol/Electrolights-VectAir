@@ -141,9 +141,9 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
             new Delay(1),
             shoot,
             transferOn,
-            new FollowPath(paths.intakeSet2,true,1.0),
+            new FollowPath(paths.intakeSet2,true,0.9),
             transferOff,
-            new FollowPath(paths.launchSet2,true,1.0),
+            new FollowPath(paths.launchSet2,true,0.9),
             shoot,
             transferOn,
             new FollowPath(paths.resetHelper,true,1.0),
@@ -151,7 +151,7 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
             new FollowPath(paths.resetIntakeSpam, true, 1.0),
             new Delay(1.3),
             transferOff,
-            new FollowPath(paths.launchSpam,true,1.0),
+            new FollowPath(paths.launchSpam,true,0.9),
             shoot,
             transferOn,
             new FollowPath(paths.intakeSet1,true,1.0),
@@ -183,7 +183,7 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
             flywheel.setPower(1);
         }
         else if(spinup==false){
-            shooter(1140);
+            shooter(1150);
         }
 
         follower.update();
@@ -230,7 +230,7 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
                                     new Pose(82.600, 87.200),
                                     new Pose(85.000, 87.000),
                                     new Pose(84.000, 61.000),
-                                    new Pose(124.000, 59.000)
+                                    new Pose(124.000, 61.000)
                             )
                     ).setTangentHeadingInterpolation()
 
@@ -242,7 +242,7 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
                                     new Pose(87.700, 55.500),
                                     new Pose(82.600, 87.200)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(-3), Math.toRadians(45))
+                    ).setLinearHeadingInterpolation(Math.toRadians(-3), Math.toRadians(41))
                     .build();
 
             resetHelper = follower.pathBuilder().addPath(
@@ -273,7 +273,7 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
                                     new Pose(107.400, 50.000),
                                     new Pose(82.600, 87.200)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(29), Math.toRadians(45))
+                    ).setLinearHeadingInterpolation(Math.toRadians(29), Math.toRadians(41))
                     .build();
 
             intakeSet1 = follower.pathBuilder().addPath(
@@ -293,7 +293,7 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
                                     new Pose(101.500, 84.000),
                                     new Pose(82.600, 87.200)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(45))
+                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(41))
                     .build();
 
             intakeSet3 = follower.pathBuilder().addPath(
@@ -313,8 +313,7 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
                                     new Pose(100.000, 43.000),
                                     new Pose(82.600, 87.200)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(1), Math.toRadians(45
-                    ))
+                    ).setLinearHeadingInterpolation(Math.toRadians(1), Math.toRadians(41))
                     .build();
 
             teleOpPar = follower.pathBuilder().addPath(

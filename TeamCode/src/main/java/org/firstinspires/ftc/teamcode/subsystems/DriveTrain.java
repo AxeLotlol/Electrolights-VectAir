@@ -219,24 +219,26 @@ public class DriveTrain implements Subsystem {
 
     static boolean shooting = false;
 
-    static Command shootFalse = new LambdaCommand()
+    static Command shootTrue = new LambdaCommand()
             .setStart(() -> shooting=true);
 
-    static Command shootTrue = new LambdaCommand()
+    static Command shootFalse = new LambdaCommand()
             .setStart(() -> shooting=false);
+
 
     static boolean lowerangle = false;
 
     static boolean didFirst = false;
 
-    public static SequentialGroup shoot = new SequentialGroup(new SetPosition(transfer2, 0.3), new Delay(0.4), new SetPower(transfer1, -0.75), new Delay(0.75), new SetPower(transfer1, 0), new SetPosition(transfer2, 0.7));
+    //public static SequentialGroup shoot = new SequentialGroup(new SetPosition(transfer2, 0.3), new Delay(0.4), new SetPower(transfer1, -0.75), new Delay(0.75), new SetPower(transfer1, 0), new SetPosition(transfer2, 0.7));
 
-//    public static void shoot(){
-//        if(shoot.isDone() || !didFirst){
-//            didFirst = true;
-//            shoot.schedule();
-//        }
-//    }
+
+    public static void shoot(){
+        if(shooting==false){
+            shooting = true;
+            shoot.schedule();
+        }
+    }
 
     public boolean lift;
 
@@ -262,13 +264,31 @@ public class DriveTrain implements Subsystem {
 
     double distance;
 
+    public static Command opentransfer = new LambdaCommand()
+            .setStart(()-> {
+                //`5transfer2.setPosition(-0.25);
+                transfer2.setPosition(0.3);
+            }).setIsDone(() -> true);
+    public static Command closeTransfer = new LambdaCommand()
+            .setStart(() -> {
+                transfer2.setPosition(0.7);
+            }).setIsDone(() -> true);
+    static Command transferOn = new LambdaCommand()
+            .setStart(()-> transfer1.setPower(-0.7))
+            .setIsDone(() -> true);
+    static Command transferOff = new LambdaCommand()
+            .setStart(() -> transfer1.setPower(0))
+            .setIsDone(() -> true);
+
+    public static SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.4), transferOn, new Delay(0.6), transferOff, closeTransfer, shootFalse);
+
     @Override
     public void periodic() {
         if (firsttime == true) {
             Gamepads.gamepad1().triangle().whenBecomesTrue(() -> autolocktrue())
                     .whenBecomesFalse(() -> autolockfalse());
             Gamepads.gamepad2().cross().whenBecomesTrue(() -> hood());
-            Gamepads.gamepad1().rightTrigger().greaterThan(0.5).whenBecomesTrue(shoot);
+            Gamepads.gamepad1().rightTrigger().greaterThan(0.3).whenBecomesTrue(shoot);
             intakeMotor = new MotorEx("intake");
             transfer1 = new MotorEx("transfer");
             transfer2 = new ServoEx("transferServo1");

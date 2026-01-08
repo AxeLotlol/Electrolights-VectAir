@@ -136,14 +136,6 @@ public class TeleOpBlue extends NextFTCOpMode {
 
     public boolean shoot;
 
-    public void shoot(){
-        if(shoot==false){
-            shoot=true;
-            DriveTrain.opentransfer.schedule();
-            shoot=false;
-        }
-    }
-
     @Override
     public void onStartButtonPressed() {
 

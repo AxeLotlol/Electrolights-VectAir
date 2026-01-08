@@ -128,20 +128,11 @@ public class TeleOpRed extends NextFTCOpMode {
 
     public boolean shoot;
 
-    public void shoot(){
-        if(shoot==false){
-            shoot=true;
-            DriveTrain.opentransfer.schedule();
-            shoot=false;
-        }
-    }
-
     @Override
     public void onStartButtonPressed() {
 
         //Gamepads.gamepad1().rightTrigger().greaterThan(0.2).whenBecomesTrue(() -> DriveTrain.shoot.schedule());
         Gamepads.gamepad2().cross().whenBecomesTrue(() -> hood());
-        Gamepads.gamepad2().rightTrigger().greaterThan(0.4).whenBecomesTrue(() -> DriveTrain.closeTransfer.schedule());
         /*SequentialGroup onStart= new SequentialGroup(
                 new Delay(2),
                 //TempHood.INSTANCE.HoodUp,

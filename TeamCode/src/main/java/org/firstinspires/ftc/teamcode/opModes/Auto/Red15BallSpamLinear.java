@@ -242,8 +242,7 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
                                     new Pose(87.700, 55.500),
                                     new Pose(82.600, 87.200)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(-3), Math.toRadians(46))
-                    .setReversed()
+                    ).setLinearHeadingInterpolation(Math.toRadians(-3), Math.toRadians(45))
                     .build();
 
             resetHelper = follower.pathBuilder().addPath(
@@ -274,8 +273,7 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
                                     new Pose(107.400, 50.000),
                                     new Pose(82.600, 87.200)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(29), Math.toRadians(46))
-                    .setReversed()
+                    ).setLinearHeadingInterpolation(Math.toRadians(29), Math.toRadians(45))
                     .build();
 
             intakeSet1 = follower.pathBuilder().addPath(
@@ -295,8 +293,7 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
                                     new Pose(101.500, 84.000),
                                     new Pose(82.600, 87.200)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(46))
-                    .setReversed()
+                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(45))
                     .build();
 
             intakeSet3 = follower.pathBuilder().addPath(
@@ -316,8 +313,8 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
                                     new Pose(100.000, 43.000),
                                     new Pose(82.600, 87.200)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(1), Math.toRadians(46))
-                    .setReversed()
+                    ).setLinearHeadingInterpolation(Math.toRadians(1), Math.toRadians(45
+                    ))
                     .build();
 
             teleOpPar = follower.pathBuilder().addPath(

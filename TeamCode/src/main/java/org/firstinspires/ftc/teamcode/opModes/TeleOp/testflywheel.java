@@ -74,7 +74,7 @@ public class testflywheel extends NextFTCOpMode {
 
     static boolean shooting = false;
 
-    public static float rpm = 2700;
+    public static float rpm = 2000;
 
     private static MotorEx transfer1;
     private static ServoEx transfer2;

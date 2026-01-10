@@ -67,7 +67,7 @@ public class DriveTrain implements Subsystem {
 
     private boolean autolock = false;
 
-    public double aimMultiplier = 0.425;
+    public double aimMultiplier = 0.475;
 
     private boolean slow = false;
     // === AprilTag/Limelight align tuning ===
@@ -337,10 +337,10 @@ public class DriveTrain implements Subsystem {
             aimMultiplier = 0.8;
         }
         else if(headingError<40||headingError>-40){
-            aimMultiplier = 0.425;
+            aimMultiplier = 0.475;
         }
         else{
-            aimMultiplier = 0.425;
+            aimMultiplier = 0.475;
         }
         double finalHeadingError = headingError;
         yVCtx = () -> visionYawCommand(finalHeadingError);

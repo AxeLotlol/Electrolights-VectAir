@@ -3,6 +3,7 @@
 package org.firstinspires.ftc.teamcode.opModes.Auto;
 
 
+import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 
@@ -13,6 +14,7 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.CRServo;
 
@@ -57,6 +59,7 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
+
 
     private Paths paths;
     private MotorEx intakeMotor;
@@ -120,10 +123,13 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
 
     private Boolean preloadspin;
 
-    Command preloadSpun = new LambdaCommand()
-            .setStart(() -> preloadspin=true);
-    Command preloadSpunReal = new LambdaCommand()
-            .setStart(() -> preloadspin=false);
+    private double preloadtps;
+
+    private double shoottps;
+    Command findTPSShoot = new LambdaCommand()
+            .setStart(()->shoottps = findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
+    Command findTPSPreload = new LambdaCommand()
+            .setStart(()->preloadtps = findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
 
     public void onInit() {
         telemetry.addLine("Initializing Follower...");
@@ -137,7 +143,9 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
 
         IMUEx imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
 
-
+        Limelight3A limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight.pipelineSwitch(7);
+        limelight.start();
         paths = new Paths(follower);
         intakeMotor = new MotorEx("intake");
         transfer1 = new MotorEx("transfer");
@@ -166,11 +174,10 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
     Command intakeMotorOff = new LambdaCommand()
             .setStart(() -> intakeMotor.setPower(0));
 
-    Command distance = new LambdaCommand()
-            .setStart(()-> findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
+    double distance;
 
     Command transferOn = new LambdaCommand()
-            .setStart(()-> transfer1.setPower(-0.6));
+            .setStart(()-> transfer1.setPower(-1));
     Command transferOff = new LambdaCommand()
             .setStart(() -> transfer1.setPower(0));
     Command transferOnForIntake = new LambdaCommand()
@@ -187,7 +194,7 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
                 transfer2.setPosition(0.7);
             });
 
-    public SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.35), transferOn, new Delay(1), transferOff, closeTransfer);
+    public SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.35), transferOn, new Delay(0.67), transferOff, closeTransfer);
 
     public boolean spinup = true;
     public Command spinupfalse = new LambdaCommand()
@@ -212,17 +219,14 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
 
             spinupPLEASEEIsagiINEEDTHIS,
 
-            //HoodUpAuto,
-                preloadSpun,
             new FollowPath(paths.PreloadLaunch,true,1.0),
-            spinupfalse,
             intakeMotorOn,
             opentransfer,
-            new Delay(1),
+            new Delay(0.5),
+            spinupfalse,
+            new Delay(0.5),
             shoot,
             transferOnForIntake,
-            HoodDown,
-                preloadSpunReal,
             new FollowPath(paths.intakeSet2,true,0.9),
 
             transferOff,
@@ -265,17 +269,15 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
 
     @Override
     public void onUpdate(){
-        if(preloadspin==true){
-            shooter(1135);
-        }
-        if(preloadspin==false){
-
-            shooter(1130);
-        }
-
         follower.update();
-
-
+        if(spinup==false) {
+            if (DistanceRed.INSTANCE.getDistanceFromTag() != 0) {
+                shooter(findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
+            } else if (DistanceRed.INSTANCE.getDistanceFromTag() == 0) {
+                distance = follower.getPose().distanceFrom(new Pose(127.6, 130.4));
+                shooter((float) (distance / 39.37));
+            }
+        }
     }
 
 

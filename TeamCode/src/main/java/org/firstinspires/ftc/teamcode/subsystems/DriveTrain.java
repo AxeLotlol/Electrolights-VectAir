@@ -106,8 +106,8 @@ public class DriveTrain implements Subsystem {
     public static final MotorEx fR = new MotorEx("frontRight").brakeMode();
     public static final MotorEx bL = new MotorEx("backLeft").brakeMode();
     public static final MotorEx bR = new MotorEx("backRight").brakeMode();
-
-    public static double sensistivity = 1;
+    public static MotorEx flywheel2 = new MotorEx("launchingmotor2");
+    public static MotorEx flywheel= new MotorEx("launchingmotor");
 
     private IMUEx imu;
 
@@ -274,7 +274,7 @@ public class DriveTrain implements Subsystem {
                 transfer2.setPosition(0.7);
             }).setIsDone(() -> true);
     static Command transferOn = new LambdaCommand()
-            .setStart(()-> transfer1.setPower(-0.7))
+            .setStart(()-> transfer1.setPower(-1))
             .setIsDone(() -> true);
     static Command transferOff = new LambdaCommand()
             .setStart(() -> transfer1.setPower(0))
@@ -352,10 +352,15 @@ public class DriveTrain implements Subsystem {
                 shooter(findTPS((distance / 39.37)));
             }
         }
+        double s1speed = 60 * flywheel.getVelocity()/28;
+        double s2speed = 60 * flywheel2.getVelocity()/28;
+
+        ActiveOpMode.telemetry().addData("Motor1Speed", s1speed);
+        ActiveOpMode.telemetry().addData("Motor2Speed", s2speed);
 
 
 
-
+/*
         ActiveOpMode.telemetry().addData("distancered", DistanceRed.INSTANCE.getDistanceFromTag());
         ActiveOpMode.telemetry().addData("distanceblue", DistanceBlue.INSTANCE.getDistanceFromTag());
         ActiveOpMode.telemetry().addData("RobotVelX", robotVelX);
@@ -373,6 +378,6 @@ public class DriveTrain implements Subsystem {
         ActiveOpMode.telemetry().addData("headingError", headingError);
         ActiveOpMode.telemetry().addData("distance", distance);
         ActiveOpMode.telemetry().addData("yVCtx", visionYawCommand(headingError));
-        ActiveOpMode.telemetry().update();
+        ActiveOpMode.telemetry().update();*/
     }
 }

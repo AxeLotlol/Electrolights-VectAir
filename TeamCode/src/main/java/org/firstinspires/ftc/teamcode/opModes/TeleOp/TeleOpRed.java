@@ -114,15 +114,15 @@ public class TeleOpRed extends NextFTCOpMode {
         float newtps=1000;
         if(lowerangle==true){
             newtps = findTPS44(DistanceRed.INSTANCE.getDistanceFromTag());
-            ActiveOpMode.telemetry().addData("Lowerangle:", lowerangle);
+            //ActiveOpMode.telemetry().addData("Lowerangle:", lowerangle);
         }
         else if(lowerangle==false) {
             newtps = findTPS(DistanceRed.INSTANCE.getDistanceFromTag());
-            ActiveOpMode.telemetry().addData("Lowerangle:", lowerangle);
+            //ActiveOpMode.telemetry().addData("Lowerangle:", lowerangle);
         }
         if (DistanceRed.INSTANCE.getDistanceFromTag() != 0) {
             shooter(newtps);
-            ActiveOpMode.telemetry().addData("newtps", newtps);
+            //ActiveOpMode.telemetry().addData("newtps", newtps);
         }
     }
 

@@ -4,7 +4,6 @@ import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 
 
-
 import android.os.Build;
 
 import com.bylazar.configurables.annotations.Configurable;
@@ -128,13 +127,7 @@ public class testflywheel extends NextFTCOpMode {
         shooter((rpm*28)/60);
         double ticksPerSecond = flywheel.getVelocity();
 
-        //shooter(configvelocity);
-        ActiveOpMode.telemetry().addData("Required RPM", rpm);
-
         double currRPM = (ticksPerSecond / 28) * 60.0;
-
-        ActiveOpMode.telemetry().addData("Motor RPM", currRPM);
-        ActiveOpMode.telemetry().update();
 
 
         /*if (lift == true) {

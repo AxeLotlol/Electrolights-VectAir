@@ -270,8 +270,7 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
         pathTimer.resetTimer();
         flywheel.setPower(1);
         flywheel2.setPower(-1);
-        flywheel.setPower(1);
-        flywheel2.setPower(-1);
+
         //int tag=MotifScanning.INSTANCE.findMotif();
         Auto().schedule();
 

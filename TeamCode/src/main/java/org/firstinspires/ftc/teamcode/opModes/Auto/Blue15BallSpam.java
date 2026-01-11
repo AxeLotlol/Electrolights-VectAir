@@ -226,8 +226,8 @@ public class Blue15BallSpam extends NextFTCOpMode {
         opmodeTimer.resetTimer();
         pathTimer.resetTimer();
 
-        flywheel.setPower(1);
-        flywheel2.setPower(-1);
+        //flywheel.setPower(1);
+        //flywheel2.setPower(-1);
 
         Auto().schedule();
     }
@@ -237,7 +237,7 @@ public class Blue15BallSpam extends NextFTCOpMode {
         follower.update();
 
         if (preloadSpin) {
-            shooter(1145);
+            shooter(1155);
         } else {
             if (DistanceRed.INSTANCE.getDistanceFromTag() != 0) {
                 shooter(findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));

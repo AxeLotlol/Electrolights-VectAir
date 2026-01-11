@@ -125,7 +125,7 @@ public class TeleOpBlue extends NextFTCOpMode {
         }
         if (DistanceBlue.INSTANCE.getDistanceFromTag() != 0) {
             shooter(newtps);
-            //ActiveOpMode.telemetry().addData("newtps", newtps);
+            ActiveOpMode.telemetry().addData("newtps", newtps);
         }
     }
 

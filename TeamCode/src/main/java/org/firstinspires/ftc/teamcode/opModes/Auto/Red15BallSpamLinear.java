@@ -275,7 +275,7 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
                 shooter(findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
                 ActiveOpMode.telemetry().addData("Limelight!", findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
             } else if (DistanceRed.INSTANCE.getDistanceFromTag() == 0) {
-                shooter(1125);
+                shooter(1122.5);
             }
         }
     }

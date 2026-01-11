@@ -14,10 +14,14 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
+import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
@@ -73,6 +77,8 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
 
     private ServoEx transfer2;
 
+    public Limelight3A limelight3A;
+
     public static MotorEx flywheel = new MotorEx("launchingmotor");
 
     public static MotorEx flywheel2 = new MotorEx("launchingmotor2");
@@ -122,6 +128,7 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
     );
 
     private Boolean preloadspin;
+    public IMU imu2;
 
     private double preloadtps;
 
@@ -143,9 +150,11 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
 
         IMUEx imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
 
-        Limelight3A limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.pipelineSwitch(7);
-        limelight.start();
+        imu2 = ActiveOpMode.hardwareMap().get(IMU.class, "imu");
+
+        limelight3A = ActiveOpMode.hardwareMap().get(Limelight3A.class, "limelight");
+        limelight3A.pipelineSwitch(7); //april tag 7 pipeline
+        limelight3A.start();
         paths = new Paths(follower);
         intakeMotor = new MotorEx("intake");
         transfer1 = new MotorEx("transfer");
@@ -197,6 +206,8 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
     public SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.35), transferOn, new Delay(0.67), transferOff, closeTransfer);
 
     public boolean spinup = true;
+
+    public static boolean hasTag;
     public Command spinupfalse = new LambdaCommand()
             .setStart(()-> {
                 spinup=false;
@@ -217,6 +228,7 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
 
     Command preloadSpun = new LambdaCommand().setStart(() -> preloadspinreal = true);
     Command preloadSpunReal = new LambdaCommand().setStart(() -> preloadspinreal = false);
+    static double ta;
 
     public Command Auto(){
         return new SequentialGroup(
@@ -228,9 +240,7 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
                 spinupfalse,
             intakeMotorOn,
             opentransfer,
-            new Delay(1.15),
-
-            new Delay(0.5),
+            new Delay(1.5),
             shoot,
             transferOnForIntake,
             preloadSpunReal,
@@ -265,6 +275,7 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
         );
     }
 
+
     public void onStartButtonPressed() {
         opmodeTimer.resetTimer();
         pathTimer.resetTimer();
@@ -280,25 +291,36 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
     }
 
     @Override
-    public void onUpdate(){
+    public void onUpdate() {
         follower.update();
-
-        if(preloadspinreal) {
+        LLResult result = limelight3A.getLatestResult();
+        hasTag = (result != null) && result.isValid() && !result.getFiducialResults().isEmpty();
+        YawPitchRollAngles orientation = imu2.getRobotYawPitchRollAngles();
+        limelight3A.updateRobotOrientation(orientation.getYaw(AngleUnit.DEGREES));
+        LLResult llResult = limelight3A.getLatestResult();
+        if (llResult != null && llResult.isValid()) {
+            ta = llResult.getTa();
+        }
+        ActiveOpMode.telemetry().addData("hasTag:", hasTag);
+        ActiveOpMode.telemetry().update();
+        if (hasTag) {
+            distance = 1.892 * Math.pow(ta, -0.513) + 0.08;
+        }
+        if (preloadspinreal) {
             shooter(1145);
         }
-        else{
+        else {
             if (DistanceRed.INSTANCE.getDistanceFromTag() != 0) {
                 shooter(findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
                 ActiveOpMode.telemetry().addData("Limelight!", findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
-            } else if (DistanceRed.INSTANCE.getDistanceFromTag() == 0) {
-                shooter(1122);
             }
+            else if (DistanceRed.INSTANCE.getDistanceFromTag() == 0) {
+                shooter(1120);
+                ActiveOpMode.telemetry().addLine("Constant!");
+            }
+
         }
-
     }
-
-
-
 
     @Override
     public void onStop() {

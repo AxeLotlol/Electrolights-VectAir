@@ -227,6 +227,8 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
             new FollowPath(paths.PreloadLaunch,true,1.0),
                 spinupfalse,
             intakeMotorOn,
+
+
             opentransfer,
             new Delay(1.15),
 
@@ -241,7 +243,7 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
             shoot,
             transferOnForIntake,
             new FollowPath(paths.resetHelper,true,1.0),
-            new Delay(0.15),
+            new Delay(0.3),
             new FollowPath(paths.resetIntakeSpam, true, 1.0),
             new Delay(1.3),
             transferOff,
@@ -284,7 +286,7 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
         follower.update();
 
         if(preloadspinreal) {
-            shooter(1145);
+            shooter(1155);
         }
         else{
             if (DistanceRed.INSTANCE.getDistanceFromTag() != 0) {
@@ -335,8 +337,8 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
                             new BezierCurve(
                                     new Pose(82.600, 87.200),
                                     new Pose(85.000, 87.000),
-                                    new Pose(84.000, 61.000),
-                                    new Pose(124.000, 61.000)
+                                    new Pose(84.000, 62.000),
+                                    new Pose(124.000, 62.000)
                             )
                     ).setTangentHeadingInterpolation()
 

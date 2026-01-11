@@ -217,7 +217,7 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
     public Command Auto(){
         return new SequentialGroup(
 
-            spinupPLEASEEIsagiINEEDTHIS,
+            //spinupPLEASEEIsagiINEEDTHIS,
 
             new FollowPath(paths.PreloadLaunch,true,1.0),
             intakeMotorOn,
@@ -261,8 +261,11 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
     public void onStartButtonPressed() {
         opmodeTimer.resetTimer();
         pathTimer.resetTimer();
+        flywheel.setPower(1);
+        flywheel2.setPower(-1);
         //int tag=MotifScanning.INSTANCE.findMotif();
         Auto().schedule();
+
 
 
     }

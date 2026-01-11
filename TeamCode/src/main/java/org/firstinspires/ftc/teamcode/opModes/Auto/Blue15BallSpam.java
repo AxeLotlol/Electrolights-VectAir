@@ -226,8 +226,8 @@ public class Blue15BallSpam extends NextFTCOpMode {
         opmodeTimer.resetTimer();
         pathTimer.resetTimer();
 
-        //flywheel.setPower(1);
-        //flywheel2.setPower(-1);
+        flywheel.setPower(1);
+        flywheel2.setPower(-1);
 
         Auto().schedule();
     }

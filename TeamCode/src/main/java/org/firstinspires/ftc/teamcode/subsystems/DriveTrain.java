@@ -141,7 +141,7 @@ public class DriveTrain implements Subsystem {
             double targetHeading = Math.toDegrees(Math.atan2(virtualGoal.getY() - currPose.getY(), virtualGoal.getX() - currPose.getX()));
             double robotHeading = Math.toDegrees(follower.getPose().getHeading());
             double headingError = targetHeading - robotHeading;
-            yVCtx = () -> visionYawCommand(headingError);
+            //yVCtx = () -> visionYawCommand(headingError);
             return new MecanumDriverControlled(
                     fL,
                     fR,
@@ -195,7 +195,14 @@ public class DriveTrain implements Subsystem {
             ActiveOpMode.telemetry().addLine("No direction set");
         }
         imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
-        Pose startingpose=new Pose (72, 72, Math.toRadians(90));
+        Pose startingpose = new Pose (115, 66, Math.toRadians(90));
+        if(alliance ==-1){
+            startingpose=new Pose (115, 66, Math.toRadians(90));
+        }
+        if(alliance ==1){
+            startingpose=new Pose (29, 66, Math.toRadians(90));
+        }
+
 
         follower = follower();
         follower.setStartingPose(startingpose);
@@ -343,13 +350,13 @@ public class DriveTrain implements Subsystem {
             aimMultiplier = 0.475;
         }
         double finalHeadingError = headingError;
-        yVCtx = () -> visionYawCommand(finalHeadingError);
+        //yVCtx = () -> visionYawCommand(finalHeadingError);
         if (DistanceRed.INSTANCE.getDistanceFromTag() == 0 && DistanceBlue.INSTANCE.getDistanceFromTag() == 0) {
             distance = follower.getPose().distanceFrom(virtualGoalDist);
             if (lowerangle == true) {
-                shooter(findTPS44((distance / 39.37)));
+                //shooter(findTPS44((distance / 39.37)));
             } else if (lowerangle == false) {
-                shooter(findTPS((distance / 39.37)));
+                //shooter(findTPS((distance / 39.37)));
             }
         }
         double s1speed = 60 * flywheel.getVelocity()/28;
@@ -360,7 +367,7 @@ public class DriveTrain implements Subsystem {
 
 
 
-/*
+
         ActiveOpMode.telemetry().addData("distancered", DistanceRed.INSTANCE.getDistanceFromTag());
         ActiveOpMode.telemetry().addData("distanceblue", DistanceBlue.INSTANCE.getDistanceFromTag());
         ActiveOpMode.telemetry().addData("RobotVelX", robotVelX);
@@ -378,6 +385,6 @@ public class DriveTrain implements Subsystem {
         ActiveOpMode.telemetry().addData("headingError", headingError);
         ActiveOpMode.telemetry().addData("distance", distance);
         ActiveOpMode.telemetry().addData("yVCtx", visionYawCommand(headingError));
-        ActiveOpMode.telemetry().update();*/
+        ActiveOpMode.telemetry().update();
     }
 }

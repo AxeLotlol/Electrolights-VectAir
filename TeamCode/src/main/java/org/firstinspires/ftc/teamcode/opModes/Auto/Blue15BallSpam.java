@@ -150,7 +150,7 @@ public class Blue15BallSpam extends NextFTCOpMode {
 
                 intakeMotorOn,
                 openTransfer,
-                new Delay(1.15),
+                new Delay(1.25),
                 new Delay(0.5),
                 shoot,
 
@@ -166,7 +166,7 @@ public class Blue15BallSpam extends NextFTCOpMode {
                 new Delay(0.3),
 
                 new FollowPath(paths.resetIntakeSpam, true, 1.0),
-                new Delay(1.3),
+                new Delay(1.2),
                 transferOff,
 
                 reverseIntake,
@@ -237,7 +237,7 @@ public class Blue15BallSpam extends NextFTCOpMode {
         follower.update();
 
         if (preloadSpin) {
-            shooter(1155);
+            shooter(1165);
         } else {
             if (DistanceRed.INSTANCE.getDistanceFromTag() != 0) {
                 shooter(findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
@@ -325,13 +325,13 @@ public class Blue15BallSpam extends NextFTCOpMode {
                             new Pose(61.4, 87.2),
                             new Pose(52.5, 97.3),
                             new Pose(42.5, 87.0),
-                            new Pose(19.335, 86.898)
+                            new Pose(18, 86.898)
                     )
             ).setTangentHeadingInterpolation().build();
 
             launchSet1 = follower.pathBuilder().addPath(
                     new BezierCurve(
-                            new Pose(18.335, 86.898),
+                            new Pose(18, 86.898),
                             new Pose(42.5, 84.0),
                             new Pose(61.4, 87.2)
                     )

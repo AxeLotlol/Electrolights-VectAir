@@ -396,7 +396,7 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
 
             launchSet1 = follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(125.665, 86.898),
+                                    new Pose(124.665, 86.898),
                                     new Pose(101.500, 84.000),
                                     new Pose(82.600, 87.200)
                             )

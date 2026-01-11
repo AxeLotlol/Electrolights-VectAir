@@ -162,8 +162,10 @@ public class Blue15BallSpam extends NextFTCOpMode {
                 shoot,
 
                 transferOn,
+                intakeMotorOff,
                 new FollowPath(paths.resetHelper, true, 1.0),
                 new Delay(0.3),
+                intakeMotorOn,
 
                 new FollowPath(paths.resetIntakeSpam, true, 1.0),
                 new Delay(1.2),

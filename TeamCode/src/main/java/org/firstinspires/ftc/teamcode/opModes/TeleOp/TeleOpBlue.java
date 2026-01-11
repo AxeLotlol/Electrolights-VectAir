@@ -115,6 +115,8 @@ public class TeleOpBlue extends NextFTCOpMode {
                 .whenBecomesFalse(() -> transfer.setPower(0));
         Gamepads.gamepad2().leftTrigger().greaterThan(0.3).whenBecomesTrue(()->intakeMotor.setPower(-1))
                 .whenBecomesFalse(() -> intakeMotor.setPower(0));
+        Gamepads.gamepad2().rightTrigger().greaterThan(0.3).whenBecomesTrue(()-> transfer.setPower(-1))
+                .whenBecomesFalse(() -> intakeMotor.setPower(0));
 
 
     }

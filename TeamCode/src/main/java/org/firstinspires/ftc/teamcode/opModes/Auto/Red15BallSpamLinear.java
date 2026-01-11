@@ -273,9 +273,9 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
         if(spinup==false) {
             if (DistanceRed.INSTANCE.getDistanceFromTag() != 0) {
                 shooter(findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
+                ActiveOpMode.telemetry().addData("Limelight!", findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
             } else if (DistanceRed.INSTANCE.getDistanceFromTag() == 0) {
-                distance = follower.getPose().distanceFrom(new Pose(127.6, 130.4));
-                shooter((float) (distance / 39.37));
+                shooter(1125);
             }
         }
     }

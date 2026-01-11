@@ -83,7 +83,7 @@ public class DriveTrain implements Subsystem {
 
     private double visionYawCommand(double txDeg) {
         if (Math.abs(txDeg) < YAW_DEADBAND_DEG) return 0.0;
-        return -1*aimMultiplier*clip(YAW_KP * txDeg, -YAW_MAX, YAW_MAX);
+        return aimMultiplier*clip(YAW_KP * txDeg, -YAW_MAX, YAW_MAX);
     }
 
     private void autolocktrue(){
@@ -140,8 +140,19 @@ public class DriveTrain implements Subsystem {
             Pose virtualGoal = new Pose(goalX-vP.getXComponent(), goalY-vP.getYComponent());
             double targetHeading = Math.toDegrees(Math.atan2(virtualGoal.getY() - currPose.getY(), virtualGoal.getX() - currPose.getX()));
             double robotHeading = Math.toDegrees(follower.getPose().getHeading());
-            double headingError = targetHeading - robotHeading;
-            //yVCtx = () -> visionYawCommand(headingError);
+            double headingError = robotHeading - targetHeading;
+            aimMultiplier = 0.7;
+            if(alliance==1 && DistanceBlue.INSTANCE.getDistanceFromTag() != 0) {
+                headingError = DistanceBlue.getTx();
+                aimMultiplier = 0.475;
+            }
+            if(alliance==-1 && DistanceRed.INSTANCE.getDistanceFromTag() != 0) {
+                headingError = DistanceRed.getTx();
+                aimMultiplier = 0.475;
+            }
+            double finalHeadingError = headingError;
+            yVCtx = () -> visionYawCommand(finalHeadingError);
+
             return new MecanumDriverControlled(
                     fL,
                     fR,
@@ -216,8 +227,8 @@ public class DriveTrain implements Subsystem {
     private static MotorEx transfer1;
     private static ServoEx transfer2;
 
-    double goalY = 144;
-    double goalX = 144;
+    double goalY = 136;
+    double goalX = 132;
 
     double goalYDist = 130.4;
     double goalXDist = 127.6;
@@ -240,12 +251,8 @@ public class DriveTrain implements Subsystem {
     //public static SequentialGroup shoot = new SequentialGroup(new SetPosition(transfer2, 0.3), new Delay(0.4), new SetPower(transfer1, -0.75), new Delay(0.75), new SetPower(transfer1, 0), new SetPosition(transfer2, 0.7));
 
 
-    public static void shoot(){
-        if(shooting==false){
-            shooting = true;
-            shoot.schedule();
-        }
-    }
+
+
 
     public boolean lift;
 
@@ -268,6 +275,7 @@ public class DriveTrain implements Subsystem {
         }
 
     }
+    static double transferpower = -1.0;
 
     double distance;
 
@@ -281,21 +289,29 @@ public class DriveTrain implements Subsystem {
                 transfer2.setPosition(0.7);
             }).setIsDone(() -> true);
     static Command transferOn = new LambdaCommand()
-            .setStart(()-> transfer1.setPower(-1))
+            .setStart(()-> transfer1.setPower(transferpower))
             .setIsDone(() -> true);
     static Command transferOff = new LambdaCommand()
             .setStart(() -> transfer1.setPower(0))
             .setIsDone(() -> true);
 
-    public static SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.4), transferOn, new Delay(0.6), transferOff, closeTransfer, shootFalse);
 
+    public static void shoot(){
+        if(shooting==false){
+            shooting = true;
+            SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.4), transferOn, new Delay(0.6), transferOff, closeTransfer, shootFalse);
+            shoot.schedule();
+        }
+    }
+    Command shooter = new LambdaCommand()
+            .setStart(()-> shoot());
     @Override
     public void periodic() {
         if (firsttime == true) {
             Gamepads.gamepad1().triangle().whenBecomesTrue(() -> autolocktrue())
                     .whenBecomesFalse(() -> autolockfalse());
             Gamepads.gamepad2().cross().whenBecomesTrue(() -> hood());
-            Gamepads.gamepad1().rightTrigger().greaterThan(0.3).whenBecomesTrue(shoot);
+            Gamepads.gamepad1().rightTrigger().greaterThan(0.3).whenBecomesTrue(shooter);
             intakeMotor = new MotorEx("intake");
             transfer1 = new MotorEx("transfer");
             transfer2 = new ServoEx("transferServo1");
@@ -310,11 +326,11 @@ public class DriveTrain implements Subsystem {
 
         if (isBlue() == true) {
             goalXDist = 16.4;
-            goalX = 0;
+            goalX = 12;
         }
         if (isRed() == true) {
             goalXDist = 127.6;
-            goalX = 144;
+            goalX = 132;
         }
         double robotVelX = follower.getVelocity().getXComponent();
         double robotVelY = follower.getVelocity().getYComponent();
@@ -328,36 +344,33 @@ public class DriveTrain implements Subsystem {
         Pose virtualGoal = new Pose(goalX - vP.getXComponent(), goalY - vP.getYComponent());
         double targetHeading = Math.toDegrees(Math.atan2(virtualGoal.getY() - currPose.getY(), virtualGoal.getX() - currPose.getX()));
         double robotHeading = Math.toDegrees(follower.getPose().getHeading());
-        if (DistanceRed.INSTANCE.getDistanceFromTag() == 0 && DistanceBlue.INSTANCE.getDistanceFromTag() == 0){
-            headingError = robotHeading - targetHeading;
+        //if (DistanceRed.INSTANCE.getDistanceFromTag() == 0 && DistanceBlue.INSTANCE.getDistanceFromTag() == 0){
+        headingError = robotHeading - targetHeading;
+        aimMultiplier = 0.7;
+        if(alliance==1 && DistanceBlue.INSTANCE.getDistanceFromTag() != 0) {
+            headingError = DistanceBlue.getTx();
+            aimMultiplier = 0.475;
         }
-        else {
-            if(alliance==1) {
-                headingError = DistanceBlue.getTx();
-            }
-            if(alliance==-1) {
-                headingError = DistanceRed.getTx();
-            }
+        if(alliance==-1 && DistanceRed.INSTANCE.getDistanceFromTag() != 0) {
+            headingError = DistanceRed.getTx();
+            aimMultiplier = 0.475;
         }
+
         Pose virtualGoalDist = new Pose(goalXDist - vP.getXComponent(), goalYDist - vP.getYComponent());
-        if(headingError>40||headingError<-40){
-            aimMultiplier = 0.8;
-        }
-        else if(headingError<40||headingError>-40){
-            aimMultiplier = 0.475;
-        }
-        else{
-            aimMultiplier = 0.475;
-        }
         double finalHeadingError = headingError;
-        //yVCtx = () -> visionYawCommand(finalHeadingError);
+        yVCtx = () -> visionYawCommand(finalHeadingError);
         if (DistanceRed.INSTANCE.getDistanceFromTag() == 0 && DistanceBlue.INSTANCE.getDistanceFromTag() == 0) {
             distance = follower.getPose().distanceFrom(virtualGoalDist);
             if (lowerangle == true) {
-                //shooter(findTPS44((distance / 39.37)));
+                shooter(findTPS44((distance / 39.37)));
             } else if (lowerangle == false) {
-                //shooter(findTPS((distance / 39.37)));
+                shooter(findTPS((distance / 39.37)));
             }
+        }
+        if (lowerangle == true) {
+            transferpower = -0.67;
+        } else if (lowerangle == false) {
+            transferpower = -1;
         }
         double s1speed = 60 * flywheel.getVelocity()/28;
         double s2speed = 60 * flywheel2.getVelocity()/28;
@@ -372,6 +385,7 @@ public class DriveTrain implements Subsystem {
         ActiveOpMode.telemetry().addData("distanceblue", DistanceBlue.INSTANCE.getDistanceFromTag());
         ActiveOpMode.telemetry().addData("RobotVelX", robotVelX);
         ActiveOpMode.telemetry().addData("RobotVelY", robotVelY);
+        ActiveOpMode.telemetry().addData("shooting", shooting);
         ActiveOpMode.telemetry().addData("RobotX", robotX);
         ActiveOpMode.telemetry().addData("RobotY", robotY);
         ActiveOpMode.telemetry().addData("goalX", goalX);

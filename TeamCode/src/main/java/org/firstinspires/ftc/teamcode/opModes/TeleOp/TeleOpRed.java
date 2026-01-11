@@ -73,19 +73,16 @@ public class TeleOpRed extends NextFTCOpMode {
             lift=true;
             lowerangle=true;
             TempHood.INSTANCE.HoodUp.schedule();
-            ActiveOpMode.telemetry().addLine("HoodUp");
         }
         else if (lift==true) {
             lift=false;
             lowerangle=false;
             TempHood.INSTANCE.HoodDown.schedule();
-            ActiveOpMode.telemetry().addLine("HoodDown");
         }
         else if (lift!=true&&lift!=false) {
             lift=true;
             lowerangle=true;
             TempHood.INSTANCE.HoodUp.schedule();
-            ActiveOpMode.telemetry().addLine("HoodUp");
         }
 
     }
@@ -137,7 +134,7 @@ public class TeleOpRed extends NextFTCOpMode {
     @Override
     public void onStartButtonPressed() {
 
-        //Gamepads.gamepad1().rightTrigger().greaterThan(0.2).whenBecomesTrue(() -> DriveTrain.shoot.schedule());
+
         Gamepads.gamepad2().cross().whenBecomesTrue(() -> hood());
         /*SequentialGroup onStart= new SequentialGroup(
                 new Delay(2),

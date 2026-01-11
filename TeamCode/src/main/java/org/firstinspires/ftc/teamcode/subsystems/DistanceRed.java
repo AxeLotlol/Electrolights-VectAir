@@ -42,10 +42,8 @@ public class DistanceRed implements Subsystem {
         LLResult llResult = limelight3A.getLatestResult();
         if (llResult != null && llResult.isValid()) {
             ta = llResult.getTa();
-            tx = llResult.getTa();
+            tx = llResult.getTx();
         }
-        ActiveOpMode.telemetry().addData("hasTag:", hasTag);
-        ActiveOpMode.telemetry().update();
     }
 
     public double getDistanceFromTag() {

@@ -75,8 +75,6 @@ public class Flywheel implements Subsystem {
         velocityControlWithFeedforwardExample(currentState, tps);
         velocityControlWithFeedforwardExample2(currentState2, tps);
         double rpm = (flywheelvelocity / 28) * 60.0;
-        ActiveOpMode.telemetry().addData("Flywheel Current Vel", flywheelvelocity);
-        ActiveOpMode.telemetry().addData("Flywheel Required Vel", tps);
 
     }
     @Override public void initialize() {

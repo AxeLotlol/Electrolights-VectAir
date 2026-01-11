@@ -213,20 +213,27 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
 
     public boolean lift;
     boolean lowerangle = false;
+    private Boolean preloadspinreal;
+
+    Command preloadSpun = new LambdaCommand().setStart(() -> preloadspinreal = true);
+    Command preloadSpunReal = new LambdaCommand().setStart(() -> preloadspinreal = false);
 
     public Command Auto(){
         return new SequentialGroup(
 
-            //spinupPLEASEEIsagiINEEDTHIS,
+            spinupPLEASEEIsagiINEEDTHIS,
+            preloadSpun,
 
             new FollowPath(paths.PreloadLaunch,true,1.0),
+                spinupfalse,
             intakeMotorOn,
             opentransfer,
-            new Delay(0.5),
-            spinupfalse,
+            new Delay(1.15),
+
             new Delay(0.5),
             shoot,
             transferOnForIntake,
+            preloadSpunReal,
             new FollowPath(paths.intakeSet2,true,0.9),
 
             transferOff,
@@ -263,6 +270,8 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
         pathTimer.resetTimer();
         flywheel.setPower(1);
         flywheel2.setPower(-1);
+        flywheel.setPower(1);
+        flywheel2.setPower(-1);
         //int tag=MotifScanning.INSTANCE.findMotif();
         Auto().schedule();
 
@@ -273,7 +282,11 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
     @Override
     public void onUpdate(){
         follower.update();
-        if(spinup==false) {
+
+        if(preloadspinreal) {
+            shooter(1145);
+        }
+        else{
             if (DistanceRed.INSTANCE.getDistanceFromTag() != 0) {
                 shooter(findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
                 ActiveOpMode.telemetry().addData("Limelight!", findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
@@ -281,6 +294,7 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
                 shooter(1122);
             }
         }
+
     }
 
 
@@ -313,7 +327,7 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
 
                                     new Pose(82.600, 87.200)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(49), Math.toRadians(39))
+                    ).setLinearHeadingInterpolation(Math.toRadians(49), Math.toRadians(41))
 
                     .build();
 

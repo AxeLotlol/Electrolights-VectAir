@@ -4,7 +4,7 @@ package org.firstinspires.ftc.teamcode.opModes.Auto;
 
 
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
-import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.flywheel;
+//import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.flywheel;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 
 import com.bylazar.configurables.annotations.Configurable;
@@ -340,12 +340,12 @@ public class blue15spamreal extends NextFTCOpMode {
 
     Command shootForMe = new LambdaCommand()
             .setStart(()->shooter(1358));
-    Command spin = new LambdaCommand()
-            .setStart(()-> flywheel.setPower(0.4));
+    /*Command spin = new LambdaCommand()
+            .setStart(()-> flywheel.setPower(0.4));*/
 
     public Command Auto(){
         return new SequentialGroup(
-                spin,
+                //spin,
                 opentransfer,
                 new Delay(0.5),
 

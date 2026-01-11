@@ -111,8 +111,10 @@ public class TeleOpBlue extends NextFTCOpMode {
         follower = PedroComponent.follower();
         Gamepads.gamepad1().leftTrigger().greaterThan(0.3).whenBecomesTrue(()-> intakeMotor.setPower(1))
                 .whenBecomesFalse(() -> intakeMotor.setPower(0));
-        Gamepads.gamepad1().leftBumper().whenBecomesTrue(()-> transfer.setPower(0.9))
+        Gamepads.gamepad1().leftBumper().whenBecomesTrue(()-> transfer.setPower(1))
                 .whenBecomesFalse(() -> transfer.setPower(0));
+        Gamepads.gamepad2().leftTrigger().greaterThan(0.3).whenBecomesTrue(()->intakeMotor.setPower(-1))
+                .whenBecomesFalse(() -> intakeMotor.setPower(0));
 
 
     }

@@ -124,7 +124,7 @@ public class Blue15BallSpam extends NextFTCOpMode {
             closeTransfer
     );
 
-    private boolean preloadSpin = false;
+    public boolean preloadSpin = false;
 
     private Command enablePreloadSpin = new LambdaCommand()
             .setStart(() -> preloadSpin = true);
@@ -142,8 +142,8 @@ public class Blue15BallSpam extends NextFTCOpMode {
 
     public Command Auto() {
         return new SequentialGroup(
-                spinup,
-                enablePreloadSpin,
+                /*spinup,
+                enablePreloadSpin,*/
 
                 new FollowPath(paths.PreloadLaunch, true, 1.0),
                 disablePreloadSpin,
@@ -228,8 +228,10 @@ public class Blue15BallSpam extends NextFTCOpMode {
         opmodeTimer.resetTimer();
         pathTimer.resetTimer();
 
-        flywheel.setPower(1);
-        flywheel2.setPower(-1);
+        /*flywheel.setPower(1);
+        flywheel2.setPower(-1);*/
+        preloadSpin = true;
+
 
         Auto().schedule();
     }
@@ -267,7 +269,7 @@ public class Blue15BallSpam extends NextFTCOpMode {
             PreloadLaunch = follower.pathBuilder().addPath(
                     new BezierLine(
                             new Pose(24.6, 126.4),
-                            new Pose(61.4, 87.2)
+                            new Pose(62.4, 84.2)
                     )
             ).setLinearHeadingInterpolation(
                     Math.toRadians(131),
@@ -276,7 +278,7 @@ public class Blue15BallSpam extends NextFTCOpMode {
 
             intakeSet2 = follower.pathBuilder().addPath(
                     new BezierCurve(
-                            new Pose(61.4, 87.2),
+                            new Pose(62.4, 84.2),
                             new Pose(59.0, 87.0),
                             new Pose(60.0, 61.0),
                             new Pose(20.0, 61.0)

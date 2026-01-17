@@ -87,6 +87,28 @@ public class TeleOpBlue extends NextFTCOpMode {
 
     }
 
+    public boolean liftmid;
+    boolean loweranglemid = false;
+
+    public void hoodMid(){
+        if(liftmid==false){
+            liftmid=true;
+            loweranglemid=true;
+            TempHood.INSTANCE.HoodUpMidRange.schedule();
+        }
+        else if (liftmid==true) {
+            liftmid=false;
+            loweranglemid=false;
+            TempHood.INSTANCE.HoodDown.schedule();
+        }
+        else if (liftmid!=true&&liftmid!=false) {
+            liftmid=true;
+            loweranglemid=true;
+            TempHood.INSTANCE.HoodUpMidRange.schedule();
+        }
+
+    }
+
 
 
     private static final int APRILTAG_PIPELINE = 8;
@@ -136,6 +158,7 @@ public class TeleOpBlue extends NextFTCOpMode {
 
 
         Gamepads.gamepad2().cross().whenBecomesTrue(() -> hood());
+        Gamepads.gamepad2().triangle().whenBecomesTrue(() -> hoodMid());
         /*SequentialGroup onStart= new SequentialGroup(
                 new Delay(2),
                 //TempHood.INSTANCE.HoodUp,

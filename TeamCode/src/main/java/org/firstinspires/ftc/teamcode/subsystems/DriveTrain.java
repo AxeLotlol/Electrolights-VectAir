@@ -246,6 +246,8 @@ public class DriveTrain implements Subsystem {
 
     static boolean lowerangle = false;
 
+    static boolean loweranglemid = false;
+
     static boolean didFirst = false;
 
     //public static SequentialGroup shoot = new SequentialGroup(new SetPosition(transfer2, 0.3), new Delay(0.4), new SetPower(transfer1, -0.75), new Delay(0.75), new SetPower(transfer1, 0), new SetPosition(transfer2, 0.7));
@@ -255,6 +257,8 @@ public class DriveTrain implements Subsystem {
 
 
     public boolean lift;
+
+    public boolean liftmid;
 
 
     public void hood(){
@@ -272,6 +276,22 @@ public class DriveTrain implements Subsystem {
             lift=true;
             lowerangle=true;
             ActiveOpMode.telemetry().addLine("HoodUp");
+        }
+
+    }
+
+    public void hoodMid(){
+        if(liftmid==false){
+            liftmid=true;
+            loweranglemid=true;
+        }
+        else if (liftmid==true) {
+            liftmid=false;
+            loweranglemid=false;
+        }
+        else if (liftmid!=true&&liftmid!=false) {
+            liftmid=true;
+            loweranglemid=true;
         }
 
     }

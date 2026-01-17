@@ -50,6 +50,12 @@ public class TempHood implements Subsystem {
             HoodPowerZero
     );
 
+    public SequentialGroup HoodUpMidRange=new SequentialGroup(
+            HoodRunUp,
+            new Delay(0.05),
+            HoodPowerZero
+    );
+
     ParallelGroup HoodRunDown=new ParallelGroup(
             new SetPower(hoodServo1,1),
             new SetPower(hoodServo2,-1)

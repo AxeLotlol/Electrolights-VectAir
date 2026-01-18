@@ -7,12 +7,11 @@ import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
 import dev.nextftc.core.commands.groups.ParallelGroup;
 import dev.nextftc.core.commands.groups.SequentialGroup;
+import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.ftc.ActiveOpMode;
-import dev.nextftc.ftc.Gamepads;
 import dev.nextftc.hardware.impl.CRServoEx;
 import dev.nextftc.hardware.powerable.SetPower;
-import java.time.*;
 
 
 @Configurable
@@ -23,23 +22,21 @@ public class TempHood implements Subsystem {
     public static final TempHood INSTANCE = new TempHood();
     private TempHood() { }
 
-    private CRServo hoodServo1n;
-    private CRServo hoodServo2n;
+    private static CRServo hoodServo1n;
+    private static CRServo hoodServo2n;
 
-    private CRServoEx hoodServo1 = new CRServoEx(() -> hoodServo1n);
-    private CRServoEx hoodServo2 = new CRServoEx(() -> hoodServo2n);
-
-
+    private static CRServoEx hoodServo1 = new CRServoEx(() -> hoodServo1n);
+    private static CRServoEx hoodServo2 = new CRServoEx(() -> hoodServo2n);
 
 
 
 
-    ParallelGroup HoodRunUp=new ParallelGroup(
+    static ParallelGroup HoodRunUp=new ParallelGroup(
             new SetPower(hoodServo1,-1),
             new SetPower(hoodServo2,1)
     );
 
-    public ParallelGroup HoodPowerZero=new ParallelGroup(
+    public static ParallelGroup HoodPowerZero=new ParallelGroup(
             new SetPower(hoodServo1,0),
             new SetPower(hoodServo2,0)
     );
@@ -56,7 +53,7 @@ public class TempHood implements Subsystem {
             HoodPowerZero
     );
 
-    ParallelGroup HoodRunDown=new ParallelGroup(
+    static ParallelGroup HoodRunDown=new ParallelGroup(
             new SetPower(hoodServo1,1),
             new SetPower(hoodServo2,-1)
     );
@@ -67,11 +64,24 @@ public class TempHood implements Subsystem {
             HoodPowerZero
     );
 
-    public SequentialGroup HoodUpAuto=new SequentialGroup(
-            HoodRunUp,
-            new Delay(0.12),
-            HoodPowerZero
-    );
+    public static void hoodUp(double runtime, double currentstate) {
+        SequentialGroup runUp = new SequentialGroup(
+                HoodRunUp,
+                new Delay(runtime - currentstate),
+                HoodPowerZero
+        );
+        SequentialGroup runDown = new SequentialGroup(
+                HoodRunDown,
+                new Delay(currentstate - runtime),
+                HoodPowerZero
+        );
+        if(runtime>currentstate) {
+            runUp.schedule();
+        }
+        if(runtime<currentstate){
+            runDown.schedule();
+        }
+    }
 
 
 

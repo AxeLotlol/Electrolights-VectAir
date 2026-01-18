@@ -28,6 +28,7 @@ public class DistanceBlue implements Subsystem {
 
     public static final DistanceBlue INSTANCE = new DistanceBlue();
 
+
     public void initialize() {
         limelight3A = ActiveOpMode.hardwareMap().get(Limelight3A.class, "limelight");
         limelight3A.pipelineSwitch(8); //april tag 8 pipeline

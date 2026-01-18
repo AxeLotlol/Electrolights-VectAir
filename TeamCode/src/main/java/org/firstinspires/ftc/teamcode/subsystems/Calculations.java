@@ -12,6 +12,7 @@ public class Calculations implements Subsystem {
 
     double ta;
     double distance;
+
     public static double v0;
     public static double numerator;
     public static double denominator;

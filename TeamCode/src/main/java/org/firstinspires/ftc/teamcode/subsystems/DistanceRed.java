@@ -34,6 +34,7 @@ public class DistanceRed implements Subsystem {
         imu = ActiveOpMode.hardwareMap().get(IMU.class, "imu");
     }
 
+
     public void periodic() {
         LLResult result = limelight3A.getLatestResult();
         hasTag = (result != null) && result.isValid() && !result.getFiducialResults().isEmpty();

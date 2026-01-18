@@ -136,7 +136,7 @@ public class TeleOpRed extends NextFTCOpMode {
 
     @Override
     public void onUpdate() {
-        float newtps=1000;
+        /*float newtps=1000;
         if(lowerangle==true){
             newtps = findTPS44(DistanceRed.INSTANCE.getDistanceFromTag());
             //ActiveOpMode.telemetry().addData("Lowerangle:", lowerangle);
@@ -148,7 +148,7 @@ public class TeleOpRed extends NextFTCOpMode {
         if (DistanceRed.INSTANCE.getDistanceFromTag() != 0) {
             shooter(newtps);
             //ActiveOpMode.telemetry().addData("newtps", newtps);
-        }
+        }*/
     }
 
     public boolean shoot;
@@ -157,8 +157,8 @@ public class TeleOpRed extends NextFTCOpMode {
     public void onStartButtonPressed() {
 
 
-        Gamepads.gamepad2().cross().whenBecomesTrue(() -> hood());
-        Gamepads.gamepad2().triangle().whenBecomesTrue(() -> hoodMid());
+        //Gamepads.gamepad2().cross().whenBecomesTrue(() -> hood());
+        //Gamepads.gamepad2().triangle().whenBecomesTrue(() -> hoodMid());
         /*SequentialGroup onStart= new SequentialGroup(
                 new Delay(2),
                 //TempHood.INSTANCE.HoodUp,

@@ -68,11 +68,9 @@ public class Blue15BallSpam extends NextFTCOpMode {
     private CRServoEx hoodServo1 = new CRServoEx(() -> hoodServo1n);
     private CRServoEx hoodServo2 = new CRServoEx(() -> hoodServo2n);
 
-    public Pose start = new Pose(
-            24.6,
-            126.4,
-            Math.toRadians(131)
-    );
+    public Pose start = new Pose(24.6, 126.4, Math.toRadians(131));
+
+
 
     ParallelGroup HoodRunUp = new ParallelGroup(
             new SetPower(hoodServo1, -1),
@@ -90,10 +88,12 @@ public class Blue15BallSpam extends NextFTCOpMode {
             HoodPowerZero
     );
 
+
+
     private Command intakeMotorOn = new LambdaCommand()
             .setStart(() -> intakeMotor.setPower(-1));
 
-    private Command intakeMotorOff = new LambdaCommand()
+    Command intakeMotorOff = new LambdaCommand()
             .setStart(() -> intakeMotor.setPower(0));
 
     Command transferOn = new LambdaCommand()
@@ -102,17 +102,20 @@ public class Blue15BallSpam extends NextFTCOpMode {
     Command transferOff = new LambdaCommand()
             .setStart(() -> transfer1.setPower(0));
 
+    Command transferOnForIntake = new LambdaCommand()
+            .setStart(() -> transfer1.setPower(-1));
+
     public Command reverseIntakeForMe = new LambdaCommand()
             .setStart(() -> intakeMotor.setPower(0.5));
 
-    public Command openTransfer = new LambdaCommand()
+    public Command opentransfer = new LambdaCommand()
             .setStart(() -> transfer2.setPosition(0.3));
 
     public Command closeTransfer = new LambdaCommand()
             .setStart(() -> transfer2.setPosition(0.7));
 
     public SequentialGroup shoot = new SequentialGroup(
-            openTransfer,
+            opentransfer,
             new Delay(0.35),
             transferOn,
             new Delay(0.87),
@@ -120,25 +123,33 @@ public class Blue15BallSpam extends NextFTCOpMode {
             closeTransfer
     );
 
-    public boolean preloadspinreal = false;
+    private Boolean preloadspinreal = false;
+
+    Command preloadSpunReal = new LambdaCommand()
+            .setStart(() -> preloadspinreal = false);
+
+
 
     public Command Auto() {
         return new SequentialGroup(
                 new FollowPath(paths.PreloadLaunch, true, 1.0),
 
                 intakeMotorOn,
-                openTransfer,
+                opentransfer,
                 new Delay(1),
-                shoot,
 
-                transferOn,
+                shoot,
+                transferOnForIntake,
+                preloadSpunReal,
+
                 new FollowPath(paths.intakeSet2, true, 0.9),
                 transferOff,
 
                 new FollowPath(paths.launchSet2, true, 0.9),
+                intakeMotorOn,
                 shoot,
 
-                transferOn,
+                transferOnForIntake,
                 new FollowPath(paths.resetHelper, true, 1.0),
                 new Delay(0.35),
 
@@ -151,15 +162,16 @@ public class Blue15BallSpam extends NextFTCOpMode {
 
                 intakeMotorOn,
                 shoot,
+                transferOnForIntake,
 
-                transferOn,
                 new FollowPath(paths.intakeSet1, true, 1.0),
                 transferOff,
 
                 new FollowPath(paths.launchSet1, true, 1.0),
+                intakeMotorOn,
                 shoot,
+                transferOnForIntake,
 
-                transferOn,
                 new FollowPath(paths.intakeSet3, true, 1.0),
                 transferOff,
 
@@ -169,6 +181,8 @@ public class Blue15BallSpam extends NextFTCOpMode {
                 new FollowPath(paths.teleOpPar, true, 1.0)
         );
     }
+
+
 
     @Override
     public void onInit() {
@@ -200,7 +214,10 @@ public class Blue15BallSpam extends NextFTCOpMode {
     public void onStartButtonPressed() {
         opmodeTimer.resetTimer();
         pathTimer.resetTimer();
+
         preloadspinreal = true;
+        shooter(1085);
+
         Auto().schedule();
     }
 
@@ -224,6 +241,8 @@ public class Blue15BallSpam extends NextFTCOpMode {
         follower.breakFollowing();
     }
 
+
+
     public static class Paths {
 
         public PathChain PreloadLaunch, intakeSet2, launchSet2, resetHelper,
@@ -239,7 +258,7 @@ public class Blue15BallSpam extends NextFTCOpMode {
                     )
             ).setLinearHeadingInterpolation(
                     Math.toRadians(131),
-                    Math.toRadians(139)
+                    Math.toRadians(41 + 180)
             ).build();
 
             intakeSet2 = follower.pathBuilder().addPath(
@@ -258,7 +277,7 @@ public class Blue15BallSpam extends NextFTCOpMode {
                             new Pose(60.226, 90.871)
                     )
             ).setLinearHeadingInterpolation(
-                    Math.toRadians(183),
+                    Math.toRadians(177),
                     Math.toRadians(141)
             ).build();
 
@@ -282,8 +301,8 @@ public class Blue15BallSpam extends NextFTCOpMode {
 
             launchSpam = follower.pathBuilder().addPath(
                     new BezierCurve(
-                            new Pose(14.0, 62.0),
-                            new Pose(36.6, 50.0),
+                            new Pose(13.1, 56.0),
+                            new Pose(36.6, 54.0),
                             new Pose(60.226, 90.871)
                     )
             ).setLinearHeadingInterpolation(
@@ -308,7 +327,7 @@ public class Blue15BallSpam extends NextFTCOpMode {
                     )
             ).setLinearHeadingInterpolation(
                     Math.toRadians(180),
-                    Math.toRadians(145)
+                    Math.toRadians(141)
             ).build();
 
             intakeSet3 = follower.pathBuilder().addPath(

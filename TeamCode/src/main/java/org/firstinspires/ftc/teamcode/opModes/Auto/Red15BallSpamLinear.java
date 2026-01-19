@@ -381,7 +381,7 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
                                     new Pose(125, 68.500),
                                     new Pose(120,66),
 
-                                    new Pose(126, 57.000)
+                                    new Pose(126, 56.000)
                             )
                     ).setConstantHeadingInterpolation(Math.toRadians(45))
 
@@ -389,7 +389,7 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
 
             launchSpam = follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(126, 57),
+                                    new Pose(126, 56),
                                     new Pose(107.400, 54.000),
                                     new Pose(84.774, 90.871)
                             )

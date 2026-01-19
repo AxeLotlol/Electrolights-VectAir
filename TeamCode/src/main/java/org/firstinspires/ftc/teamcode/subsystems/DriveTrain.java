@@ -10,7 +10,8 @@ import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpBlue.isBlue;
 import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpRed.isRed;
 import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
-import static org.firstinspires.ftc.teamcode.subsystems.TempHood.hoodUp;
+//import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
+//import static org.firstinspires.ftc.teamcode.subsystems.TempHood.hoodUp;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.geometry.Pose;
@@ -134,8 +135,8 @@ public class DriveTrain implements Subsystem {
             ActiveOpMode.telemetry().addLine("No direction set");
         }
         Pose currPose = follower.getPose();
-        double robotHeading = Math.toDegrees(follower.getPose().getHeading());
-        Vector robotToGoalVector = new Vector(goalX-currPose.getX(), goalY - currPose.getY());
+        double robotHeading = follower.getPose().getHeading();
+        Vector robotToGoalVector = new Vector(follower.getPose().distanceFrom(new Pose(goalX, goalY)), Math.atan2(goalY - currPose.getY(), goalX - currPose.getX()));
         Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity());
 
 
@@ -220,11 +221,11 @@ public class DriveTrain implements Subsystem {
     private static MotorEx transfer1;
     private static ServoEx transfer2;
 
-    double goalY = 138;
-    double goalX = 138;
+    double goalY = 144;
+    double goalX = 144;
 
-    double goalYDist = 130.4;
-    double goalXDist = 127.6;
+    double goalYDist = 144;
+    double goalXDist = 144;
 
 
     static boolean shooting = false;
@@ -271,22 +272,6 @@ public class DriveTrain implements Subsystem {
         }
 
     }
-
-    public void hoodMid(){
-        if(liftmid==false){
-            liftmid=true;
-            loweranglemid=true;
-        }
-        else if (liftmid==true) {
-            liftmid=false;
-            loweranglemid=false;
-        }
-        else if (liftmid!=true&&liftmid!=false) {
-            liftmid=true;
-            loweranglemid=true;
-        }
-
-    }
     static double transferpower = -1.0;
 
     double distance;
@@ -311,7 +296,7 @@ public class DriveTrain implements Subsystem {
     public static void shoot(){
         if(shooting==false){
             shooting = true;
-            SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.4), transferOn, new Delay(0.6), transferOff, closeTransfer, shootFalse);
+            SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.1), transferOn, new Delay(0.25), transferOff, closeTransfer, shootFalse);
             shoot.schedule();
         }
     }
@@ -337,16 +322,17 @@ public class DriveTrain implements Subsystem {
 
 
         if (isBlue() == true) {
-            goalXDist = 6;
-            goalX = 6;
+            goalXDist = 0;
+            goalX = 0;
         }
         if (isRed() == true) {
-            goalXDist = 138;
-            goalX = 138;
+            goalXDist = 144;
+            goalX = 144;
         }
         Pose currPose = follower.getPose();
-        double robotHeading = Math.toDegrees(follower.getPose().getHeading());
-        Vector robotToGoalVector = new Vector(goalX-currPose.getX(), goalY - currPose.getY());
+        double robotHeading = follower.getPose().getHeading();
+        Vector robotToGoalVector = new Vector(follower.getPose().distanceFrom(new Pose(goalX, goalY)), Math.atan2(goalY - currPose.getY(), goalX - currPose.getX()));
+        Vector v = new Vector(new Pose(144, 144));
         Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity());
         Double headingError = results[2];
         double finalHeadingError = headingError;
@@ -354,8 +340,12 @@ public class DriveTrain implements Subsystem {
         double flywheelSpeed = results[0];
         shooter((float) flywheelSpeed);
         double hoodAngle = results[1];
-        hoodUp(hoodAngle, currentHoodState);
-        currentHoodState=hoodAngle;
+        TempHood.hoodUp(hoodAngle, currentHoodState);
+        double zeroornot = TempHood.hoodUp(hoodAngle, currentHoodState);
+        if(zeroornot !=0)
+        {
+            currentHoodState=zeroornot;
+        }
         double s1speed = 60 * flywheel.getVelocity()/28;
         double s2speed = 60 * flywheel2.getVelocity()/28;
 
@@ -365,9 +355,11 @@ public class DriveTrain implements Subsystem {
         ActiveOpMode.telemetry().addData("shooting", shooting);
         ActiveOpMode.telemetry().addData("goalX", goalX);
         ActiveOpMode.telemetry().addData("goalY", goalY);
+        ActiveOpMode.telemetry().addData("RobotX", currPose.getX());
+        ActiveOpMode.telemetry().addData("RobotY", currPose.getY());
         ActiveOpMode.telemetry().addData("goalXDist", goalXDist);
         ActiveOpMode.telemetry().addData("goalYDist", goalYDist);
-        ActiveOpMode.telemetry().addData("robotHeading", robotHeading);
+        ActiveOpMode.telemetry().addData("robotHeading", Math.toDegrees(robotHeading));
         ActiveOpMode.telemetry().addData("headingError", headingError);
         ActiveOpMode.telemetry().addData("distance", distance);
         ActiveOpMode.telemetry().addData("yVCtx", visionYawCommand(headingError));

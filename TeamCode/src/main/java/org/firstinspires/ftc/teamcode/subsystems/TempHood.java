@@ -31,7 +31,7 @@ public class TempHood implements Subsystem {
 
 
 
-    static ParallelGroup HoodRunUp=new ParallelGroup(
+    public static ParallelGroup HoodRunUp=new ParallelGroup(
             new SetPower(hoodServo1,-1),
             new SetPower(hoodServo2,1)
     );
@@ -41,30 +41,32 @@ public class TempHood implements Subsystem {
             new SetPower(hoodServo2,0)
     );
 
-    public SequentialGroup HoodUp=new SequentialGroup(
+    /*public SequentialGroup HoodUp=new SequentialGroup(
             HoodRunUp,
             new Delay(0.18),
             HoodPowerZero
-    );
+    );*/
 
-    public SequentialGroup HoodUpMidRange=new SequentialGroup(
+    /*public SequentialGroup HoodUpMidRange=new SequentialGroup(
             HoodRunUp,
             new Delay(0.05),
             HoodPowerZero
-    );
+    );*/
 
-    static ParallelGroup HoodRunDown=new ParallelGroup(
+    public static ParallelGroup HoodRunDown=new ParallelGroup(
             new SetPower(hoodServo1,1),
             new SetPower(hoodServo2,-1)
     );
 
-    public SequentialGroup HoodDown=new SequentialGroup(
+    /*public SequentialGroup HoodDown=new SequentialGroup(
             HoodRunDown,
             new Delay(0.17),
             HoodPowerZero
-    );
+    );*/
 
-    public static void hoodUp(double runtime, double currentstate) {
+    public static double hoodUp(double runtime, double currentstate) {
+        ActiveOpMode.telemetry().addData("runtime", runtime);
+        ActiveOpMode.telemetry().addData("currentstate", currentstate);
         SequentialGroup runUp = new SequentialGroup(
                 HoodRunUp,
                 new Delay(runtime - currentstate),
@@ -75,11 +77,16 @@ public class TempHood implements Subsystem {
                 new Delay(currentstate - runtime),
                 HoodPowerZero
         );
-        if(runtime>currentstate) {
+        if(runtime>currentstate/*+0.012*/) {
             runUp.schedule();
+            return runtime;
         }
-        if(runtime<currentstate){
+        if(runtime<currentstate/*-0.012*/){
             runDown.schedule();
+            return runtime;
+        }
+        else{
+            return 0;
         }
     }
 

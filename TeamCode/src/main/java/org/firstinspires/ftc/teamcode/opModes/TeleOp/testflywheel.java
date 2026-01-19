@@ -56,21 +56,6 @@ public class testflywheel extends NextFTCOpMode {
 
     public boolean running=false;
 
-    public void hood(){
-        if(lift==false){
-            lift=true;
-            TempHood.INSTANCE.HoodUp.schedule();
-        }
-        else if (lift==true) {
-            lift=false;
-            TempHood.INSTANCE.HoodDown.schedule();
-        }
-        else if (lift!=true&&lift!=false) {
-            lift=true;
-            TempHood.INSTANCE.HoodUp.schedule();
-        }
-
-    }
 
     static boolean shooting = false;
 
@@ -119,8 +104,6 @@ public class testflywheel extends NextFTCOpMode {
     public void onStartButtonPressed() {
         Gamepads.gamepad1().rightTrigger().greaterThan(0.4).whenBecomesTrue(() -> shoot());
         flywheel.setPower(0.1);
-        Gamepads.gamepad1().triangle().whenBecomesTrue(() -> hood());
-        Gamepads.gamepad1().circle().whenBecomesTrue(() -> TempHood.INSTANCE.HoodPowerZero.schedule());
     }
     @Override
     public void onUpdate(){

@@ -67,47 +67,9 @@ public class TeleOpBlue extends NextFTCOpMode {
     }
     public boolean lift;
     boolean lowerangle = false;
-
-    public void hood(){
-        if(lift==false){
-            lift=true;
-            lowerangle=true;
-            TempHood.INSTANCE.HoodUp.schedule();
-        }
-        else if (lift==true) {
-            lift=false;
-            lowerangle=false;
-            TempHood.INSTANCE.HoodDown.schedule();
-        }
-        else if (lift!=true&&lift!=false) {
-            lift=true;
-            lowerangle=true;
-            TempHood.INSTANCE.HoodUp.schedule();
-        }
-
-    }
-
     public boolean liftmid;
     boolean loweranglemid = false;
 
-    public void hoodMid(){
-        if(liftmid==false){
-            liftmid=true;
-            loweranglemid=true;
-            TempHood.INSTANCE.HoodUpMidRange.schedule();
-        }
-        else if (liftmid==true) {
-            liftmid=false;
-            loweranglemid=false;
-            TempHood.INSTANCE.HoodDown.schedule();
-        }
-        else if (liftmid!=true&&liftmid!=false) {
-            liftmid=true;
-            loweranglemid=true;
-            TempHood.INSTANCE.HoodUpMidRange.schedule();
-        }
-
-    }
 
 
 

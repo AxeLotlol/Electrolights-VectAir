@@ -95,10 +95,10 @@ public class AirsortAuto extends NextFTCOpMode {
                 //TempHood.INSTANCE.HoodUp,
                 new SetPower(transfer, 0.7),
                 new Delay(0.0000),
-                TempHood.INSTANCE.HoodUp,
-                TempHood.INSTANCE.HoodUp,
+                //TempHood.INSTANCE.HoodUp,
+                //TempHood.INSTANCE.HoodUp,
                 new Delay(1.0),
-                TempHood.INSTANCE.HoodDown,
+                //TempHood.INSTANCE.HoodDown,
                 new Delay(1.0),
                 new SetPower(transfer, 0)
         );

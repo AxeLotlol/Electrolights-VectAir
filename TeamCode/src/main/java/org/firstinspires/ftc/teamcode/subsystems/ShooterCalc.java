@@ -64,7 +64,7 @@ public class ShooterCalc implements Subsystem {
             hoodAngle=Math.toRadians(63);
         }
 
-        //flywheelSpeed = Math.sqrt(g * ndr * ndr / (2 * Math.pow(Math.cos(hoodAngle), 2) * (ndr * Math. tan(hoodAngle) - y)));
+        flywheelSpeed = Math.sqrt(g * ndr * ndr / (2 * Math.pow(Math.cos(hoodAngle), 2) * (ndr * Math. tan(hoodAngle) - y)));
         flywheelSpeed = flywheelSpeed/ 39.37;
         double headingVelCompOffset = Math.atan(perpendicularComponent / ivr);
         double headingAngle = Math.toDegrees(robotHeading - robotToGoalVector.getTheta() + headingVelCompOffset);

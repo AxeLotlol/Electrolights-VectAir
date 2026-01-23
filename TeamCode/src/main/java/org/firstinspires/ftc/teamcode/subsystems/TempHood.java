@@ -41,11 +41,11 @@ public class TempHood implements Subsystem {
             new SetPower(hoodServo2,0)
     );
 
-    /*public SequentialGroup HoodUp=new SequentialGroup(
+    public static SequentialGroup HoodUp=new SequentialGroup(
             HoodRunUp,
             new Delay(0.18),
             HoodPowerZero
-    );*/
+    );
 
     /*public SequentialGroup HoodUpMidRange=new SequentialGroup(
             HoodRunUp,
@@ -58,16 +58,20 @@ public class TempHood implements Subsystem {
             new SetPower(hoodServo2,-1)
     );
 
-    /*public SequentialGroup HoodDown=new SequentialGroup(
+    public static SequentialGroup HoodDown=new SequentialGroup(
             HoodRunDown,
             new Delay(0.17),
             HoodPowerZero
-    );*/
+    );
 
     public static double hoodUp(double runtime, double currentstate) {
+        if(Double.isNaN(runtime)!=true){
         ActiveOpMode.telemetry().addData("runtime", runtime);
         ActiveOpMode.telemetry().addData("currentstate", currentstate);
         SequentialGroup runUp = new SequentialGroup(
+                HoodRunUp,
+                HoodRunUp,
+                HoodRunUp,
                 HoodRunUp,
                 new Delay(runtime - currentstate),
                 HoodPowerZero
@@ -77,15 +81,22 @@ public class TempHood implements Subsystem {
                 new Delay(currentstate - runtime),
                 HoodPowerZero
         );
-        if(runtime>currentstate/*+0.012*/) {
+        if(runtime>currentstate+0.007) {
             runUp.schedule();
+            ActiveOpMode.telemetry().addLine("runUp");
             return runtime;
         }
-        if(runtime<currentstate/*-0.012*/){
+        if(runtime<currentstate-0.007){
             runDown.schedule();
+            ActiveOpMode.telemetry().addLine("runDown");
             return runtime;
         }
         else{
+            ActiveOpMode.telemetry().addLine("returning0");
+            return 0;
+        }}
+        else{
+            ActiveOpMode.telemetry().addLine("NaN");
             return 0;
         }
     }
@@ -94,10 +105,9 @@ public class TempHood implements Subsystem {
 
 
     @Override
-    public void initialize() {
-
-        hoodServo1n= ActiveOpMode.hardwareMap().get(CRServo.class, "hoodServo1");
-        hoodServo2n=  ActiveOpMode.hardwareMap().get(CRServo.class, "hoodServo2");
+    public void initialize(){
+        //hoodServo1n= ActiveOpMode.hardwareMap().get(CRServo.class, "hoodServo1");
+        //hoodServo2n=  ActiveOpMode.hardwareMap().get(CRServo.class, "hoodServo2");
 
 
     }

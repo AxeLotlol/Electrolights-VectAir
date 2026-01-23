@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.DistanceBlue;
 import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
+import org.firstinspires.ftc.teamcode.subsystems.PositionalHood;
 import org.firstinspires.ftc.teamcode.subsystems.TempHood;
 
 import dev.nextftc.core.commands.delays.Delay;
@@ -36,7 +37,7 @@ public class TeleOpRed extends NextFTCOpMode {
     public TeleOpRed() {
         addComponents(
                 new PedroComponent(Constants::createFollower),
-                new SubsystemComponent(DistanceRed.INSTANCE, TempHood.INSTANCE, DriveTrain.INSTANCE/*, Intake.INSTANCE, Spindexer.INSTANCE*/),
+                new SubsystemComponent(DistanceRed.INSTANCE, TempHood.INSTANCE, PositionalHood.INSTANCE, DriveTrain.INSTANCE/*, Intake.INSTANCE, Spindexer.INSTANCE*/),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE
 
@@ -71,6 +72,35 @@ public class TeleOpRed extends NextFTCOpMode {
 
     public boolean liftmid;
     boolean loweranglemid = false;
+
+    public boolean isInLaunchZone(double x, double y) {
+
+        // Triangle 1: Goal Side (Top)
+        // Vertices: (-8, 144), (152, 144), (72, 64)
+        // This triangle exists between y = 64 and y = 144.
+        if (y >= 64 && y <= 144) {
+            // As y increases from 64 to 144, the width of the triangle increases.
+            // The slope of the edges is (144 - 64) / (152 - 72) = 80 / 80 = 1.
+            double halfWidth = (y - 64);
+            if (x >= (72 - halfWidth) && x <= (72 + halfWidth)) {
+                return true;
+            }
+        }
+
+        // Triangle 2: Audience Side (Bottom)
+        // Vertices: (72, 32), (104, 0), (40, 0)
+        // This triangle exists between y = 0 and y = 32.
+        if (y >= 0 && y <= 32) {
+            // As y decreases from 32 to 0, the width increases.
+            // The slope of the edges is (32 - 0) / (72 - 40) = 32 / 32 = 1.
+            double halfWidth = (32 - y);
+            if (x >= (72 - halfWidth) && x <= (72 + halfWidth)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 
 

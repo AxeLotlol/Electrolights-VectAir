@@ -11,7 +11,6 @@ import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpBlue.isBlue;
 import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpRed.isRed;
 import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
 //import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
-//import static org.firstinspires.ftc.teamcode.subsystems.TempHood.hoodUp;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.geometry.Pose;
@@ -26,6 +25,7 @@ import dev.nextftc.control.ControlSystem;
 import dev.nextftc.control.KineticState;
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
+import dev.nextftc.core.commands.groups.ParallelGroup;
 import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.components.BindingsComponent;
@@ -70,7 +70,7 @@ public class DriveTrain implements Subsystem {
 
     private boolean autolock = false;
 
-    public double aimMultiplier = 0.475;
+    public double aimMultiplier = 0.575;
 
     private boolean slow = false;
     // === AprilTag/Limelight align tuning ===
@@ -81,9 +81,12 @@ public class DriveTrain implements Subsystem {
 
     public double currentHoodState = 0;
 
+    public double hoodAngleDriver = 0;
+
     private double clip(double v, double lo, double hi) {
         return Math.max(lo, Math.min(hi, v));
     }
+
 
 
     private double visionYawCommand(double txDeg) {
@@ -121,6 +124,22 @@ public class DriveTrain implements Subsystem {
     public int alliance;
 
     public Supplier<Double> yVCtx;
+
+    public static double hoodToPos(double runtime) {
+        if(Double.isNaN(runtime)!=true) {
+            ActiveOpMode.telemetry().addData("runtime", runtime);
+            ParallelGroup HoodRunUp = new ParallelGroup(
+                    new SetPosition(hoodServo1, runtime),
+                    new SetPosition(hoodServo2, -1*runtime)
+            );
+            HoodRunUp.schedule();
+            return runtime;
+        }
+        else {
+            ActiveOpMode.telemetry().addLine("NaN");
+            return 0;
+        }
+    }
 
     @Override
     public Command getDefaultCommand() {
@@ -208,10 +227,14 @@ public class DriveTrain implements Subsystem {
             startingpose=new Pose (29, 66, Math.toRadians(90));
         }
 
+        hoodServo1n= ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo1");
+        hoodServo2n=  ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo2");
+
 
         follower = follower();
         follower.setStartingPose(startingpose);
         follower.update();
+
 
 
     }
@@ -221,11 +244,11 @@ public class DriveTrain implements Subsystem {
     private static MotorEx transfer1;
     private static ServoEx transfer2;
 
-    double goalY = 144;
-    double goalX = 144;
+    double goalY = 138;
+    double goalX = 138;
 
-    double goalYDist = 144;
-    double goalXDist = 144;
+    double goalYDist = 138;
+    double goalXDist = 138;
 
 
     static boolean shooting = false;
@@ -272,6 +295,23 @@ public class DriveTrain implements Subsystem {
         }
 
     }
+
+    public boolean decrease = false;
+
+    public void hoodControl(){
+        if(decrease!=true&&hoodAngleDriver<1){
+            hoodAngleDriver = hoodAngleDriver+0.1;
+        }
+        else if (decrease==true&&hoodAngleDriver<1&&hoodAngleDriver>1) {
+            decrease=true;
+            hoodAngleDriver = 1;
+        }
+        else{
+            hoodAngleDriver=0;
+        }
+
+    }
+
     static double transferpower = -1.0;
 
     double distance;
@@ -300,19 +340,58 @@ public class DriveTrain implements Subsystem {
             shoot.schedule();
         }
     }
+
+    public boolean isInLaunchZone(double x, double y) {
+
+        // Vertices: (-8, 144), (152, 144), (72, 64)
+        // This triangle exists between y = 64 and y = 144.
+        if (y >= 64 && y <= 144) {
+            // As y increases from 64 to 144, the width of the triangle increases.
+            // The slope of the edges is (144 - 64) / (152 - 72) = 80 / 80 = 1.
+            double halfWidth = (y - 64);
+            if (x >= (72 - halfWidth) && x <= (72 + halfWidth)) {
+                return true;
+            }
+        }
+
+        // Vertices: (72, 32), (104, 0), (40, 0)
+        // This triangle exists between y = 0 and y = 32.
+        if (y >= 0 && y <= 32) {
+            // As y decreases from 32 to 0, the width increases.
+            // The slope of the edges is (32 - 0) / (72 - 40) = 32 / 32 = 1.
+            double halfWidth = (32 - y);
+            if (x >= (72 - halfWidth) && x <= (72 + halfWidth)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static Servo hoodServo1n;
+    private static Servo hoodServo2n;
+
+    private static ServoEx hoodServo1 = new ServoEx(() -> hoodServo1n);
+    private static ServoEx hoodServo2 = new ServoEx(() -> hoodServo2n);
     Command shooter = new LambdaCommand()
             .setStart(()-> shoot());
     @Override
     public void periodic() {
         if (firsttime == true) {
+
             Gamepads.gamepad1().triangle().whenBecomesTrue(() -> autolocktrue())
                     .whenBecomesFalse(() -> autolockfalse());
-            Gamepads.gamepad2().cross().whenBecomesTrue(() -> hood());
+            Gamepads.gamepad1().cross().whenBecomesTrue(() -> hoodControl());
             Gamepads.gamepad1().rightTrigger().greaterThan(0.3).whenBecomesTrue(shooter);
             intakeMotor = new MotorEx("intake");
             transfer1 = new MotorEx("transfer");
             transfer2 = new ServoEx("transferServo1");
             firsttime = false;
+            ParallelGroup HoodPowerZero=new ParallelGroup(
+                    new SetPosition(hoodServo1,0),
+                    new SetPosition(hoodServo2,0)
+            );
+            HoodPowerZero.schedule();
 
 
         }
@@ -322,35 +401,46 @@ public class DriveTrain implements Subsystem {
 
 
         if (isBlue() == true) {
-            goalXDist = 0;
-            goalX = 0;
+            goalXDist = 6;
+            goalX = 6;
         }
         if (isRed() == true) {
-            goalXDist = 144;
-            goalX = 144;
+            goalXDist = 138;
+            goalX = 138;
         }
         Pose currPose = follower.getPose();
         double robotHeading = follower.getPose().getHeading();
         Vector robotToGoalVector = new Vector(follower.getPose().distanceFrom(new Pose(goalX, goalY)), Math.atan2(goalY - currPose.getY(), goalX - currPose.getX()));
-        Vector v = new Vector(new Pose(144, 144));
+        //Vector v = new Vector(new Pose(138, 138));
         Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity());
         Double headingError = results[2];
         double finalHeadingError = headingError;
         yVCtx = () -> visionYawCommand(finalHeadingError);
         double flywheelSpeed = results[0];
-        shooter((float) flywheelSpeed);
-        double hoodAngle = results[1];
-        TempHood.hoodUp(hoodAngle, currentHoodState);
-        double zeroornot = TempHood.hoodUp(hoodAngle, currentHoodState);
-        if(zeroornot !=0)
-        {
-            currentHoodState=zeroornot;
+        if(headingError<-50||headingError>50) {
+            shooter((float) flywheelSpeed / 2);
+            aimMultiplier = 0.6;
         }
+        else{
+
+            if(follower.getVelocity().getMagnitude()<1.5){
+                aimMultiplier = 0.475;
+                shooter((float) ((float) flywheelSpeed * 1.15));
+            }
+            else{
+                shooter((float) ((float) flywheelSpeed * 1.05));
+                aimMultiplier = 0.575;
+            }
+        }
+        double hoodAngle = results[1];
+        hoodToPos(hoodAngle);
         double s1speed = 60 * flywheel.getVelocity()/28;
         double s2speed = 60 * flywheel2.getVelocity()/28;
 
         ActiveOpMode.telemetry().addData("Motor1Speed", s1speed);
         ActiveOpMode.telemetry().addData("Motor2Speed", s2speed);
+        ActiveOpMode.telemetry().addData("servo1pos", hoodServo1.getPosition());
+        ActiveOpMode.telemetry().addData("servo2pos", hoodServo2.getPosition());
 
         ActiveOpMode.telemetry().addData("shooting", shooting);
         ActiveOpMode.telemetry().addData("goalX", goalX);
@@ -360,6 +450,7 @@ public class DriveTrain implements Subsystem {
         ActiveOpMode.telemetry().addData("goalXDist", goalXDist);
         ActiveOpMode.telemetry().addData("goalYDist", goalYDist);
         ActiveOpMode.telemetry().addData("robotHeading", Math.toDegrees(robotHeading));
+        ActiveOpMode.telemetry().addData("velocity", follower.getVelocity());
         ActiveOpMode.telemetry().addData("headingError", headingError);
         ActiveOpMode.telemetry().addData("distance", distance);
         ActiveOpMode.telemetry().addData("yVCtx", visionYawCommand(headingError));

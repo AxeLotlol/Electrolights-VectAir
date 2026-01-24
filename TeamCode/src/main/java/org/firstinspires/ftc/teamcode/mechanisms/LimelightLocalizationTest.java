@@ -12,6 +12,9 @@ import dev.nextftc.ftc.components.BulkReadComponent;
 @TeleOp
 public class LimelightLocalizationTest extends NextFTCOpMode {
 
+    private double x;
+    private double y;
+
     public LimelightLocalizationTest() {
         addComponents(
                 new SubsystemComponent(LimelightLocalization.INSTANCE),
@@ -22,18 +25,19 @@ public class LimelightLocalizationTest extends NextFTCOpMode {
     }
 
     @Override
-    public void onInit() {
-
-    }
+    public void onInit() {}
 
     @Override
-    public void onStartButtonPressed() {
-
-    }
+    public void onStartButtonPressed() {}
 
     @Override
     public void onUpdate() {
 
+        x = LimelightLocalization.INSTANCE.returnX();
+        y = LimelightLocalization.INSTANCE.returnY();
+
+        telemetry.addData("x:", x);
+        telemetry.addData("y:", y);
     }
 
 }

@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -12,6 +9,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 import dev.nextftc.core.subsystems.Subsystem;
+import dev.nextftc.ftc.ActiveOpMode;
 
 public class LimelightLocalization implements Subsystem {
 
@@ -20,15 +18,19 @@ public class LimelightLocalization implements Subsystem {
 
     Limelight3A limelight;
     IMU imu;
+    private double x;
+    private double y;
 
+    @Override
     public void initialize() {
-        limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        imu = hardwareMap.get(IMU.class, "imu");
+        limelight = ActiveOpMode.hardwareMap().get(Limelight3A.class, "limelight");
+        imu = ActiveOpMode.hardwareMap().get(IMU.class, "imu");
 
         limelight.pipelineSwitch(0);
         limelight.start();
     }
 
+    @Override
     public void periodic() {
 
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
@@ -42,11 +44,12 @@ public class LimelightLocalization implements Subsystem {
 
             Pose3D botPose = result.getBotpose_MT2();
 
-            double x = botPose.getPosition().x;
-            double y = botPose.getPosition().y;
-
-            telemetry.addData("MT2 X", x);
-            telemetry.addData("MT2 Y", y);
+            x = botPose.getPosition().x;
+            y = botPose.getPosition().y;
         }
     }
+
+    public double returnX() {return x;}
+    public double returnY() {return y;}
+
 }

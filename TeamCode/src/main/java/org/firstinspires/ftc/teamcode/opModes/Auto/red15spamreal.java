@@ -111,27 +111,27 @@ public class red15spamreal extends NextFTCOpMode {
 
     public Pose intake12 = new Pose(125,84);
 
-    public Pose schoolLauncher = new Pose(86,87);
+    public Pose e = new Pose(86,87);
 
-    public Pose schoolLauncherFinal = new Pose(76,76);
+    public Pose b = new Pose(76,76);
 
 
 
-    public Pose whatAyushDoestoHAMDLOintake3 = new Pose(88,89);
+    public Pose r = new Pose(88,89);
 
-    public Pose WhatAyushDoestoHAMDLOintake31 = new Pose(84,40);
+    public Pose c = new Pose(84,40);
 
-    public Pose WhatAyushDoestoHAMDLOintake32 = new Pose(125,39.5);
+    public Pose x = new Pose(125,39.5);
 
-    public Pose ayushHASALAUNCHER = new Pose(84,36);
+    public Pose y = new Pose(84,36);
 
-    public Pose ayushHasAnotherLauncher = new Pose(88,89.5);
+    public Pose k = new Pose(88,89.5);
 
-    public Pose AyushLaunchedMEE = new Pose(76,76);
+    public Pose pp = new Pose(76,76);
 
-    public Pose launch3 = new Pose(77,77);
+    public Pose he = new Pose(77,77);
 
-    public Pose Teleop1 = new Pose(84,60);
+    public Pose telepp = new Pose(84,60);
 
 
 

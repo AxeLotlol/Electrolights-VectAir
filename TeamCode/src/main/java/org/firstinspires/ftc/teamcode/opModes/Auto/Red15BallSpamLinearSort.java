@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.opModes.Auto;
 
 
-import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
+import static org.firstinspires.ftc.teamcode.subsystems.MotifScanning.findMotif;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
@@ -14,16 +14,14 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.hardware.CRServo;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
-import org.firstinspires.ftc.teamcode.subsystems.TempHood;
+import org.firstinspires.ftc.teamcode.subsystems.MotifScanning;
 
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
-import dev.nextftc.core.commands.groups.ParallelGroup;
 import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.components.BindingsComponent;
@@ -33,20 +31,18 @@ import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
-import dev.nextftc.hardware.impl.CRServoEx;
 import dev.nextftc.hardware.impl.Direction;
 import dev.nextftc.hardware.impl.IMUEx;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
-import dev.nextftc.hardware.powerable.SetPower;
 
 
 @Autonomous(name = "Red Auto 15 Ball SPam Linear", group = "Autonomous")
 @Configurable
-public class Red15BallSpamLinear extends NextFTCOpMode {
-    public Red15BallSpamLinear(){
+public class Red15BallSpamLinearSort extends NextFTCOpMode {
+    public Red15BallSpamLinearSort(){
         addComponents(
-                new SubsystemComponent(Flywheel.INSTANCE,DistanceRed.INSTANCE),
+                new SubsystemComponent(Flywheel.INSTANCE,DistanceRed.INSTANCE,MotifScanning.INSTANCE),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE,
                 new PedroComponent(hwMap -> Constants.createFollower(hwMap))
@@ -330,6 +326,9 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
         public PathChain launchSet3;
         public PathChain teleOpPar;
 
+        public Command getTheMotif = new LambdaCommand()
+                .setStart(() -> tagId = findMotif());
+
 
 
         public Paths(Follower follower) {
@@ -347,8 +346,8 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
                             new BezierCurve(
                                     new Pose(93.774, 95.871),
                                     new Pose(85.000, 87.000),
-                                    new Pose(85.183, 66.060),
-                                    new Pose(125, 67.1)
+                                    new Pose(84.000, 62.000),
+                                    new Pose(124.000, 62.000)
                             )
                     ).setTangentHeadingInterpolation()
 
@@ -356,18 +355,18 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
 
             launchSet2 = follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(125, 67.1),
+                                    new Pose(124.000, 59.000),
                                     new Pose(87.700, 55.500),
                                     new Pose(93.774, 87.871)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(-3), Math.toRadians(41))
-                    //.addTemporalCallback(0.7,reverseIntakeForMe)
+                    .addTemporalCallback(1,getTheMotif )
                     .build();
 
             resetHelper = follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(93.774, 87.871),
-                                    new Pose(85.762, 74.462),
+                                    new Pose(84.774, 90.871),
+                                    new Pose(80.400, 86.400),
                                     new Pose(97.200, 56.200),
                                     new Pose(106.300, 62.500),
                                     new Pose(125, 68)
@@ -381,7 +380,7 @@ public class Red15BallSpamLinear extends NextFTCOpMode {
                                     new Pose(125, 68.500),
                                     new Pose(120,66),
 
-                                    new Pose(126.5, 56.000)
+                                    new Pose(126, 56.000)
                             )
                     ).setConstantHeadingInterpolation(Math.toRadians(45))
 

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.mechanisms;
+package org.firstinspires.ftc.teamcode.opModes.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -28,16 +28,18 @@ public class LimelightLocalizationTest extends NextFTCOpMode {
     public void onInit() {}
 
     @Override
-    public void onStartButtonPressed() {}
+    public void onStartButtonPressed() {telemetry.addLine("Running Code.");}
 
     @Override
     public void onUpdate() {
 
         x = LimelightLocalization.INSTANCE.returnX();
         y = LimelightLocalization.INSTANCE.returnY();
+        telemetry.addLine("Running Loop");
 
         telemetry.addData("x:", x);
         telemetry.addData("y:", y);
+        telemetry.update();
     }
 
 }

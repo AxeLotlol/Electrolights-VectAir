@@ -62,17 +62,17 @@ public class Blue15BallSpam extends NextFTCOpMode {
     public static MotorEx flywheel = new MotorEx("launchingmotor");
     public static MotorEx flywheel2 = new MotorEx("launchingmotor2");
 
-    private CRServo hoodServo1n;
-    private CRServo hoodServo2n;
+   // private CRServo hoodServo1n;
+    //private CRServo hoodServo2n;
 
-    private CRServoEx hoodServo1 = new CRServoEx(() -> hoodServo1n);
-    private CRServoEx hoodServo2 = new CRServoEx(() -> hoodServo2n);
+    //private CRServoEx hoodServo1 = new CRServoEx(() -> hoodServo1n);
+    //private CRServoEx hoodServo2 = new CRServoEx(() -> hoodServo2n);
 
     public Pose start = new Pose(24.6, 126.4, Math.toRadians(131));
 
 
 
-    ParallelGroup HoodRunUp = new ParallelGroup(
+    /*ParallelGroup HoodRunUp = new ParallelGroup(
             new SetPower(hoodServo1, -1),
             new SetPower(hoodServo2, 1)
     );
@@ -87,7 +87,7 @@ public class Blue15BallSpam extends NextFTCOpMode {
             new Delay(0.18),
             HoodPowerZero
     );
-
+*/
 
 
     private Command intakeMotorOn = new LambdaCommand()
@@ -197,8 +197,8 @@ public class Blue15BallSpam extends NextFTCOpMode {
         transfer1 = new MotorEx("transfer");
         transfer2 = new ServoEx("transferServo1");
 
-        hoodServo1n = ActiveOpMode.hardwareMap().get(CRServo.class, "hoodServo1");
-        hoodServo2n = ActiveOpMode.hardwareMap().get(CRServo.class, "hoodServo2");
+       // hoodServo1n = ActiveOpMode.hardwareMap().get(CRServo.class, "hoodServo1");
+        //hoodServo2n = ActiveOpMode.hardwareMap().get(CRServo.class, "hoodServo2");
 
         paths = new Paths(follower);
         follower.setStartingPose(start);

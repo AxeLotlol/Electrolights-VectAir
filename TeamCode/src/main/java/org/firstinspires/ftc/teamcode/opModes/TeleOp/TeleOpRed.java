@@ -16,8 +16,10 @@ import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
 import org.firstinspires.ftc.teamcode.subsystems.PositionalHood;
 import org.firstinspires.ftc.teamcode.subsystems.TempHood;
 
+import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
 import dev.nextftc.core.commands.groups.SequentialGroup;
+import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.components.SubsystemComponent;
 import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.ftc.ActiveOpMode;
@@ -25,6 +27,7 @@ import dev.nextftc.ftc.Gamepads;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.ftc.components.BulkReadComponent;
+import dev.nextftc.hardware.driving.Drivetrain;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.powerable.SetPower;
 
@@ -68,6 +71,9 @@ public class TeleOpRed extends NextFTCOpMode {
     }
     public boolean lift;
     boolean lowerangle = false;
+
+
+
 
 
     public boolean liftmid;
@@ -122,6 +128,12 @@ public class TeleOpRed extends NextFTCOpMode {
                 .whenBecomesFalse(() -> intakeMotor.setPower(0));
         Gamepads.gamepad2().rightTrigger().greaterThan(0.3).whenBecomesTrue(()-> transfer.setPower(-1))
                 .whenBecomesFalse(() -> intakeMotor.setPower(0));
+        Gamepads.gamepad1().rightBumper().whenBecomesTrue(() -> DriveTrain.opentransfer.schedule())
+                .whenBecomesFalse(() -> DriveTrain.closeTransfer.schedule());
+
+
+
+
 
 
 

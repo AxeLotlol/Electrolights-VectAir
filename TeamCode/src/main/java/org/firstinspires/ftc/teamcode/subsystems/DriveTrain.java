@@ -209,6 +209,11 @@ public class DriveTrain implements Subsystem {
 
     @Override
     public void initialize() {
+
+        firsttime = true;
+        shooting = false;
+        autolock = false;
+
         if(isBlue()==true) {
             alliance=1;
         }

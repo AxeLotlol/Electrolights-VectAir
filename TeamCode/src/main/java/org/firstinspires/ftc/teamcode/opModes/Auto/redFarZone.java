@@ -59,7 +59,7 @@ public class redFarZone extends NextFTCOpMode {
 
     int tagId = 0;
 
-    public Pose start = new Pose(80.837, 8.692, Math.toRadians(49));
+    public Pose start = new Pose(80.837, 8.692, Math.toRadians(90));
 
 
     private MotorEx transfer1;
@@ -215,12 +215,14 @@ public class redFarZone extends NextFTCOpMode {
     public Command Auto() {
         return new SequentialGroup(
                 new FollowPath(paths.Shoot1),
+
+                new Delay(3.0),
                 shoot,
                 new Delay(0.5),
                 intakeMotorOn,
                 transferOnForIntake,
                 new FollowPath(paths.Intake1),
-                new Delay(0.5),
+                new Delay(1.0),
                 intakeMotorOff,
                 new FollowPath(paths.Shoot2),
                 shoot,
@@ -240,7 +242,7 @@ public class redFarZone extends NextFTCOpMode {
         flywheel2.setPower(-1);*/
 
         preloadspinreal = true;
-        shooter(2095);
+        shooter(1300);
 
         //int tag=MotifScanning.INSTANCE.findMotif();
         Auto().schedule();
@@ -255,13 +257,13 @@ public class redFarZone extends NextFTCOpMode {
         follower.update();
 
         if (preloadspinreal) {
-            shooter(2095);
+            shooter(1285);
         } else {
             if (DistanceRed.INSTANCE.getDistanceFromTag() != 0) {
                 shooter(findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
                 ActiveOpMode.telemetry().addData("Limelight!", findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
             } else if (DistanceRed.INSTANCE.getDistanceFromTag() == 0) {
-                shooter(2095);
+                shooter(1285);
             }
         }
 
@@ -286,9 +288,9 @@ public class redFarZone extends NextFTCOpMode {
                             new BezierLine(
                                     new Pose(80.837, 8.692),
 
-                                    new Pose(84.104, 16.008)
+                                    new Pose(80.837, 16.009)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(65))
+                    ).setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(67))
 
                     .build();
 
@@ -296,7 +298,7 @@ public class redFarZone extends NextFTCOpMode {
                             new BezierCurve(
                                     new Pose(84.104, 16.008),
                                     new Pose(113.052, 9.595),
-                                    new Pose(135.102, 9.293)
+                                    new Pose(122, 9.293)
                             )
                     ).setTangentHeadingInterpolation()
 
@@ -306,9 +308,9 @@ public class redFarZone extends NextFTCOpMode {
                             new BezierCurve(
                                     new Pose(135.102, 9.293),
                                     new Pose(82.321, 12.129),
-                                    new Pose(84.104, 16.008)
+                                    new Pose(80.837, 16.009)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(355), Math.toRadians(65))
+                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(67))
 
                     .build();
 

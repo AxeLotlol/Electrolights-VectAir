@@ -418,11 +418,11 @@ public class DriveTrain implements Subsystem {
         yVCtx = () -> visionYawCommand(finalHeadingError);
         double flywheelSpeed = results[0];
         if(headingError<-50||headingError>50) {
-            shooter((float) flywheelSpeed / 2);
+            shooter((float) ((float) flywheelSpeed * 0.75));
             aimMultiplier = 0.6;
         }
         else{
-            shooter((float) ((float) flywheelSpeed * 1.05));
+            shooter((float) flywheelSpeed + 30);
             if(follower.getVelocity().getMagnitude()<1.5){
                 aimMultiplier = 0.475;
             }
@@ -440,7 +440,7 @@ public class DriveTrain implements Subsystem {
         ActiveOpMode.telemetry().addData("servo1pos", hoodServo1.getPosition());
         ActiveOpMode.telemetry().addData("servo2pos", hoodServo2.getPosition());
 
-        ActiveOpMode.telemetry().addData("shooting", shooting);
+        ActiveOpMode.telemetry().addData("aimMultipler", aimMultiplier);
         ActiveOpMode.telemetry().addData("goalX", goalX);
         ActiveOpMode.telemetry().addData("goalY", goalY);
         ActiveOpMode.telemetry().addData("RobotX", currPose.getX());

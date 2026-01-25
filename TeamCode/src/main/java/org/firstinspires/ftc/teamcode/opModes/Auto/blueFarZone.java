@@ -35,7 +35,7 @@ import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
 
 
-@Autonomous(name = "Red Auto 15 Ball SPam Linear", group = "Autonomous")
+@Autonomous(name = "Blue Farzone", group = "Autonomous")
 @Configurable
 public class blueFarZone extends NextFTCOpMode {
     public blueFarZone() {
@@ -59,7 +59,7 @@ public class blueFarZone extends NextFTCOpMode {
 
     int tagId = 0;
 
-    public Pose start = new Pose(119.4, 126.4, Math.toRadians(49));
+    public Pose start = new Pose(80.837, 8.692, Math.toRadians(49));
 
 
     private MotorEx transfer1;

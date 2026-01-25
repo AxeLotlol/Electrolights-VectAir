@@ -422,9 +422,10 @@ public class DriveTrain implements Subsystem {
             aimMultiplier = 0.6;
         }
         else{
-            shooter((float) flywheelSpeed + 30);
-            if(follower.getVelocity().getMagnitude()<1.5){
-                aimMultiplier = 0.475;
+            double offset = -8/17 * currPose.distanceFrom(new Pose( 138, 138)) + 746/17;
+            shooter((float) ((float) flywheelSpeed));
+            if(follower.getVelocity().getMagnitude()<2.5){
+                aimMultiplier = 0.4;
             }
             else{
                 aimMultiplier = 0.575;

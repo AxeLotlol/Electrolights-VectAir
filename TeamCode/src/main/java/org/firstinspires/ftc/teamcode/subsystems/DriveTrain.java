@@ -424,13 +424,13 @@ public class DriveTrain implements Subsystem {
         double flywheelSpeed = results[0];
         if(headingError<-50||headingError>50) {
             shooter((float) ((float) flywheelSpeed * 0.75));
-            aimMultiplier = 0.6;
+            aimMultiplier = 0.8;
         }
         else{
             double offset = -8/17 * currPose.distanceFrom(new Pose( 138, 138)) + 746/17;
             shooter((float) ((float) flywheelSpeed));
             if(follower.getVelocity().getMagnitude()<2){
-                aimMultiplier = 0.25;
+                aimMultiplier = 0.4;
             }
             else{
                 aimMultiplier = 0.575;

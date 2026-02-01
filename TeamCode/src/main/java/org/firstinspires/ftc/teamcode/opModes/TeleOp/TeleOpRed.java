@@ -114,9 +114,9 @@ public class TeleOpRed extends NextFTCOpMode {
     private static final int APRILTAG_PIPELINE = 7;
     @Override
     public void onInit() {
-        Limelight3A limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.pipelineSwitch(APRILTAG_PIPELINE);
-        limelight.start();
+//        Limelight3A limelight = hardwareMap.get(Limelight3A.class, "limelight");
+//        limelight.pipelineSwitch(APRILTAG_PIPELINE);
+//        limelight.start();
         red=true;
         intakeMotor = new MotorEx("intake").reversed();
         transfer = new MotorEx("transfer").reversed();

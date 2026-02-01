@@ -1,25 +1,17 @@
 
 
-package org.firstinspires.ftc.teamcode.opModes.Auto;
+package TRASH;
 
 
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 
-import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
-import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
-import org.firstinspires.ftc.teamcode.subsystems.MotifScanning;
 
 import dev.nextftc.control.ControlSystem;
 import dev.nextftc.control.KineticState;
@@ -30,21 +22,38 @@ import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
-import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.extensions.pedro.PedroComponent;
+import dev.nextftc.extensions.pedro.FollowPath;
+import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
+import dev.nextftc.hardware.impl.CRServoEx;
 import dev.nextftc.hardware.impl.Direction;
 import dev.nextftc.hardware.impl.IMUEx;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
 import dev.nextftc.hardware.powerable.SetPower;
 
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous(name = "Blue Auto Default Position MIRRORED", group = "Autonomous")
+import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
+
+
+import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
+import org.firstinspires.ftc.teamcode.subsystems.MotifScanning;
+
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+
+
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.bylazar.configurables.annotations.Configurable;
+import com.qualcomm.robotcore.hardware.CRServo;
+
+
+@Autonomous(name = "Red Auto New Position", group = "Autonomous")
 @Configurable
-public class blueDefaultNewMirrored extends NextFTCOpMode {
-    public blueDefaultNewMirrored(){
+public class redNewPos extends NextFTCOpMode {
+    public redNewPos(){
         addComponents(
                 new SubsystemComponent(Flywheel.INSTANCE,DistanceRed.INSTANCE),
                 BulkReadComponent.INSTANCE,
@@ -62,37 +71,38 @@ public class blueDefaultNewMirrored extends NextFTCOpMode {
 
 
     private Paths paths;
-    public Pose start = new Pose(24.677419354838708,125.70967741935485, Math.toRadians(125));
+    public Pose start = new Pose(88.37383177570092,8.52336448598131, Math.toRadians(90));
 
-    public Pose PreLoadLaunch1 = new Pose(62.12903225806452,96.67741935483872);
+    public Pose PreLoadLaunch1 = new Pose(86.2258064516129,97.83870967741936);
 
-    public Pose ControlPoint1 = new Pose(50.225806451612904,80.41935483870968);
+    public Pose ControlPoint1 = new Pose(61.00934579439252,82.76635514018692 );
 
-    public Pose Intake1 = new Pose(15.25233644859813,83.66355140186916);
+    public Pose Intake1 = new Pose(129.4018691588785,83.66355140186916);
 
     public Pose ClassifierRampPoint = new Pose(63.58064516129032,74.32258064516128);
 
     public Pose ClassifierRamp = new Pose(124.74766355140187,75.14018691588785);
 
-    public Pose Launch1 = new Pose(62.12903225806452, 96.67741935483872);
+    public Pose Launch1 = new Pose(86.2258064516129, 97.83870967741936);
 
-    public Pose ControlPoint2 = new Pose(63.87096774193548,54.70967741935483);
+    public Pose ControlPoint2 = new Pose(71.99999999999999,56.60747663551402);
 
-    public Pose Intake2 = new Pose(12.11214953271028,58.11214953271029);
-    public Pose ShootCP = new Pose(50,56);
+    public Pose Intake2 = new Pose(124.19626168224298,56.43925233644861);
+    public Pose ShootCP = new Pose(100,57);
 
-    public Pose ControlPoint3 = new Pose(72.87096774193549,25.258064516129032);
+    public Pose ControlPoint3 = new Pose(75.3644859813084,27.77570093457944);
 
-    //public Pose ControlPoint4 = new Pose(74.46728971962617,38.439252336448604);
+    public Pose ControlPoint4 = new Pose(74.46728971962617,38.439252336448604);
 
-    public Pose Intake3 = new Pose(11.214953271028037,36.78504672897196);
+    public Pose Intake3 = new Pose(128.2258064516129,35.12903225806451);
 
-    public Pose Teleop1 = new Pose(60.11214953271028,80.009345794392516);
+    public Pose Teleop1 = new Pose(100.11214953271028,80.009345794392516);
 
 
 
 
     private static final int APRILTAG_PIPELINE = 8;
+
 
 
 
@@ -162,6 +172,13 @@ public class blueDefaultNewMirrored extends NextFTCOpMode {
     private ServoEx hoodservo2;
     private Command spinFlyWheel1500;
     private Command intakeMotorOn;
+
+    private CRServo hoodServo1n;
+    private CRServo hoodServo2n;
+
+    private CRServoEx hoodServo1 = new CRServoEx(() -> hoodServo1n);
+    private CRServoEx hoodServo2 = new CRServoEx(() -> hoodServo2n);
+
     public void onInit() {
         telemetry.addLine("Initializing Follower...");
 
@@ -179,9 +196,6 @@ public class blueDefaultNewMirrored extends NextFTCOpMode {
         IMUEx imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
 
 
-
-
-
         paths = new Paths(follower);
         intakeMotor = new MotorEx("intake");
         transfer1 = new MotorEx("transfer");
@@ -191,27 +205,13 @@ public class blueDefaultNewMirrored extends NextFTCOpMode {
         hoodservo1 = new ServoEx("hoodServo1");
         hoodservo2 = new ServoEx("hoodServo2");
 
+
         spinFlyWheel1500 = new LambdaCommand()
                 .setStart(() -> shooter(1130));
         intakeMotorOn = new LambdaCommand()
                 .setStart(() -> intakeMotor.setPower(-1));
-
-        //start.mirror();
-        //PreLoadLaunch1.mirror();
-        //ControlPoint1.mirror();
-        //Intake1.mirror();
-        /*ClassifierRampPoint.mirror();
-        ClassifierRamp.mirror();
-        ControlPoint2.mirror();
-        Intake2.mirror();
-        Launch1.mirror();
-        ControlPoint3.mirror();
-        //ControlPoint4.mirror();
-        Intake3.mirror();
-        Teleop1.mirror();*/
-
-
-
+        hoodServo1n= ActiveOpMode.hardwareMap().get(CRServo.class, "hoodServo1");
+        hoodServo2n=  ActiveOpMode.hardwareMap().get(CRServo.class, "hoodServo2");
         pathTimer = new Timer();
         actionTimer = new Timer();
         opmodeTimer = new Timer();
@@ -276,11 +276,35 @@ public class blueDefaultNewMirrored extends NextFTCOpMode {
 
 
             });*/
+    ParallelGroup HoodRunUp=new ParallelGroup(
+            new SetPower(hoodServo1,1),
+            new SetPower(hoodServo2,-1)
+    );
+    public ParallelGroup HoodPowerZero=new ParallelGroup(
+            new SetPower(hoodServo1,0),
+            new SetPower(hoodServo2,0)
+    );
 
+    public SequentialGroup HoodUp=new SequentialGroup(
+            HoodRunUp,
+            new Delay(0.1),
+            HoodPowerZero
+    );
+
+    ParallelGroup HoodRunDown=new ParallelGroup(
+            new SetPower(hoodServo1,-1),
+            new SetPower(hoodServo2,1)
+    );
+
+    public SequentialGroup HoodDown=new SequentialGroup(
+            HoodRunDown,
+            new Delay(0.17),
+            HoodPowerZero
+    );
 
     public Command Auto(){
         return new SequentialGroup(
-
+                HoodUp,
                 spinFlyWheel1500,
                 intakeMotorOn,
                 new FollowPath(paths.PreLoadLaunch,true,0.8),
@@ -449,7 +473,7 @@ public class blueDefaultNewMirrored extends NextFTCOpMode {
                             start,
                             PreLoadLaunch1
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(125), Math.toRadians(143))
+                    .setLinearHeadingInterpolation(Math.toRadians(51), Math.toRadians(37))
                     //.setVelocityConstraint(50)
                     .build();
             Intake1set = follower.pathBuilder()
@@ -459,7 +483,7 @@ public class blueDefaultNewMirrored extends NextFTCOpMode {
                             Intake1
 
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(143), Math.toRadians(180))
+                    .setLinearHeadingInterpolation(Math.toRadians(56), Math.toRadians(0))
 
                     .build();
             ClassifierRamp1 = follower.pathBuilder()
@@ -478,7 +502,7 @@ public class blueDefaultNewMirrored extends NextFTCOpMode {
                             Intake1,
                             Launch1
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(143))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(33))
 
                     .build();
             Intake2ndSet = follower.pathBuilder()
@@ -488,7 +512,7 @@ public class blueDefaultNewMirrored extends NextFTCOpMode {
                             Intake2
 
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(143), Math.toRadians(180))
+                    .setLinearHeadingInterpolation(Math.toRadians(50), Math.toRadians(0))
 
                     .build();
             Launch2 = follower.pathBuilder()
@@ -497,13 +521,14 @@ public class blueDefaultNewMirrored extends NextFTCOpMode {
                             ShootCP,
                             Launch1
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(143))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(30))
 
                     .build();
             Intake3rdSet = follower.pathBuilder()
                     .addPath(new BezierCurve(
                             Launch1,
                             ControlPoint3,
+                            ControlPoint4,
                             Intake3
 
                     ))

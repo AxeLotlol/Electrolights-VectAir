@@ -1,89 +1,94 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
-
 import com.bylazar.configurables.annotations.Configurable;
-
-import dev.nextftc.bindings.*;
+import dev.nextftc.bindings.BindingManager;
 import dev.nextftc.control.KineticState;
 import dev.nextftc.control.ControlSystem;
-
 import dev.nextftc.control.feedback.PIDCoefficients;
 import dev.nextftc.control.feedforward.BasicFeedforwardParameters;
 import dev.nextftc.core.subsystems.Subsystem;
-import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.hardware.impl.MotorEx;
-@Configurable
-public class Flywheel implements Subsystem {
-    public Flywheel() {
 
-    }
+@Configurable // make the class configurable
+public class Flywheel implements Subsystem {
 
     public static final Flywheel INSTANCE = new Flywheel();
-    public static double flywheelvelocity;
 
-    public static double flywheelvelocity2;
-
-    public static MotorEx flywheel = new MotorEx("launchingmotor");
-
+    // Motors
+    public static MotorEx flywheel1 = new MotorEx("launchingmotor");
     public static MotorEx flywheel2 = new MotorEx("launchingmotor2");
 
-    public static PIDCoefficients myPidCoeff = new PIDCoefficients(0.15, 0.005, 0.00);
-    public static BasicFeedforwardParameters myFF = new BasicFeedforwardParameters(0.0067, 0, 0.01);
+    // PID + Feedforward
+    public static PIDCoefficients myPidCoeff = new PIDCoefficients(0.15, 0.005, 0.0);
+    public static BasicFeedforwardParameters myFF = new BasicFeedforwardParameters(0.0067, 0.0, 0.01);
 
+    // ===== BYLazar Panels (must be public static double) =====
+    public static double motor1RPM = 0;
+    public static double motor2RPM = 0;
+    public static double motor1Power = 0;
+    public static double motor2Power = 0;
+    public static double targetTPSGraph = 1400; // your TPS target
 
-    public static double configvelocity = 1400; //far zone - ~1500. near zone - ~1200-1300
+    public static double configTPS = 1400; // default target
 
-    public static void velocityControlWithFeedforwardExample(KineticState currentstate, float configtps) {
-        // Create a velocity controller with PID and feedforward
+    private Flywheel() {}
+
+    // ===== Motor 1 Control =====
+    public static void controlMotor1(KineticState currentState, double targetTPS) {
         ControlSystem controller = ControlSystem.builder()
-                .velPid(myPidCoeff) // Velocity PID with kP=0.1, kI=0.01, kD=0.05
-                .basicFF(myFF) // Basic feedforward with kV=0.02, kA=0.0, kS=0.01 //pid tuning
+                .velPid(myPidCoeff)
+                .basicFF(myFF)
                 .build();
-
-        controller.setGoal(new KineticState(0.0, configtps, 0.0));
-
-        // In a loop (simulated here), you would:
-        // Create a KineticState with current position and velocity
-
-        double power = controller.calculate(currentstate);
-        flywheel.setPower(power);
+        controller.setGoal(new KineticState(0.0, targetTPS, 0.0));
+        double power = controller.calculate(currentState);
+        power = Math.max(-1.0, Math.min(1.0, power));
+        flywheel1.setPower(power);
+        motor1Power = power;
     }
-    public static void velocityControlWithFeedforwardExample2(KineticState currentstate, float configtps) {
-        // Create a velocity controller with PID and feedforward
+
+    // ===== Motor 2 Control =====
+    public static void controlMotor2(KineticState currentState, double targetTPS) {
         ControlSystem controller = ControlSystem.builder()
-                .velPid(myPidCoeff) // Velocity PID with kP=0.1, kI=0.01, kD=0.05
-                .basicFF(myFF) // Basic feedforward with kV=0.02, kA=0.0, kS=0.01 //pid tuning
+                .velPid(myPidCoeff)
+                .basicFF(myFF)
                 .build();
-
-        controller.setGoal(new KineticState(0.0, configtps, 0.0));
-
-        // In a loop (simulated here), you would:
-        // Create a KineticState with current position and velocity
-
-        double power = controller.calculate(currentstate);
-        flywheel2.setPower(-1*power);
+        controller.setGoal(new KineticState(0.0, targetTPS, 0.0));
+        double power = controller.calculate(currentState);
+        power = Math.max(-1.0, Math.min(1.0, power));
+        flywheel2.setPower(-power); // inverted
+        motor2Power = power;
     }
-    public static void shooter(float tps) {
+
+    // ===== Shooter method =====
+    public static void shooter(double targetTPS) {
         BindingManager.update();
-        flywheelvelocity = flywheel.getVelocity();
-        flywheelvelocity2 = flywheel2.getVelocity();
-        KineticState currentState = new KineticState(0, flywheelvelocity, 0.0);
-        KineticState currentState2 = new KineticState(0, -1*flywheelvelocity2, 0.0);
-        //if(tps-(-1*flywheelvelocity)<7 && tps-(-1*flywheelvelocity)>-7){
-        velocityControlWithFeedforwardExample(currentState, tps);
-        velocityControlWithFeedforwardExample2(currentState2, tps);
-        double rpm = (flywheelvelocity / 28) * 60.0;
 
+        double velocity1 = flywheel1.getVelocity();
+        double velocity2 = flywheel2.getVelocity();
+
+        KineticState state1 = new KineticState(0.0, velocity1, 0.0);
+        KineticState state2 = new KineticState(0.0, -velocity2, 0.0);
+
+        controlMotor1(state1, targetTPS);
+        controlMotor2(state2, targetTPS);
+
+        motor1RPM = (velocity1 / 28.0) * 60.0;
+        motor2RPM = (velocity2 / 28.0) * 60.0;
+        targetTPSGraph = targetTPS;
     }
-    @Override public void initialize() {
 
+    @Override
+    public void initialize() {
+        flywheel1.setPower(0);
+        flywheel2.setPower(0);
+
+        motor1RPM = 0;
+        motor2RPM = 0;
+        motor1Power = 0;
+        motor2Power = 0;
+        targetTPSGraph = configTPS;
     }
 
-    @Override public void periodic() {
-
-    }
+    @Override
+    public void periodic() {}
 }
-

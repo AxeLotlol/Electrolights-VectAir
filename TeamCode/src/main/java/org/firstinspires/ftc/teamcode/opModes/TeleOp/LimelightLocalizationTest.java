@@ -1,45 +1,118 @@
 package org.firstinspires.ftc.teamcode.opModes.TeleOp;
 
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.robotcore.hardware.IMU;
 
-import org.firstinspires.ftc.teamcode.subsystems.LimelightLocalization;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
-import dev.nextftc.core.components.BindingsComponent;
-import dev.nextftc.core.components.SubsystemComponent;
-import dev.nextftc.ftc.NextFTCOpMode;
-import dev.nextftc.ftc.components.BulkReadComponent;
+import dev.nextftc.core.subsystems.Subsystem;
+import dev.nextftc.ftc.ActiveOpMode;
 
-@TeleOp
-public class LimelightLocalizationTest extends NextFTCOpMode {
+/**
+ * Limelight AprilTag localization converted for Pedro Pathing
+ *
+ * Limelight frame:
+ *   +X = right
+ *   +Y = forward
+ *   units = meters
+ *
+ * Pedro frame:
+ *   +X = forward
+ *   +Y = left
+ *   units = inches
+ */
+public class LimelightLocalizationTest implements Subsystem {
 
-    private double x;
-    private double y;
+    public static final LimelightLocalizationTest INSTANCE =
+            new LimelightLocalizationTest();
 
-    public LimelightLocalizationTest() {
-        addComponents(
-                new SubsystemComponent(LimelightLocalization.INSTANCE),
-                BulkReadComponent.INSTANCE,
-                BindingsComponent.INSTANCE
+    private LimelightLocalizationTest() {}
 
-        );
+    private Limelight3A limelight;
+    private IMU imu;
+
+    // Pedro-compatible pose
+    private double xInches = 0.0;
+    private double yInches = 0.0;
+    private double headingRad = 0.0;
+
+    private boolean hasPose = false;
+
+    private static final double METERS_TO_INCHES = 39.3701;
+
+    @Override
+    public void initialize() {
+
+        limelight = ActiveOpMode.hardwareMap()
+                .get(Limelight3A.class, "limelight");
+
+        imu = ActiveOpMode.hardwareMap()
+                .get(IMU.class, "imu");
+
+        // AprilTag pipeline
+        limelight.pipelineSwitch(0);
+        limelight.start();
     }
 
     @Override
-    public void onInit() {}
+    public void periodic() {
 
-    @Override
-    public void onStartButtonPressed() {telemetry.addLine("Running Code.");}
+        // ---------------- IMU HEADING ----------------
+        YawPitchRollAngles orientation =
+                imu.getRobotYawPitchRollAngles();
 
-    @Override
-    public void onUpdate() {
+        double yawDeg = orientation.getYaw(AngleUnit.DEGREES);
+        headingRad = Math.toRadians(yawDeg);
 
-        x = LimelightLocalization.INSTANCE.returnX();
-        y = LimelightLocalization.INSTANCE.returnY();
-        telemetry.addLine("Running Loop");
+        // Provide heading to Limelight
+        limelight.updateRobotOrientation(yawDeg);
 
-        telemetry.addData("x:", x);
-        telemetry.addData("y:", y);
-        telemetry.update();
+        // ---------------- LIMELIGHT POSE ----------------
+        LLResult result = limelight.getLatestResult();
+        if (result == null || !result.isValid()) {
+            hasPose = false;
+            return;
+        }
+
+        Pose3D botPose = result.getBotpose_MT2();
+        if (botPose == null) {
+            hasPose = false;
+            return;
+        }
+
+        // Limelight pose (meters)
+        double llX = botPose.getPosition().x; // right
+        double llY = botPose.getPosition().y; // forward
+
+        // Convert to Pedro coordinate frame (inches)
+        xInches =  llY * METERS_TO_INCHES;
+        yInches = -llX * METERS_TO_INCHES;
+
+        hasPose = true;
     }
 
+    // ---------------- PUBLIC GETTERS ----------------
+
+    /** Pedro X (forward, inches) */
+    public double getX() {
+        return xInches;
+    }
+
+    /** Pedro Y (left, inches) */
+    public double getY() {
+        return yInches;
+    }
+
+    /** Pedro heading (radians, CCW+) */
+    public double getHeading() {
+        return headingRad;
+    }
+
+    /** Whether Limelight currently has a valid field pose */
+    public boolean hasValidPose() {
+        return hasPose;
+    }
 }

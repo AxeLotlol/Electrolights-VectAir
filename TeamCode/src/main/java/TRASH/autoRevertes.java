@@ -1,6 +1,4 @@
-
-
-package org.firstinspires.ftc.teamcode.opModes.Auto;
+package TRASH;
 
 
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
@@ -44,12 +42,12 @@ import dev.nextftc.hardware.impl.ServoEx;
 import dev.nextftc.hardware.powerable.SetPower;
 
 
-@Autonomous(name = "New Paths Cleaner red auto hopefully", group = "Autonomous")
+@Autonomous(name = "Red Auto REVERTED BACK TO DECEMBER 23RD Default Position", group = "Auto+nomous")
 @Configurable
-public class newCleanerRedAuto extends NextFTCOpMode {
-    public newCleanerRedAuto(){
+public class autoRevertes extends NextFTCOpMode {
+    public autoRevertes() {
         addComponents(
-                new SubsystemComponent(Flywheel.INSTANCE,DistanceRed.INSTANCE),
+                new SubsystemComponent(Flywheel.INSTANCE, DistanceRed.INSTANCE),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE,
                 new PedroComponent(hwMap -> Constants.createFollower(hwMap))
@@ -57,67 +55,61 @@ public class newCleanerRedAuto extends NextFTCOpMode {
 
         );
     }
+
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
 
 
-
-
     private Paths paths;
 
-    public Pose start = new Pose(120.57109116743206,127.86724836492107, Math.toRadians(42));
+    public Pose start = new Pose(125.79827045231767, 125.69678743996302, Math.toRadians(39));
 
-    //public Pose PreloadCP = new Pose(118.82561804849406,122.21046123805121);
+    public Pose PreloadCP = new Pose(118.82561804849406, 122.21046123805121);
 
-    public Pose PreLoadLaunch1 = new Pose(93.40014104519382,92.84219547297337);
+    public Pose PreLoadLaunch1 = new Pose(110.78558507577333, 115.9135913662864);
 
-    public Pose intake21 = new Pose(84.27239998850445,86.89855013373378);
+    public Pose intake1CP1 = new Pose(108.89607353678281, 84.44081612930407);
 
     //public Pose intake1CP2 = new Pose(125,79.5);
 
-    public Pose Intake1stSetClassifier = new Pose(129.06201308063146,80.19535517270434);
+    public Pose Intake1stSetClassifier = new Pose(129.86565102121477, 84.24612836558748);
 
-    public Pose launchCP1 = new Pose(85.75831132331433,85.83718489458386   );
+    public Pose launchCP1 = new Pose(98.46728971962617, 103.40186915887851);
 
-    public Pose Launch1 = new Pose(79.81466598407474,79.25672041185429);
+    public Pose Launch1 = new Pose(89.15468008859412, 93.26674156863335);
 
-    public Pose intake2CP = new Pose(80.0269390319047,59.09078086800561);
-    //public Pose intake2CP2 = new Pose(111.27191127768515,59.96606242014606);
+    public Pose intake2CP = new Pose(101.39398703893502, 66.13871482396966);
+    public Pose intake2CP2 = new Pose(111.27191127768515, 59.96606242014606);
 
-    public Pose intake2 = new Pose(128.42134714385298,57.56255480702201);
+    public Pose intake2 = new Pose(128.99406947073683, 63.78080707157992);
 
-    public Pose launch2Cp = new Pose(90.85286447123399,92.84219547297337);
+    public Pose launch2Cp = new Pose(90.64448124970694, 92.57668852180086);
 
-    public Pose launch2 = new Pose(79.81466598407474,79.25672041185429);
+    public Pose launch2 = new Pose(77.60747663551402, 79.17757009345794);
 
-    public Pose intake3CP = new Pose(82.39621398915043,31.070039137485907);
+    public Pose intake3CP = new Pose(86.57710068080985, 30.984925621358947);
 
-    public Pose intake3 = new Pose(132.9116040369947,31.74357767145716);
+    public Pose intake3 = new Pose(123.189868489156, 30.113344070881013);
 
-    public Pose launch3CP = new Pose(85.75831132331433,86.04945794241382);
+    public Pose launch3CP = new Pose(92.96869871764815, 100.42092247610242);
 
-    public Pose launch3 = new Pose(79.81466598407474,79.25672041185429,Math.toRadians(58));
+    public Pose launch3 = new Pose(80.60747663551402, 80.17757009345794, Math.toRadians(50));
 
-    public Pose loadingZoneCP1 = new Pose(116.11335716300232,75.43580555091452);
+    public Pose loadingZoneCP1 = new Pose(116.11335716300232, 75.43580555091452);
 
-    public Pose loadingZoneCP2 = new Pose(140.73202013289117,42.32121008943673);
+    public Pose loadingZoneCP2 = new Pose(140.73202013289117, 42.32121008943673);
 
-    public Pose loadingZone = new Pose(135.67065489374124,9.055706819278855);
+    public Pose loadingZone = new Pose(135.67065489374124, 9.055706819278855);
 
-    public Pose loadingZoneLaunchcp1 = new Pose(94.24923323651377,98.785840812213);
+    public Pose loadingZoneLaunchcp1 = new Pose(94.24923323651377, 98.785840812213);
 
-    public Pose loadingZoneLaunch = new Pose(74.69158878504672,72.89719626168224);
+    public Pose loadingZoneLaunch = new Pose(74.69158878504672, 72.89719626168224);
 
-    public Pose Teleop1 = new Pose(100.11214953271028,80.009345794392516);
-
-
+    public Pose Teleop1 = new Pose(100.11214953271028, 80.009345794392516);
 
 
     private static final int APRILTAG_PIPELINE = 8;
-
-
-
 
 
     private MotorEx FlywheelReal;
@@ -127,7 +119,7 @@ public class newCleanerRedAuto extends NextFTCOpMode {
 
     // private MotorEx spindexerMotor;
 
-    private boolean path2Following= false;
+    private boolean path2Following = false;
     int ball1Color = 0;
     int ball2Color = 0;
     int ball3Color = 0;
@@ -137,15 +129,8 @@ public class newCleanerRedAuto extends NextFTCOpMode {
     public static double spindexvelocity;
 
 
-
-
-
-    Command  flywheelYes= new LambdaCommand()
+    Command flywheelYes = new LambdaCommand()
             .setStart(() -> shooter(1500));
-
-
-
-
 
 
     /*Command pathCommand = new LambdaCommand()
@@ -160,8 +145,6 @@ public class newCleanerRedAuto extends NextFTCOpMode {
             .setStart(() -> follower.followPath(paths.Intake3rdSet))
             .setIsDone(() -> !follower.isBusy())
             .named("Path4 Command");
-
-
 
 
     public static void velocityControlWithFeedforwardExample(KineticState currentstate, float configtps) {
@@ -200,9 +183,6 @@ public class newCleanerRedAuto extends NextFTCOpMode {
         telemetry.addLine("Initializing Follower...");
 
 
-
-
-
         telemetry.update();
         follower = PedroComponent.follower();
         Limelight3A limelight = hardwareMap.get(Limelight3A.class, "limelight");
@@ -228,19 +208,19 @@ public class newCleanerRedAuto extends NextFTCOpMode {
         shootClose = new LambdaCommand()
                 .setStart(() -> {
                     shooter(1250);
-                     shootClose1 = true;
+                    shootClose1 = true;
 
 
                 });
         shootFar = new LambdaCommand()
-                .setStart(()->{
+                .setStart(() -> {
                     shooter(1330);
-                     shootClose1 = false;
+                    shootClose1 = false;
                 });
         intakeMotorOn = new LambdaCommand()
                 .setStart(() -> intakeMotor.setPower(-1));
-        hoodServo1n= ActiveOpMode.hardwareMap().get(CRServo.class, "hoodServo1");
-        hoodServo2n=  ActiveOpMode.hardwareMap().get(CRServo.class, "hoodServo2");
+        hoodServo1n = ActiveOpMode.hardwareMap().get(CRServo.class, "hoodServo1");
+        hoodServo2n = ActiveOpMode.hardwareMap().get(CRServo.class, "hoodServo2");
         pathTimer = new Timer();
         actionTimer = new Timer();
         opmodeTimer = new Timer();
@@ -259,8 +239,6 @@ public class newCleanerRedAuto extends NextFTCOpMode {
     }
 
 
-
-
     Command stopFlywheel = new LambdaCommand()
             .setStart(() -> shooter(0));
 
@@ -274,12 +252,12 @@ public class newCleanerRedAuto extends NextFTCOpMode {
             .setStart(() -> tagId = MotifScanning.INSTANCE.findMotif());
 
     Command distance = new LambdaCommand()
-            .setStart(()-> findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
+            .setStart(() -> findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
 
     Command opentransfer = new LambdaCommand()
-            .setStart(()-> {
+            .setStart(() -> {
                 //`5transfer2.setPosition(-0.25);
-                transfer2.setPosition(0.4);
+                transfer2.setPosition(0.3);
                 //transfer3.setPosition(0.75);
             });
     Command closeTransfer = new LambdaCommand()
@@ -290,13 +268,13 @@ public class newCleanerRedAuto extends NextFTCOpMode {
             });
 
     Command transferOn = new LambdaCommand()
-            .setStart(()-> transfer1.setPower(-1));
+            .setStart(() -> transfer1.setPower(-1));
     Command transferOnIntake = new LambdaCommand()
-            .setStart(()-> transfer1.setPower(-0.6));
+            .setStart(() -> transfer1.setPower(-0.6));
     Command transferOff = new LambdaCommand()
             .setStart(() -> transfer1.setPower(0));
     Command shootCloseyipeee = new LambdaCommand()
-            .setStart(()-> shooter(1250));
+            .setStart(() -> shooter(1250));
 
     /*Command shootByTag1 = new LambdaCommand()
                 .setStart(() -> {
@@ -315,52 +293,154 @@ public class newCleanerRedAuto extends NextFTCOpMode {
 
 
             });*/
-    ParallelGroup HoodRunUp=new ParallelGroup(
-            new SetPower(hoodServo1,1),
-            new SetPower(hoodServo2,-1)
+    ParallelGroup HoodRunUp = new ParallelGroup(
+            new SetPower(hoodServo1, 1),
+            new SetPower(hoodServo2, -1)
     );
-    public ParallelGroup HoodPowerZero=new ParallelGroup(
-            new SetPower(hoodServo1,0),
-            new SetPower(hoodServo2,0)
+    public ParallelGroup HoodPowerZero = new ParallelGroup(
+            new SetPower(hoodServo1, 0),
+            new SetPower(hoodServo2, 0)
     );
 
-    public SequentialGroup HoodUp=new SequentialGroup(
+    public SequentialGroup HoodUp = new SequentialGroup(
             HoodRunUp,
             new Delay(0.1),
             HoodPowerZero
     );
 
-    ParallelGroup HoodRunDown=new ParallelGroup(
-            new SetPower(hoodServo1,-1),
-            new SetPower(hoodServo2,1)
+    ParallelGroup HoodRunDown = new ParallelGroup(
+            new SetPower(hoodServo1, -1),
+            new SetPower(hoodServo2, 1)
     );
 
-    public SequentialGroup HoodDown=new SequentialGroup(
+    public SequentialGroup HoodDown = new SequentialGroup(
             HoodRunDown,
             new Delay(0.17),
             HoodPowerZero
     );
     Command spinUp = new LambdaCommand()
-            .setStart(()-> FlywheelReal.setPower(-1));
+            .setStart(() -> FlywheelReal.setPower(-1));
 
 
-    public Command Auto(){
+    public Command Auto() {
         return new SequentialGroup(
-                shootCloseyipeee,
+
+
+                spinUp,
+                new Delay(0.3),
+                //shootCloseyipeee,
+                shootClose,
+                //intakeMotorOn,
                 opentransfer,
-                new FollowPath(paths.PreLoadLaunch,true,0.99),
+                //new Delay(1.5),
+                new FollowPath(paths.PreLoadLaunch, true, 0.99),
+
+
                 transferOn,
-                new Delay(1),
+                new Delay(1.5),
+
+                transferOff,
+                //new TurnTo(Angle.fromDeg(90)),
+                //getMotif,
+                //shootFar,
+                closeTransfer,
+
+
+                intakeMotorOn,
+
+
+                new Delay(0.2),
+                transferOnIntake,
+                intakeMotorOn,
+                new FollowPath(paths.IntakeandClassifier, false, 0.9),
+                transferOff,
+                //new Delay(1.0),
+
+                /*new FollowPath(paths.ClassifierRamp1,true,0.8),
+                new Delay(0.5),
+                //transferOff,
+                //new Delay(0.1),
+                // Sorting logic all here with the order, etc
+                */
+                //intakeMotorOn,
+                new FollowPath(paths.Launch1Real, true, 0.9),
+
+                opentransfer,
+                new Delay(0.2),
+                transferOn,
+
+
+                // Transfer logic with transfer
+                new Delay(1.5),
                 transferOff,
                 closeTransfer,
+                new Delay(0.3),
+
                 intakeMotorOn,
-                new FollowPath(paths.IntakeandClassifier,false,0.99)
+                transferOnIntake,
+                shootFar,
+                new FollowPath(paths.Intake2ndSet, false, 0.8),
+
+                transferOff,
+                new Delay(0.3),
+                //opentransfer,
+
+                //intakeMotorOff,
+
+                // Sorting logic and order here
 
 
+                new FollowPath(paths.Launch2, true, 0.9),
+                opentransfer,
+                intakeMotorOn,
 
 
+                transferOn,
+
+                // Transfer logic with transfer
+                new Delay(1.75),
+                closeTransfer,
+                transferOff,
 
 
+                intakeMotorOn,
+                transferOnIntake,
+                new FollowPath(paths.Intake3rdSet, false, 0.9),
+
+                transferOff,
+
+
+                // Sorting logic here
+                new FollowPath(paths.Launch3, false, 0.9),
+                opentransfer,
+                new Delay(0.3),
+
+                // Transfer and shoot logic
+                opentransfer,
+                transferOn,
+                intakeMotorOff,
+
+                new Delay(1.5),
+                //closeTransfer,
+                transferOff,
+                closeTransfer,
+
+                intakeMotorOn,
+                transferOn,
+
+                new FollowPath(paths.LoadingZone, false, 0.9),
+                transferOff,
+                new Delay(0.4),
+
+
+                new FollowPath(paths.LoadingZoneLaunch, true, 0.9),
+                opentransfer,
+                transferOn,
+                new Delay(1.5),
+                opentransfer,
+                transferOff,
+                stopFlywheel,
+                new FollowPath(paths.teleOp, true, 0.9)
 
 
         );
@@ -378,34 +458,23 @@ public class newCleanerRedAuto extends NextFTCOpMode {
         telemetry.update();
 
 
-
-
-
-
-
-
-
     }
 
     @Override
-    public void onUpdate(){
+    public void onUpdate() {
 
-        Pose goalRed = new Pose(144,144);
-        double distance = follower.getPose().distanceFrom(goalRed);
-        shooter(findTPS(0.85*(distance /  39.37)));
+        if (shootClose1) {
+            shooter(1250);
+
+        } else if (!shootClose1) {
+            shooter(1300);
+        }
+
+
         follower.update();
 
 
-
-
-
-
-
-
-
     }
-
-
 
 
     @Override
@@ -438,7 +507,6 @@ public class newCleanerRedAuto extends NextFTCOpMode {
         public PathChain teleOp;
 
 
-
         public Paths(Follower follower) {
             //Path1 = follower.pathBuilder()
             //.addPath(new BezierLine(
@@ -451,21 +519,20 @@ public class newCleanerRedAuto extends NextFTCOpMode {
             PreLoadLaunch = follower.pathBuilder()
                     .addPath(new BezierCurve(
                             start,
-
+                            PreloadCP,
                             PreLoadLaunch1
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(42),Math.toRadians(46))
+                    .setTangentHeadingInterpolation().setReversed()
                     //.setVelocityConstraint(50)
                     .build();
             IntakeandClassifier = follower.pathBuilder()
                     .addPath(new BezierCurve(
                             PreLoadLaunch1,
-                            intake21,
+                            intake1CP1,
                             Intake1stSetClassifier
 
                     ))
                     .setTangentHeadingInterpolation()
-
 
                     .build();
            /* ClassifierRamp1 = follower.pathBuilder()
@@ -493,7 +560,7 @@ public class newCleanerRedAuto extends NextFTCOpMode {
                     .addPath(new BezierCurve(
                             Launch1,
                             intake2CP,
-                            //intake2CP2,
+                            intake2CP2,
                             intake2
 
                     ))

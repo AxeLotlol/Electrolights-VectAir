@@ -1,10 +1,7 @@
-package org.firstinspires.ftc.teamcode.opModes.Auto;
+package TRASH;
 
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierCurve;
-import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 
 import dev.nextftc.core.commands.Command;
@@ -18,14 +15,11 @@ import dev.nextftc.ftc.components.BulkReadComponent;
 import dev.nextftc.hardware.impl.MotorEx;
 
 
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 
 import org.firstinspires.ftc.teamcode.subsystems.MotifScanning;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.bylazar.configurables.annotations.Configurable;
-
 
 
 @Autonomous(name="Auto Backward", group="Auto")

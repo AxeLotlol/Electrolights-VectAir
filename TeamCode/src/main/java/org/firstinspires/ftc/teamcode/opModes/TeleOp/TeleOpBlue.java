@@ -28,7 +28,7 @@ import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.powerable.SetPower;
 
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOpRed")
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOpBlue")
 public class TeleOpBlue extends NextFTCOpMode {
 
     public MotorEx intakeMotor;
@@ -76,9 +76,9 @@ public class TeleOpBlue extends NextFTCOpMode {
     private static final int APRILTAG_PIPELINE = 8;
     @Override
     public void onInit() {
-        Limelight3A limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.pipelineSwitch(APRILTAG_PIPELINE);
-        limelight.start();
+//        Limelight3A limelight = hardwareMap.get(Limelight3A.class, "limelight");
+//        limelight.pipelineSwitch(APRILTAG_PIPELINE);
+//        limelight.start();
         blue=true;
         intakeMotor = new MotorEx("intake").reversed();
         transfer = new MotorEx("transfer").reversed();

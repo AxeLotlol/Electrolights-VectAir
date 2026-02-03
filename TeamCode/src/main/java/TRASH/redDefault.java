@@ -1,28 +1,17 @@
 
 
-package org.firstinspires.ftc.teamcode.opModes.Auto;
+package TRASH;
 
 
-import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 
-import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
-import com.pedropathing.math.Vector;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.hardware.CRServo;
-
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
-import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
-import org.firstinspires.ftc.teamcode.subsystems.MotifScanning;
 
 import dev.nextftc.control.ControlSystem;
 import dev.nextftc.control.KineticState;
@@ -33,8 +22,8 @@ import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
-import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.extensions.pedro.PedroComponent;
+import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
@@ -45,11 +34,26 @@ import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
 import dev.nextftc.hardware.powerable.SetPower;
 
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous(name = "Red Auto Sorted Default Position", group = "Auto+nomous")
+import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
+
+
+import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
+import org.firstinspires.ftc.teamcode.subsystems.MotifScanning;
+
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+
+
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.bylazar.configurables.annotations.Configurable;
+import com.qualcomm.robotcore.hardware.CRServo;
+
+
+@Autonomous(name = "Red Auto Default Position", group = "Autonomous")
 @Configurable
-public class redSORTEDDefault extends NextFTCOpMode {
-    public redSORTEDDefault(){
+public class redDefault extends NextFTCOpMode {
+    public redDefault(){
         addComponents(
                 new SubsystemComponent(Flywheel.INSTANCE,DistanceRed.INSTANCE),
                 BulkReadComponent.INSTANCE,
@@ -68,37 +72,39 @@ public class redSORTEDDefault extends NextFTCOpMode {
 
     private Paths paths;
 
-    public Pose start = new Pose(120.995637263092,126.59361007794115, Math.toRadians(46));
+    public Pose start = new Pose(120,125, Math.toRadians(51));
 
-    //public Pose PreloadCP = new Pose(118.82561804849406,122.21046123805121);
+    public Pose PreloadCP = new Pose(96,96);
 
-    public Pose PreLoadLaunch1 = new Pose(82.62072683380752,87.19825030175733);
+    public Pose PreLoadLaunch1 = new Pose(77,77);
 
-    public Pose intake1CP1 = new Pose(92.12650275821392,53.996227720085926);
+    public Pose intake1CP1 = new Pose(86,87);
 
-    //public Pose intake1CP2 = new Pose(125,79.5);
+    public Pose intake1CP2 = new Pose(125,79.5);
 
-    public Pose Intake1stSetClassifier = new Pose(128.21292088931153,65.67124535073518);
+    public Pose Intake1stSetClassifier = new Pose(131,80);
 
-    public Pose launchCP1 = new Pose(86.60740351463427,93.90356071212331);
+    public Pose launchCP1 = new Pose(86,86.5);
 
-    public Pose Launch1 = new Pose(82.62072683380752,86.97373745710024);
+    public Pose Launch1 = new Pose(77,77);
 
-    public Pose intake3Cp = new Pose(70.47465187955535,35.74074560670715);
+    public Pose intake2CP = new Pose(86,60);
 
-    public Pose intake3 = new Pose(129.9111052719514,40.41075265896685);
+    public Pose intake2 = new Pose(130,58);
 
-    public Pose launch3Cp = new Pose(95.52287152349368,100.69629824268286);
+    public Pose launch2Cp = new Pose(86,86.5);
 
-    public Pose Launch31 = new Pose(82.62072683380752,87.19825030175733);
+    public Pose launch2 = new Pose(77,77);
 
-    public Pose intake1 = new Pose(131.78903981370928,83.83055763190103);
+    public Pose intake3CP = new Pose(90,35);
 
-    public Pose launch1CP = new Pose(94.03696018868378,98.785840812213);
+    public Pose intake3 = new Pose(130,35);
 
-    public Pose launch123 = new Pose(82.62072683380752,87.19825030175733);
+    public Pose launch3CP = new Pose(88,87.5);
 
-    public Pose teleopreal = new Pose(105.924250867163,84.98809270326389);
+    public Pose launch3 = new Pose(77,77);
+
+    public Pose Teleop1 = new Pose(100.11214953271028,80.009345794392516);
 
 
 
@@ -109,7 +115,7 @@ public class redSORTEDDefault extends NextFTCOpMode {
 
 
 
-    private MotorEx FlywheelReal;
+
 
 
     private MotorEx intakeMotor;
@@ -211,19 +217,17 @@ public class redSORTEDDefault extends NextFTCOpMode {
         hoodservo1 = new ServoEx("hoodServo1");
         hoodservo2 = new ServoEx("hoodServo2");
 
-        FlywheelReal = new MotorEx("launchingmotor");
-
 
         shootClose = new LambdaCommand()
                 .setStart(() -> {
-                    shooter(1300);
+                    shooter(1125);
                      shootClose1 = true;
 
 
                 });
         shootFar = new LambdaCommand()
                 .setStart(()->{
-                    shooter(1400);
+                    shooter(1330);
                      shootClose1 = false;
                 });
         intakeMotorOn = new LambdaCommand()
@@ -240,8 +244,7 @@ public class redSORTEDDefault extends NextFTCOpMode {
         telemetry.addLine("Follower + IMU + Odo Pods initialized successfully!");
         telemetry.addLine("Initialization complete!");
         telemetry.update();
-        shootClose1 = true;
-
+        shootClose1 = false;
 
         follower.update();
 
@@ -269,7 +272,7 @@ public class redSORTEDDefault extends NextFTCOpMode {
     Command opentransfer = new LambdaCommand()
             .setStart(()-> {
                 //`5transfer2.setPosition(-0.25);
-                transfer2.setPosition(0.3);
+                transfer2.setPosition(0.4);
                 //transfer3.setPosition(0.75);
             });
     Command closeTransfer = new LambdaCommand()
@@ -281,26 +284,8 @@ public class redSORTEDDefault extends NextFTCOpMode {
 
     Command transferOn = new LambdaCommand()
             .setStart(()-> transfer1.setPower(-1));
-    Command transferOnIntake = new LambdaCommand()
-            .setStart(()-> transfer1.setPower(-0.6));
     Command transferOff = new LambdaCommand()
             .setStart(() -> transfer1.setPower(0));
-    Command shootCloseyipeee = new LambdaCommand()
-            .setStart(()-> shooter(1250));
-    Command ShootFar = new LambdaCommand()
-            .setStart(() -> {
-                shooter(1400);
-                shootClose1 = false;
-
-
-            });
-
-    public Command turnTo(Pose targetPose, double timeoutSeconds) {
-        return new LambdaCommand("Turn to " + targetPose.getHeading())
-                .setStart(() -> follower.holdPoint(targetPose))
-                .setIsDone(() -> false)
-                .raceWith(new Delay(timeoutSeconds));
-    }
 
     /*Command shootByTag1 = new LambdaCommand()
                 .setStart(() -> {
@@ -344,94 +329,103 @@ public class redSORTEDDefault extends NextFTCOpMode {
             new Delay(0.17),
             HoodPowerZero
     );
-    Command spinUp = new LambdaCommand()
-            .setStart(()-> FlywheelReal.setPower(-1));
-
 
     public Command Auto(){
         return new SequentialGroup(
+                HoodUp,
                 shootClose,
+                intakeMotorOn,
+                new FollowPath(paths.PreLoadLaunch,true,0.8),
                 opentransfer,
-                new FollowPath(paths.PreLoadLaunch,true,0.99),
+                new Delay(0.3),
                 transferOn,
-                new Delay(1.0),
+                new Delay(1),
                 transferOff,
+                //new TurnTo(Angle.fromDeg(90)),
+                //getMotif,
+                shootFar,
                 closeTransfer,
-                intakeMotorOn,
-                transferOn,
-                new FollowPath(paths.IntakeandClassifier,false,0.99),
-                intakeMotorOff,
-                transferOff,
-
-                new FollowPath(paths.Launch1Real,true,0.99),
-                opentransfer,
-                transferOn,
-                intakeMotorOn,
-                new Delay(1.0),
-                closeTransfer,
-                transferOff,
-                intakeMotorOn,
-                transferOn,
-                ShootFar,
-                new FollowPath(paths.IntakeandClassifier,false,0.99),
-                new Delay(1.0),
-                new FollowPath(paths.Launch1Real,true,0.99),
-                new Delay(1.0),
 
 
-                new FollowPath(paths.Intake2ndSet,true,0.9),
-                intakeMotorOff,
+
+                intakeMotorOn,
+
+                new Delay(0.2),
+
+                new Delay(0.2),
+                transferOn,
+                new FollowPath(paths.IntakeandClassifier,false,0.7),
                 transferOff,
-                new FollowPath(paths.Launch2,true,0.99),
-                opentransfer,
+                new Delay(1.0),
+
+                /*new FollowPath(paths.ClassifierRamp1,true,0.8),
                 new Delay(0.5),
+                //transferOff,
+                //new Delay(0.1),
+                // Sorting logic all here with the order, etc
+                */intakeMotorOn,
+                new FollowPath(paths.Launch1Real,true,0.7),
+
+                opentransfer,
+                new Delay(0.2),
                 transferOn,
-                new Delay(1.0),
+
+
+                // Transfer logic with transfer
+                new Delay(1),
+                transferOff,
+                closeTransfer,
+                new Delay(0.3),
+
+                intakeMotorOn,
+                transferOn,
+                new FollowPath(paths.Intake2ndSet,false,0.7),
+                new Delay(0.2),
+                transferOff,
+                new Delay(0.3),
+                opentransfer,
+
+                //intakeMotorOff,
+
+                // Sorting logic and order here
+
+
+                new FollowPath(paths.Launch2,true,0.7),
+                intakeMotorOn,
+
+
+                transferOn,
+
+                // Transfer logic with transfer
+                new Delay(1),
                 closeTransfer,
                 transferOff,
+
+
+
                 intakeMotorOn,
                 transferOn,
-                intakeMotorOn,
-                new FollowPath(paths.Intake3rdSet,false,0.99),
-                transferOff,
+                new FollowPath(paths.Intake3rdSet,false,0.7),
 
-                new FollowPath(paths.Launch3,true,0.99),
-                intakeMotorOff,
+                transferOff,
+                new Delay(0.3),
+                opentransfer,
+
+                // Sorting logic here
+                new FollowPath(paths.Launch3,false,0.7),
+                new Delay(0.3),
+
+                // Transfer and shoot logic
                 opentransfer,
                 transferOn,
-                new Delay(1.0),
-                closeTransfer,
-                transferOff
+                intakeMotorOff,
 
-
-                /*new FollowPath(paths.PreLoadLaunch,true,0.99),
-                new Delay(1.0),
-                new FollowPath(paths.IntakeandClassifier,false,0.8),
-                new Delay(1.0),
-                new FollowPath(paths.Launch1Real,true,0.99),
-                new Delay(1.0),
-                new FollowPath(paths.IntakeandClassifier,false,0.8),
-                new Delay(1.0),
-                new FollowPath(paths.Launch1Real,true,0.99),
-                new Delay(1.0),
-                new FollowPath(paths.Intake2ndSet,false,0.99),
-                new Delay(1.0),
-                new FollowPath(paths.Launch2,true,0.99),
-                new Delay(1.0),
-                new FollowPath(paths.Intake3rdSet,false,0.99),
-                new Delay(1.0),
-                new FollowPath(paths.Launch3,true,0.99),
-                new Delay(1.0),
-                new FollowPath(paths.teleOp,true,0.99)*/
-
-
-
-
-
-
-
-
-
+                new Delay(1),
+                //closeTransfer,
+                transferOff,
+                transferOff,
+                stopFlywheel,
+                new FollowPath(paths.teleOp,true,0.9)
 
 
 
@@ -463,26 +457,17 @@ public class redSORTEDDefault extends NextFTCOpMode {
     @Override
     public void onUpdate(){
 
-        if(shootClose1){
+        //if(shootClose1){
+            //shooter(1125);
+
+        //}
+        //else if(!shootClose1){
             shooter(1300);
-        }
-        else{
-            /*Pose goalRed = new Pose(133,136);
-            double distance = follower.getPose().distanceFrom(goalRed);
-            shooter(findTPS(distance /  39.37));
-            follower.update();*/
-            shooter(1400);
-
-        }
+        //}
 
 
 
-
-
-
-
-
-
+        follower.update();
 
 
     }
@@ -513,13 +498,7 @@ public class redSORTEDDefault extends NextFTCOpMode {
 
         public PathChain Launch3;
 
-        public PathChain LoadingZone;
-
-        public PathChain LoadingZoneLaunch;
-
         public PathChain teleOp;
-
-
 
         public Paths(Follower follower) {
             //Path1 = follower.pathBuilder()
@@ -533,7 +512,7 @@ public class redSORTEDDefault extends NextFTCOpMode {
             PreLoadLaunch = follower.pathBuilder()
                     .addPath(new BezierCurve(
                             start,
-
+                            PreloadCP,
                             PreLoadLaunch1
                     ))
                     .setTangentHeadingInterpolation().setReversed()
@@ -543,6 +522,7 @@ public class redSORTEDDefault extends NextFTCOpMode {
                     .addPath(new BezierCurve(
                             PreLoadLaunch1,
                             intake1CP1,
+                            intake1CP2,
                             Intake1stSetClassifier
 
                     ))
@@ -573,51 +553,45 @@ public class redSORTEDDefault extends NextFTCOpMode {
             Intake2ndSet = follower.pathBuilder()
                     .addPath(new BezierCurve(
                             Launch1,
-                            intake3Cp,
-                            intake3
+                            intake2CP,
+                            intake2
 
                     ))
                     .setTangentHeadingInterpolation()
 
-
                     .build();
             Launch2 = follower.pathBuilder()
                     .addPath(new BezierCurve(
-                            intake3,
-                            launch3Cp,
-                            Launch31
-
-
+                            intake2,
+                            launch2Cp,
+                            launch2
                     ))
                     .setTangentHeadingInterpolation().setReversed()
 
                     .build();
             Intake3rdSet = follower.pathBuilder()
-                    .addPath(new BezierLine(
-                            Launch31,
-                            intake1
+                    .addPath(new BezierCurve(
+                            launch2,
+                            intake3CP,
+                            intake3
 
                     ))
-                    .setConstantHeadingInterpolation(Math.toRadians(0))
+                    .setTangentHeadingInterpolation()
 
                     .build();
             Launch3 = follower.pathBuilder()
                     .addPath(new BezierCurve(
-                            intake1,
-                            launch1CP,
-                            launch123
+                            intake3,
+                            launch3CP,
+                            launch3
                     ))
                     .setTangentHeadingInterpolation().setReversed()
 
                     .build();
-
-
-
-
             teleOp = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            launch123,
-                            teleopreal
+                            launch3,
+                            Teleop1
 
                     ))
                     .setConstantHeadingInterpolation(Math.toRadians(90))

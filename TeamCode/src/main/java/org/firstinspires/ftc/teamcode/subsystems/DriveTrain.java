@@ -224,12 +224,12 @@ public class DriveTrain implements Subsystem {
             ActiveOpMode.telemetry().addLine("No direction set");
         }
         imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
-        Pose startingpose = new Pose (115, 66, Math.toRadians(90));
+        Pose startingpose = new Pose (72, 72, Math.toRadians(90));
         if(alliance ==-1){
-            startingpose=new Pose (115, 66, Math.toRadians(90));
+            startingpose=new Pose (72, 72, Math.toRadians(90));
         }
         if(alliance ==1){
-            startingpose=new Pose (29, 66, Math.toRadians(90));
+            startingpose=new Pose (72, 72, Math.toRadians(90));
         }
 
         hoodServo1n= ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo1");
@@ -428,7 +428,7 @@ public class DriveTrain implements Subsystem {
         }
         else{
             double offset = -8/17 * currPose.distanceFrom(new Pose( 138, 138)) + 746/17;
-            shooter((float) ((float) flywheelSpeed));
+            shooter((float) ((float) flywheelSpeed + 10));
             if(follower.getVelocity().getMagnitude()<2){
                 aimMultiplier = 0.4;
             }

@@ -3,6 +3,7 @@
 package org.firstinspires.ftc.teamcode.pedroPathing;
 import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.control.FilteredPIDFCoefficients;
+import com.pedropathing.control.PredictiveBrakingCoefficients;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
@@ -15,6 +16,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
             .mass(10.55)
+            .predictiveBrakingCoefficients(new PredictiveBrakingCoefficients(0.3, 0.1211,0.0017011))
             .forwardZeroPowerAcceleration(-47)
             .lateralZeroPowerAcceleration(-81)
             .translationalPIDFCoefficients(new PIDFCoefficients(
@@ -57,6 +59,7 @@ public class Constants {
             ))
             .centripetalScaling(0.0005);
     public static MecanumConstants driveConstants = new MecanumConstants()
+            .useBrakeModeInTeleOp(true)
             .leftFrontMotorName("frontLeft")
             .leftRearMotorName("backLeft")
             .rightFrontMotorName("frontRight")

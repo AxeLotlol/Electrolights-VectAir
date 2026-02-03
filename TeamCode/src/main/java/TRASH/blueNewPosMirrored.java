@@ -1,4 +1,6 @@
-package org.firstinspires.ftc.teamcode.opModes.Auto;
+
+
+package TRASH;
 
 
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
@@ -13,7 +15,6 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.hardware.CRServo;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
@@ -24,30 +25,26 @@ import dev.nextftc.control.ControlSystem;
 import dev.nextftc.control.KineticState;
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
-import dev.nextftc.core.commands.groups.ParallelGroup;
 import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
 import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.extensions.pedro.PedroComponent;
-import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
-import dev.nextftc.hardware.impl.CRServoEx;
 import dev.nextftc.hardware.impl.Direction;
 import dev.nextftc.hardware.impl.IMUEx;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
-import dev.nextftc.hardware.powerable.SetPower;
 
 
-@Autonomous(name = "Red Auto REVERTED BACK TO DECEMBER 23RD Default Position", group = "Auto+nomous")
+@Autonomous(name = "Blue Auto New Position MIRRORED", group = "Autonomous")
 @Configurable
-public class autoRevertes extends NextFTCOpMode {
-    public autoRevertes() {
+public class blueNewPosMirrored extends NextFTCOpMode {
+    public blueNewPosMirrored(){
         addComponents(
-                new SubsystemComponent(Flywheel.INSTANCE, DistanceRed.INSTANCE),
+                new SubsystemComponent(Flywheel.INSTANCE,DistanceRed.INSTANCE),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE,
                 new PedroComponent(hwMap -> Constants.createFollower(hwMap))
@@ -55,71 +52,57 @@ public class autoRevertes extends NextFTCOpMode {
 
         );
     }
-
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
 
 
+
+
     private Paths paths;
+    public Pose start = new Pose(55.401869158878505,8.52336448598131, Math.toRadians(90));
 
-    public Pose start = new Pose(125.79827045231767, 125.69678743996302, Math.toRadians(39));
+    public Pose PreLoadLaunch1 = new Pose(62.12903225806452,96.67741935483872);
 
-    public Pose PreloadCP = new Pose(118.82561804849406, 122.21046123805121);
+    public Pose ControlPoint1 = new Pose(50.225806451612904,80.41935483870968);
 
-    public Pose PreLoadLaunch1 = new Pose(110.78558507577333, 115.9135913662864);
+    public Pose Intake1 = new Pose(15.25233644859813,83.66355140186916);
 
-    public Pose intake1CP1 = new Pose(108.89607353678281, 84.44081612930407);
+    public Pose ClassifierRampPoint = new Pose(63.58064516129032,74.32258064516128);
 
-    //public Pose intake1CP2 = new Pose(125,79.5);
+    public Pose ClassifierRamp = new Pose(124.74766355140187,75.14018691588785);
 
-    public Pose Intake1stSetClassifier = new Pose(129.86565102121477, 84.24612836558748);
+    public Pose Launch1 = new Pose(62.12903225806452, 96.67741935483872);
 
-    public Pose launchCP1 = new Pose(98.46728971962617, 103.40186915887851);
+    public Pose ControlPoint2 = new Pose(63.87096774193548,54.70967741935483);
 
-    public Pose Launch1 = new Pose(89.15468008859412, 93.26674156863335);
+    public Pose Intake2 = new Pose(12.11214953271028,58.11214953271029);
+    public Pose ShootCP = new Pose(50,56);
 
-    public Pose intake2CP = new Pose(101.39398703893502, 66.13871482396966);
-    public Pose intake2CP2 = new Pose(111.27191127768515, 59.96606242014606);
+    public Pose ControlPoint3 = new Pose(72.87096774193549,25.258064516129032);
 
-    public Pose intake2 = new Pose(128.99406947073683, 63.78080707157992);
+    //public Pose ControlPoint4 = new Pose(74.46728971962617,38.439252336448604);
 
-    public Pose launch2Cp = new Pose(90.64448124970694, 92.57668852180086);
+    public Pose Intake3 = new Pose(11.214953271028037,36.78504672897196);
 
-    public Pose launch2 = new Pose(77.60747663551402, 79.17757009345794);
+    public Pose Teleop1 = new Pose(60.11214953271028,80.009345794392516);
 
-    public Pose intake3CP = new Pose(86.57710068080985, 30.984925621358947);
 
-    public Pose intake3 = new Pose(123.189868489156, 30.113344070881013);
-
-    public Pose launch3CP = new Pose(92.96869871764815, 100.42092247610242);
-
-    public Pose launch3 = new Pose(80.60747663551402, 80.17757009345794, Math.toRadians(50));
-
-    public Pose loadingZoneCP1 = new Pose(116.11335716300232, 75.43580555091452);
-
-    public Pose loadingZoneCP2 = new Pose(140.73202013289117, 42.32121008943673);
-
-    public Pose loadingZone = new Pose(135.67065489374124, 9.055706819278855);
-
-    public Pose loadingZoneLaunchcp1 = new Pose(94.24923323651377, 98.785840812213);
-
-    public Pose loadingZoneLaunch = new Pose(74.69158878504672, 72.89719626168224);
-
-    public Pose Teleop1 = new Pose(100.11214953271028, 80.009345794392516);
 
 
     private static final int APRILTAG_PIPELINE = 8;
 
 
-    private MotorEx FlywheelReal;
+
+
+
 
 
     private MotorEx intakeMotor;
 
     // private MotorEx spindexerMotor;
 
-    private boolean path2Following = false;
+    private boolean path2Following= false;
     int ball1Color = 0;
     int ball2Color = 0;
     int ball3Color = 0;
@@ -129,14 +112,21 @@ public class autoRevertes extends NextFTCOpMode {
     public static double spindexvelocity;
 
 
-    Command flywheelYes = new LambdaCommand()
+
+
+
+    Command  flywheelYes= new LambdaCommand()
             .setStart(() -> shooter(1500));
 
 
-    /*Command pathCommand = new LambdaCommand()
+
+
+
+
+    Command pathCommand = new LambdaCommand()
             .setStart(() -> follower.followPath(paths.Intake1set))
             .setIsDone(() -> !follower.isBusy())
-            .named("Path2 Command");*/
+            .named("Path2 Command");
     Command pathCommand2 = new LambdaCommand()
             .setStart(() -> follower.followPath(paths.Intake2ndSet))
             .setIsDone(() -> !follower.isBusy())
@@ -145,6 +135,8 @@ public class autoRevertes extends NextFTCOpMode {
             .setStart(() -> follower.followPath(paths.Intake3rdSet))
             .setIsDone(() -> !follower.isBusy())
             .named("Path4 Command");
+
+
 
 
     public static void velocityControlWithFeedforwardExample(KineticState currentstate, float configtps) {
@@ -166,21 +158,13 @@ public class autoRevertes extends NextFTCOpMode {
     private ServoEx transfer3;
     private ServoEx hoodservo1;
     private ServoEx hoodservo2;
-    private Command shootClose;
+    private Command spinFlyWheel1500;
     private Command intakeMotorOn;
-
-    private Command shootFar;
-
-    private CRServo hoodServo1n;
-    private CRServo hoodServo2n;
-
-    private CRServoEx hoodServo1 = new CRServoEx(() -> hoodServo1n);
-    private CRServoEx hoodServo2 = new CRServoEx(() -> hoodServo2n);
-
-    private boolean shootClose1;
-
     public void onInit() {
         telemetry.addLine("Initializing Follower...");
+
+
+
 
 
         telemetry.update();
@@ -193,6 +177,9 @@ public class autoRevertes extends NextFTCOpMode {
         IMUEx imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
 
 
+
+
+
         paths = new Paths(follower);
         intakeMotor = new MotorEx("intake");
         transfer1 = new MotorEx("transfer");
@@ -202,25 +189,27 @@ public class autoRevertes extends NextFTCOpMode {
         hoodservo1 = new ServoEx("hoodServo1");
         hoodservo2 = new ServoEx("hoodServo2");
 
-        FlywheelReal = new MotorEx("launchingmotor");
-
-
-        shootClose = new LambdaCommand()
-                .setStart(() -> {
-                    shooter(1250);
-                    shootClose1 = true;
-
-
-                });
-        shootFar = new LambdaCommand()
-                .setStart(() -> {
-                    shooter(1330);
-                    shootClose1 = false;
-                });
+        spinFlyWheel1500 = new LambdaCommand()
+                .setStart(() -> shooter(1130));
         intakeMotorOn = new LambdaCommand()
                 .setStart(() -> intakeMotor.setPower(-1));
-        hoodServo1n = ActiveOpMode.hardwareMap().get(CRServo.class, "hoodServo1");
-        hoodServo2n = ActiveOpMode.hardwareMap().get(CRServo.class, "hoodServo2");
+
+        //start.mirror();
+        //PreLoadLaunch1.mirror();
+        //ControlPoint1.mirror();
+        //Intake1.mirror();
+        /*ClassifierRampPoint.mirror();
+        ClassifierRamp.mirror();
+        ControlPoint2.mirror();
+        Intake2.mirror();
+        Launch1.mirror();
+        ControlPoint3.mirror();
+        //ControlPoint4.mirror();
+        Intake3.mirror();
+        Teleop1.mirror();*/
+
+
+
         pathTimer = new Timer();
         actionTimer = new Timer();
         opmodeTimer = new Timer();
@@ -231,12 +220,9 @@ public class autoRevertes extends NextFTCOpMode {
         telemetry.addLine("Follower + IMU + Odo Pods initialized successfully!");
         telemetry.addLine("Initialization complete!");
         telemetry.update();
-        shootClose1 = true;
-
-        follower.update();
-
-
     }
+
+
 
 
     Command stopFlywheel = new LambdaCommand()
@@ -252,10 +238,10 @@ public class autoRevertes extends NextFTCOpMode {
             .setStart(() -> tagId = MotifScanning.INSTANCE.findMotif());
 
     Command distance = new LambdaCommand()
-            .setStart(() -> findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
+            .setStart(()-> findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
 
     Command opentransfer = new LambdaCommand()
-            .setStart(() -> {
+            .setStart(()-> {
                 //`5transfer2.setPosition(-0.25);
                 transfer2.setPosition(0.3);
                 //transfer3.setPosition(0.75);
@@ -263,19 +249,14 @@ public class autoRevertes extends NextFTCOpMode {
     Command closeTransfer = new LambdaCommand()
             .setStart(() -> {
                 //transfer2.setPosition(1);
-                transfer2.setPosition(0.7);
+                transfer2.setPosition(1.25);
                 //transfer3.setPosition(0);
             });
 
     Command transferOn = new LambdaCommand()
-            .setStart(() -> transfer1.setPower(-1));
-    Command transferOnIntake = new LambdaCommand()
-            .setStart(() -> transfer1.setPower(-0.6));
+            .setStart(()-> transfer1.setPower(-0.7));
     Command transferOff = new LambdaCommand()
             .setStart(() -> transfer1.setPower(0));
-    Command shootCloseyipeee = new LambdaCommand()
-            .setStart(() -> shooter(1250));
-
     /*Command shootByTag1 = new LambdaCommand()
                 .setStart(() -> {
                 if (tagId == 21) {
@@ -293,77 +274,40 @@ public class autoRevertes extends NextFTCOpMode {
 
 
             });*/
-    ParallelGroup HoodRunUp = new ParallelGroup(
-            new SetPower(hoodServo1, 1),
-            new SetPower(hoodServo2, -1)
-    );
-    public ParallelGroup HoodPowerZero = new ParallelGroup(
-            new SetPower(hoodServo1, 0),
-            new SetPower(hoodServo2, 0)
-    );
-
-    public SequentialGroup HoodUp = new SequentialGroup(
-            HoodRunUp,
-            new Delay(0.1),
-            HoodPowerZero
-    );
-
-    ParallelGroup HoodRunDown = new ParallelGroup(
-            new SetPower(hoodServo1, -1),
-            new SetPower(hoodServo2, 1)
-    );
-
-    public SequentialGroup HoodDown = new SequentialGroup(
-            HoodRunDown,
-            new Delay(0.17),
-            HoodPowerZero
-    );
-    Command spinUp = new LambdaCommand()
-            .setStart(() -> FlywheelReal.setPower(-1));
 
 
-    public Command Auto() {
+    public Command Auto(){
         return new SequentialGroup(
 
-
-                spinUp,
-                new Delay(0.3),
-                //shootCloseyipeee,
-                shootClose,
-                //intakeMotorOn,
+                spinFlyWheel1500,
+                intakeMotorOn,
+                new FollowPath(paths.PreLoadLaunch,true,0.8),
                 opentransfer,
-                //new Delay(1.5),
-                new FollowPath(paths.PreLoadLaunch, true, 0.99),
-
-
+                new Delay(0.3),
                 transferOn,
-                new Delay(1.5),
-
+                new Delay(3),
                 transferOff,
                 //new TurnTo(Angle.fromDeg(90)),
                 //getMotif,
-                //shootFar,
-                closeTransfer,
+
 
 
                 intakeMotorOn,
-
 
                 new Delay(0.2),
-                transferOnIntake,
-                intakeMotorOn,
-                new FollowPath(paths.IntakeandClassifier, false, 0.9),
+                closeTransfer,
+                new Delay(0.2),
+                transferOn,
+                new FollowPath(paths.Intake1set,false,0.8),
                 transferOff,
-                //new Delay(1.0),
 
                 /*new FollowPath(paths.ClassifierRamp1,true,0.8),
                 new Delay(0.5),
                 //transferOff,
                 //new Delay(0.1),
                 // Sorting logic all here with the order, etc
-                */
-                //intakeMotorOn,
-                new FollowPath(paths.Launch1Real, true, 0.9),
+                */intakeMotorOn,
+                new FollowPath(paths.Launch1Real,true,0.8),
 
                 opentransfer,
                 new Delay(0.2),
@@ -371,48 +315,47 @@ public class autoRevertes extends NextFTCOpMode {
 
 
                 // Transfer logic with transfer
-                new Delay(1.5),
+                new Delay(3),
                 transferOff,
                 closeTransfer,
                 new Delay(0.3),
 
                 intakeMotorOn,
-                transferOnIntake,
-                shootFar,
-                new FollowPath(paths.Intake2ndSet, false, 0.8),
-
+                transferOn,
+                new FollowPath(paths.Intake2ndSet,false,0.7),
+                new Delay(0.2),
                 transferOff,
                 new Delay(0.3),
-                //opentransfer,
+                opentransfer,
 
                 //intakeMotorOff,
 
                 // Sorting logic and order here
 
 
-                new FollowPath(paths.Launch2, true, 0.9),
-                opentransfer,
+                new FollowPath(paths.Launch2,true,0.9),
                 intakeMotorOn,
 
 
                 transferOn,
 
                 // Transfer logic with transfer
-                new Delay(1.75),
+                new Delay(3),
                 closeTransfer,
                 transferOff,
 
 
+
                 intakeMotorOn,
-                transferOnIntake,
-                new FollowPath(paths.Intake3rdSet, false, 0.9),
+                transferOn,
+                /*new FollowPath(paths.Intake3rdSet,false,0.8),
 
                 transferOff,
-
+                new Delay(0.3),
+                opentransfer,
 
                 // Sorting logic here
-                new FollowPath(paths.Launch3, false, 0.9),
-                opentransfer,
+                new FollowPath(paths.Launch3,false,0.8),
                 new Delay(0.3),
 
                 // Transfer and shoot logic
@@ -422,25 +365,12 @@ public class autoRevertes extends NextFTCOpMode {
 
                 new Delay(1.5),
                 //closeTransfer,
-                transferOff,
-                closeTransfer,
-
-                intakeMotorOn,
-                transferOn,
-
-                new FollowPath(paths.LoadingZone, false, 0.9),
-                transferOff,
-                new Delay(0.4),
-
-
-                new FollowPath(paths.LoadingZoneLaunch, true, 0.9),
-                opentransfer,
-                transferOn,
-                new Delay(1.5),
-                opentransfer,
+                transferOff,*/
                 transferOff,
                 stopFlywheel,
-                new FollowPath(paths.teleOp, true, 0.9)
+                new FollowPath(paths.teleOp,true,0.9)
+
+
 
 
         );
@@ -458,23 +388,24 @@ public class autoRevertes extends NextFTCOpMode {
         telemetry.update();
 
 
+
+
+
+
+
+
+
     }
 
     @Override
-    public void onUpdate() {
+    public void onUpdate(){
 
-        if (shootClose1) {
-            shooter(1250);
-
-        } else if (!shootClose1) {
-            shooter(1300);
-        }
-
-
-        follower.update();
+        shooter(1125);
 
 
     }
+
+
 
 
     @Override
@@ -486,9 +417,9 @@ public class autoRevertes extends NextFTCOpMode {
 
     public class Paths {
         public PathChain PreLoadLaunch;
-        public PathChain IntakeandClassifier;
+        public PathChain Intake1set;
 
-        //public PathChain ClassifierRamp1;
+        public PathChain ClassifierRamp1;
 
         public PathChain Launch1Real;
 
@@ -500,12 +431,7 @@ public class autoRevertes extends NextFTCOpMode {
 
         public PathChain Launch3;
 
-        public PathChain LoadingZone;
-
-        public PathChain LoadingZoneLaunch;
-
         public PathChain teleOp;
-
 
         public Paths(Follower follower) {
             //Path1 = follower.pathBuilder()
@@ -517,25 +443,24 @@ public class autoRevertes extends NextFTCOpMode {
             //.build();
 
             PreLoadLaunch = follower.pathBuilder()
-                    .addPath(new BezierCurve(
+                    .addPath(new BezierLine(
                             start,
-                            PreloadCP,
                             PreLoadLaunch1
                     ))
-                    .setTangentHeadingInterpolation().setReversed()
+                    .setLinearHeadingInterpolation(Math.toRadians(125), Math.toRadians(143))
                     //.setVelocityConstraint(50)
                     .build();
-            IntakeandClassifier = follower.pathBuilder()
+            Intake1set = follower.pathBuilder()
                     .addPath(new BezierCurve(
                             PreLoadLaunch1,
-                            intake1CP1,
-                            Intake1stSetClassifier
+                            ControlPoint1,
+                            Intake1
 
                     ))
-                    .setTangentHeadingInterpolation()
+                    .setLinearHeadingInterpolation(Math.toRadians(143), Math.toRadians(180))
 
                     .build();
-           /* ClassifierRamp1 = follower.pathBuilder()
+            ClassifierRamp1 = follower.pathBuilder()
                     .addPath(new BezierCurve(
                             Intake1,
                             ClassifierRampPoint,
@@ -545,78 +470,55 @@ public class autoRevertes extends NextFTCOpMode {
                     ))
                     .setConstantHeadingInterpolation(Math.toRadians(0))
 
-                    .build();*/
+                    .build();
             Launch1Real = follower.pathBuilder()
-                    .addPath(new BezierCurve(
-                            Intake1stSetClassifier,
-                            launchCP1,
+                    .addPath(new BezierLine(
+                            Intake1,
                             Launch1
-
                     ))
-                    .setTangentHeadingInterpolation().setReversed()
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(143))
 
                     .build();
             Intake2ndSet = follower.pathBuilder()
                     .addPath(new BezierCurve(
                             Launch1,
-                            intake2CP,
-                            intake2CP2,
-                            intake2
+                            ControlPoint2,
+                            Intake2
 
                     ))
-                    .setTangentHeadingInterpolation()
+                    .setLinearHeadingInterpolation(Math.toRadians(143), Math.toRadians(180))
 
                     .build();
             Launch2 = follower.pathBuilder()
                     .addPath(new BezierCurve(
-                            intake2,
-                            launch2Cp,
-                            launch2
+                            Intake2,
+                            ShootCP,
+                            Launch1
                     ))
-                    .setTangentHeadingInterpolation().setReversed()
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(143))
 
                     .build();
             Intake3rdSet = follower.pathBuilder()
                     .addPath(new BezierCurve(
-                            launch2,
-                            intake3CP,
-                            intake3
+                            Launch1,
+                            ControlPoint3,
+                            Intake3
 
                     ))
-                    .setTangentHeadingInterpolation()
+                    .setLinearHeadingInterpolation(Math.toRadians(60), Math.toRadians(0))
 
                     .build();
             Launch3 = follower.pathBuilder()
-                    .addPath(new BezierCurve(
-                            intake3,
-                            launch3CP,
-                            launch3
+                    .addPath(new BezierLine(
+                            Intake3,
+                            Launch1
                     ))
-                    .setTangentHeadingInterpolation().setReversed()
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(25))
 
-                    .build();
-
-            LoadingZone = follower.pathBuilder()
-                    .addPath(new BezierCurve(
-                            launch3,
-                            loadingZoneCP1,
-                            loadingZoneCP2,
-                            loadingZone
-                    ))
-                    .setTangentHeadingInterpolation()
-                    .build();
-
-            LoadingZoneLaunch = follower.pathBuilder()
-                    .addPath(new BezierCurve(
-                            loadingZone,
-                            loadingZoneLaunchcp1,
-                            loadingZoneLaunch
-                    ))
-                    .setTangentHeadingInterpolation().setReversed()
                     .build();
             teleOp = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            launch3,
+                            Launch1,
                             Teleop1
 
                     ))

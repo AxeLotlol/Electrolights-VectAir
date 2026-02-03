@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.opModes.TeleOp;
 
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.limelightvision.LLResult;
@@ -24,12 +24,12 @@ import dev.nextftc.ftc.ActiveOpMode;
  *   +Y = left
  *   units = inches
  */
-public class LimelightLocalization implements Subsystem {
+public class LimelightLocalizationTest implements Subsystem {
 
-    public static final LimelightLocalization INSTANCE =
-            new LimelightLocalization();
+    public static final LimelightLocalizationTest INSTANCE =
+            new LimelightLocalizationTest();
 
-    private LimelightLocalization() {}
+    private LimelightLocalizationTest() {}
 
     private Limelight3A limelight;
     private IMU imu;

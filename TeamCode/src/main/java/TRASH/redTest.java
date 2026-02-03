@@ -1,6 +1,6 @@
 
 
-package org.firstinspires.ftc.teamcode.opModes.Auto;
+package TRASH;
 
 
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
@@ -13,8 +13,6 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 
-import dev.nextftc.control.ControlSystem;
-import dev.nextftc.control.KineticState;
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
 import dev.nextftc.core.commands.groups.ParallelGroup;

@@ -209,6 +209,11 @@ public class DriveTrain implements Subsystem {
 
     @Override
     public void initialize() {
+
+        firsttime = true;
+        shooting = false;
+        autolock = false;
+
         if(isBlue()==true) {
             alliance=1;
         }
@@ -418,13 +423,14 @@ public class DriveTrain implements Subsystem {
         yVCtx = () -> visionYawCommand(finalHeadingError);
         double flywheelSpeed = results[0];
         if(headingError<-50||headingError>50) {
-            shooter((float) flywheelSpeed / 2);
-            aimMultiplier = 0.6;
+            shooter((float) ((float) flywheelSpeed * 0.75));
+            aimMultiplier = 0.8;
         }
         else{
-            shooter((float) ((float) flywheelSpeed * 1.05));
-            if(follower.getVelocity().getMagnitude()<1.5){
-                aimMultiplier = 0.475;
+            double offset = -8/17 * currPose.distanceFrom(new Pose( 138, 138)) + 746/17;
+            shooter((float) ((float) flywheelSpeed));
+            if(follower.getVelocity().getMagnitude()<2){
+                aimMultiplier = 0.4;
             }
             else{
                 aimMultiplier = 0.575;
@@ -440,7 +446,7 @@ public class DriveTrain implements Subsystem {
         ActiveOpMode.telemetry().addData("servo1pos", hoodServo1.getPosition());
         ActiveOpMode.telemetry().addData("servo2pos", hoodServo2.getPosition());
 
-        ActiveOpMode.telemetry().addData("shooting", shooting);
+        ActiveOpMode.telemetry().addData("aimMultipler", aimMultiplier);
         ActiveOpMode.telemetry().addData("goalX", goalX);
         ActiveOpMode.telemetry().addData("goalY", goalY);
         ActiveOpMode.telemetry().addData("RobotX", currPose.getX());

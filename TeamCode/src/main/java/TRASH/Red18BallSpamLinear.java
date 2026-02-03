@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opModes.Auto;
+package TRASH;
 
 
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;

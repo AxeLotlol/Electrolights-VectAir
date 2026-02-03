@@ -27,7 +27,8 @@ public class ShooterCalc implements Subsystem {
         //Vector robotToGoalVector = new Vector(goalX-robotPoseX, goalY - robotPoseY);
         double g = 32.174*12;
         double x = robotToGoalVector.getMagnitude()-ShooterConstants.PASS_THROUGH_POINT_RADIUS;
-        double y = SCORE_HEIGHT;
+        double temp = robotToGoalVector.getMagnitude()/39.37;
+        double y = /*SCORE_HEIGHT*/ -1.2152*temp*temp - 1.0003*temp + 35.955;
         double a = ShooterConstants.SCORE_ANGLE;
 
         double hoodAngle = MathFunctions.clamp(Math.atan(2 * y / x - Math.tan(a)), Math.toRadians(44.2),
@@ -63,6 +64,10 @@ public class ShooterCalc implements Subsystem {
         if(isNaN(hoodAngle)){
             hoodAngle=Math.toRadians(63);
         }
+
+        double newtemp = (ndr+5)/39.37;
+
+        y = /*SCORE_HEIGHT*/ -1.2152*newtemp*newtemp - 1.0003*newtemp + 35.955; // -0.7135x2 + 0.8315x + 33.532
 
         flywheelSpeed = Math.sqrt(g * ndr * ndr / (2 * Math.pow(Math.cos(hoodAngle), 2) * (ndr * Math. tan(hoodAngle) - y)));
         flywheelSpeed = flywheelSpeed/ 39.37;

@@ -1,6 +1,6 @@
 
 
-package org.firstinspires.ftc.teamcode.opModes.Auto;
+package TRASH;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
@@ -70,7 +70,7 @@ public class BlueDefault extends NextFTCOpMode {
 
     public Pose ControlPoint3 = new Pose(54.68571428571428,52.28571428571429);
 
-    public Pose ClassifierRampPoint = new Pose(69.38709677419355,69.67741935483872);
+    //public Pose ClassifierRampPoint = new Pose(69.38709677419355,69.67741935483872);
     //NOT SURE WHAT THIS IS -DEB
 
     public Pose ClassifierRamp = new Pose(12,61.71428571428572);
@@ -88,9 +88,9 @@ public class BlueDefault extends NextFTCOpMode {
     public Pose ControlPoint7 = new Pose(60,68.57142857142857);
 
     /*
-    second auto values in order:
+    second auto paths in order:
     START:(24.342857142857145,125.4857142857143)
-    (ALL LUANCHES ARE 72, 72 ON PEDROPATHING VISUALIZER)
+    (ALL LAUNCHES ARE 72, 72 ON PEDROPATHING VISUALIZER)
     PRELOAD LAUNCH: (72,72)
     INTAKE 1:(19.02857142857143,81.77142857142857)
     CONTROL POINT 1: (60.17142857142857,83.82857142857142)
@@ -108,6 +108,7 @@ public class BlueDefault extends NextFTCOpMode {
     (24.514285714285716,110.39999999999999)
     (52.114285714285714,96.51428571428572)
     (93.77142857142857,52.45714285714286)
+    INTAKE AND RESET RAMP IS AT (14,59.7)
      */
 
 
@@ -423,7 +424,7 @@ public class BlueDefault extends NextFTCOpMode {
             ClassifierRamp1 = follower.pathBuilder()
                     .addPath(new BezierCurve(
                             Intake1,
-                            ClassifierRampPoint,
+                            //ClassifierRampPoint,
                             ClassifierRamp
 
 

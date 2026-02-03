@@ -1,27 +1,17 @@
 
 
-package org.firstinspires.ftc.teamcode.opModes.Auto;
+package TRASH;
 
 
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
-//import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.flywheel;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 
-import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.hardware.CRServo;
-
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
-import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
-import org.firstinspires.ftc.teamcode.subsystems.MotifScanning;
 
 import dev.nextftc.control.ControlSystem;
 import dev.nextftc.control.KineticState;
@@ -32,8 +22,8 @@ import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
-import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.extensions.pedro.PedroComponent;
+import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
@@ -44,11 +34,26 @@ import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
 import dev.nextftc.hardware.powerable.SetPower;
 
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous(name = "Red Auto SPAM REALLER Position", group = "Autonomous")
+import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
+
+
+import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
+import org.firstinspires.ftc.teamcode.subsystems.MotifScanning;
+
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+
+
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.bylazar.configurables.annotations.Configurable;
+import com.qualcomm.robotcore.hardware.CRServo;
+
+
+@Autonomous(name = "Red Auto Default Position", group = "Autonomous")
 @Configurable
-public class red15spamreal extends NextFTCOpMode {
-    public red15spamreal(){
+public class redDefault extends NextFTCOpMode {
+    public redDefault(){
         addComponents(
                 new SubsystemComponent(Flywheel.INSTANCE,DistanceRed.INSTANCE),
                 BulkReadComponent.INSTANCE,
@@ -67,71 +72,39 @@ public class red15spamreal extends NextFTCOpMode {
 
     private Paths paths;
 
-    public Pose start = new Pose(119.4,126.4, Math.toRadians(49));
+    public Pose start = new Pose(120,125, Math.toRadians(51));
 
-    //public Pose PreloadCP = new Pose(76.000,76.000);
+    public Pose PreloadCP = new Pose(96,96);
 
-    public Pose PreLoadLaunch1 = new Pose(76,76);
+    public Pose PreLoadLaunch1 = new Pose(77,77);
 
-    public Pose intake2CP1 = new Pose(85,87);
+    public Pose intake1CP1 = new Pose(86,87);
 
-    public Pose intake2CP2 = new Pose(85,59);
+    public Pose intake1CP2 = new Pose(125,79.5);
 
-    public Pose Intake2nd = new Pose(127,59);
+    public Pose Intake1stSetClassifier = new Pose(131,80);
 
-    public Pose launch2CP1 = new Pose(85,89);
-    public Pose launch2CP = new Pose(85,87);
+    public Pose launchCP1 = new Pose(86,86.5);
 
-    public Pose Launch21 = new Pose(76,76);
+    public Pose Launch1 = new Pose(77,77);
 
-    public Pose resetCP1 = new Pose(80.4,86.4);
+    public Pose intake2CP = new Pose(86,60);
 
-    public Pose resetCP2 = new Pose(97.2,56.2);
+    public Pose intake2 = new Pose(130,58);
 
-    public Pose resetcp3 = new Pose(106.3,61);
+    public Pose launch2Cp = new Pose(86,86.5);
 
-    public Pose resetHelper = new Pose(123,65);
-
-
-
-    public Pose resetIntake2 = new Pose(126.000,60);
+    public Pose launch2 = new Pose(77,77);
 
     public Pose intake3CP = new Pose(90,35);
 
     public Pose intake3 = new Pose(130,35);
 
-    public Pose launchspam1 = new Pose(133.500,60);
-    public Pose launchspam2 = new Pose(112,48);
-
-    public Pose launchspam3 = new Pose(81,82.5);
-
-    public Pose launchspam4 = new Pose(76,76);
-
-    public Pose intake1 = new Pose(82,87);
-
-    public Pose intake12 = new Pose(125,84);
-
-    public Pose schoolLauncher = new Pose(86,87);
-
-    public Pose schoolLauncherFinal = new Pose(76,76);
-
-
-
-    public Pose whatAyushDoestoHAMDLOintake3 = new Pose(88,89);
-
-    public Pose WhatAyushDoestoHAMDLOintake31 = new Pose(84,40);
-
-    public Pose WhatAyushDoestoHAMDLOintake32 = new Pose(125,39.5);
-
-    public Pose ayushHASALAUNCHER = new Pose(84,36);
-
-    public Pose ayushHasAnotherLauncher = new Pose(88,89.5);
-
-    public Pose AyushLaunchedMEE = new Pose(76,76);
+    public Pose launch3CP = new Pose(88,87.5);
 
     public Pose launch3 = new Pose(77,77);
 
-    public Pose Teleop1 = new Pose(84,60);
+    public Pose Teleop1 = new Pose(100.11214953271028,80.009345794392516);
 
 
 
@@ -174,14 +147,14 @@ public class red15spamreal extends NextFTCOpMode {
             .setStart(() -> follower.followPath(paths.Intake1set))
             .setIsDone(() -> !follower.isBusy())
             .named("Path2 Command");*/
-    /*Command pathCommand2 = new LambdaCommand()
+    Command pathCommand2 = new LambdaCommand()
             .setStart(() -> follower.followPath(paths.Intake2ndSet))
             .setIsDone(() -> !follower.isBusy())
             .named("Path4 Command");
     Command pathCommand3 = new LambdaCommand()
             .setStart(() -> follower.followPath(paths.Intake3rdSet))
             .setIsDone(() -> !follower.isBusy())
-            .named("Path4 Command");*/
+            .named("Path4 Command");
 
 
 
@@ -248,14 +221,14 @@ public class red15spamreal extends NextFTCOpMode {
         shootClose = new LambdaCommand()
                 .setStart(() -> {
                     shooter(1125);
-                    shootClose1 = true;
+                     shootClose1 = true;
 
 
                 });
         shootFar = new LambdaCommand()
                 .setStart(()->{
                     shooter(1330);
-                    shootClose1 = false;
+                     shootClose1 = false;
                 });
         intakeMotorOn = new LambdaCommand()
                 .setStart(() -> intakeMotor.setPower(-1));
@@ -357,16 +330,12 @@ public class red15spamreal extends NextFTCOpMode {
             HoodPowerZero
     );
 
-    /*Command spin = new LambdaCommand()
-            .setStart(()->flywheel.setPower(-1));*/
-
     public Command Auto(){
         return new SequentialGroup(
-                //spin,
-
+                HoodUp,
                 shootClose,
                 intakeMotorOn,
-                new FollowPath(paths.Path1,true,0.99),
+                new FollowPath(paths.PreLoadLaunch,true,0.8),
                 opentransfer,
                 new Delay(0.3),
                 transferOn,
@@ -376,7 +345,6 @@ public class red15spamreal extends NextFTCOpMode {
                 //getMotif,
                 shootFar,
                 closeTransfer,
-                closeTransfer,
 
 
 
@@ -386,9 +354,9 @@ public class red15spamreal extends NextFTCOpMode {
 
                 new Delay(0.2),
                 transferOn,
-                new FollowPath(paths.Path2,false,1.0),
+                new FollowPath(paths.IntakeandClassifier,false,0.7),
                 transferOff,
-
+                new Delay(1.0),
 
                 /*new FollowPath(paths.ClassifierRamp1,true,0.8),
                 new Delay(0.5),
@@ -396,7 +364,7 @@ public class red15spamreal extends NextFTCOpMode {
                 //new Delay(0.1),
                 // Sorting logic all here with the order, etc
                 */intakeMotorOn,
-                new FollowPath(paths.Path3,true,0.99),
+                new FollowPath(paths.Launch1Real,true,0.7),
 
                 opentransfer,
                 new Delay(0.2),
@@ -411,21 +379,18 @@ public class red15spamreal extends NextFTCOpMode {
 
                 intakeMotorOn,
                 transferOn,
-                new FollowPath(paths.Path4,false,1.0),
-
-                new Delay(0.8),
+                new FollowPath(paths.Intake2ndSet,false,0.7),
                 new Delay(0.2),
                 transferOff,
                 new Delay(0.3),
+                opentransfer,
 
-
-                //intakeMotorOf
+                //intakeMotorOff,
 
                 // Sorting logic and order here
 
 
-                new FollowPath(paths.Path5,true,0.99),
-                opentransfer,
+                new FollowPath(paths.Launch2,true,0.7),
                 intakeMotorOn,
 
 
@@ -440,14 +405,14 @@ public class red15spamreal extends NextFTCOpMode {
 
                 intakeMotorOn,
                 transferOn,
-                new FollowPath(paths.Path6,false,0.99),
+                new FollowPath(paths.Intake3rdSet,false,0.7),
 
                 transferOff,
                 new Delay(0.3),
                 opentransfer,
 
                 // Sorting logic here
-                new FollowPath(paths.Path7,false,0.99),
+                new FollowPath(paths.Launch3,false,0.7),
                 new Delay(0.3),
 
                 // Transfer and shoot logic
@@ -456,22 +421,11 @@ public class red15spamreal extends NextFTCOpMode {
                 intakeMotorOff,
 
                 new Delay(1),
+                //closeTransfer,
                 transferOff,
-                closeTransfer,
-                transferOn,
-                intakeMotorOn,
-
-                new FollowPath(paths.Path8,false,0.99),
                 transferOff,
-                intakeMotorOff,
-                new FollowPath(paths.Path9,true,0.99),
-                opentransfer,
-                transferOn,
-                new Delay(1.0),
-                transferOff,
-                closeTransfer,
                 stopFlywheel,
-                new FollowPath(paths.Path10,true,1.0)
+                new FollowPath(paths.teleOp,true,0.9)
 
 
 
@@ -504,11 +458,11 @@ public class red15spamreal extends NextFTCOpMode {
     public void onUpdate(){
 
         //if(shootClose1){
-        //shooter(1125);
+            //shooter(1125);
 
         //}
         //else if(!shootClose1){
-        shooter(1300);
+            shooter(1300);
         //}
 
 
@@ -528,134 +482,121 @@ public class red15spamreal extends NextFTCOpMode {
         telemetry.update();
     }
 
-    public static class Paths {
+    public class Paths {
+        public PathChain PreLoadLaunch;
+        public PathChain IntakeandClassifier;
 
-        public PathChain Path1;
-        public PathChain Path2;
-        public PathChain Path3;
-        public PathChain Path4;
-        public PathChain Path5;
-        public PathChain Path6;
-        public PathChain Path7;
-        public PathChain Path8;
-        public PathChain Path9;
-        public PathChain Path10;
+        //public PathChain ClassifierRamp1;
+
+        public PathChain Launch1Real;
+
+        public PathChain Intake2ndSet;
+
+        public PathChain Launch2;
+
+        public PathChain Intake3rdSet;
+
+        public PathChain Launch3;
+
+        public PathChain teleOp;
 
         public Paths(Follower follower) {
-            Path1 = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierLine(new Pose(120.996, 126.594), new Pose(82.621, 87.198))
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(49),Math.toRadians(39))
-                    .setReversed()
-                    .build();
+            //Path1 = follower.pathBuilder()
+            //.addPath(new BezierLine(
+            // new Pose(56.000, 8.000),
+            // new Pose(57.078, 32.451)
+            //))
+            //.setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(180))
+            //.build();
 
-            Path2 = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierCurve(
-                                    new Pose(82.621, 87.198),
-                                    new Pose(79.815, 61.426),
-                                    new Pose(118.755, 62.275)
-                            )
-                    )
+            PreLoadLaunch = follower.pathBuilder()
+                    .addPath(new BezierCurve(
+                            start,
+                            PreloadCP,
+                            PreLoadLaunch1
+                    ))
+                    .setTangentHeadingInterpolation().setReversed()
+                    //.setVelocityConstraint(50)
+                    .build();
+            IntakeandClassifier = follower.pathBuilder()
+                    .addPath(new BezierCurve(
+                            PreLoadLaunch1,
+                            intake1CP1,
+                            intake1CP2,
+                            Intake1stSetClassifier
+
+                    ))
                     .setTangentHeadingInterpolation()
-                    .build();
 
-            Path3 = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierCurve(
-                                    new Pose(123.755, 62.275),
-                                    new Pose(110.594, 69.280),
-                                    new Pose(90.800, 95.814),
-                                    new Pose(82.574, 86.899)
-                            )
-                    )
+                    .build();
+           /* ClassifierRamp1 = follower.pathBuilder()
+                    .addPath(new BezierCurve(
+                            Intake1,
+                            ClassifierRampPoint,
+                            ClassifierRamp
+
+
+                    ))
+                    .setConstantHeadingInterpolation(Math.toRadians(0))
+
+                    .build();*/
+            Launch1Real = follower.pathBuilder()
+                    .addPath(new BezierCurve(
+                            Intake1stSetClassifier,
+                            launchCP1,
+                            Launch1
+
+                    ))
+                    .setTangentHeadingInterpolation().setReversed()
+
+                    .build();
+            Intake2ndSet = follower.pathBuilder()
+                    .addPath(new BezierCurve(
+                            Launch1,
+                            intake2CP,
+                            intake2
+
+                    ))
                     .setTangentHeadingInterpolation()
-                    .setReversed()
-                    .build();
 
-            Path4 = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierCurve(
-                                    new Pose(82.574, 86.899),
-                                    new Pose(86.183, 53.784),
-                                    new Pose(130.123, 70)
-                            )
-                    )
+                    .build();
+            Launch2 = follower.pathBuilder()
+                    .addPath(new BezierCurve(
+                            intake2,
+                            launch2Cp,
+                            launch2
+                    ))
+                    .setTangentHeadingInterpolation().setReversed()
+
+                    .build();
+            Intake3rdSet = follower.pathBuilder()
+                    .addPath(new BezierCurve(
+                            launch2,
+                            intake3CP,
+                            intake3
+
+                    ))
                     .setTangentHeadingInterpolation()
+
+                    .build();
+            Launch3 = follower.pathBuilder()
+                    .addPath(new BezierCurve(
+                            intake3,
+                            launch3CP,
+                            launch3
+                    ))
+                    .setTangentHeadingInterpolation().setReversed()
+
+                    .build();
+            teleOp = follower.pathBuilder()
+                    .addPath(new BezierLine(
+                            launch3,
+                            Teleop1
+
+                    ))
+                    .setConstantHeadingInterpolation(Math.toRadians(90))
                     .build();
 
-            Path5 = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierCurve(
-                                    new Pose(131.185, 64.185),
-                                    new Pose(116.326, 59.728),
-                                    new Pose(90.853, 95.814),
-                                    new Pose(82.574, 86.899)
-                            )
-                    )
-                    .setTangentHeadingInterpolation()
-                    .setReversed()
-                    .build();
-
-            Path6 = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierCurve(
-                                    new Pose(82.574, 86.899),
-                                    new Pose(74.932, 38.713),
-                                    new Pose(122.057, 40.411)
-                            )
-                    )
-                    .setTangentHeadingInterpolation()
-                    .build();
-
-            Path7 = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierCurve(
-                                    new Pose(122.057, 40.411),
-                                    new Pose(91.065, 96.026),
-                                    new Pose(82.574, 87.111)
-                            )
-                    )
-                    .setTangentHeadingInterpolation()
-                    .setReversed()
-                    .build();
-
-            Path8 = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierLine(new Pose(82.574, 87.111), new Pose(129.062, 83.927))
-                    )
-                    .setTangentHeadingInterpolation()
-                    .build();
-
-            Path9 = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierCurve(
-                                    new Pose(129.062, 83.927),
-                                    new Pose(90.853, 96.026),
-                                    new Pose(82.574, 87.111)
-                            )
-                    )
-                    .setTangentHeadingInterpolation()
-                    .setReversed()
-                    .build();
-
-            Path10 = follower
-                    .pathBuilder()
-                    .addPath(
-                            new BezierLine(new Pose(82.574, 87.111), new Pose(104.014, 81.592))
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(350), Math.toRadians(350))
-                    .build();
         }
     }
-    }
+}

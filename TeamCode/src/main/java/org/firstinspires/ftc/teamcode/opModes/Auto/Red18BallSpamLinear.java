@@ -214,7 +214,7 @@ public class Red18BallSpamLinear extends NextFTCOpMode {
                 transfer2.setPosition(0.7);
             });
 
-    public SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.05), transferOn, new Delay(0.22), transferOff, closeTransfer);
+    public SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.05), transferOn, new Delay(0.4), transferOff, closeTransfer);
 
     public boolean spinup = true;
     public Command spinupfalse = new LambdaCommand()
@@ -271,7 +271,7 @@ public class Red18BallSpamLinear extends NextFTCOpMode {
 
                 new FollowPath(paths.resetAndIntake1,true,1.0),
                 new Delay(1.3),
-
+                //reverseIntakeForMe,
                 new FollowPath(paths.launchSpam1, true, 1.0),
                 shoot,
 
@@ -281,6 +281,7 @@ public class Red18BallSpamLinear extends NextFTCOpMode {
 
                 new FollowPath(paths.resetAndIntake2, true, 1.0),
                 new Delay(2.0),
+                //reverseIntakeForMe,
 
                 new FollowPath(paths.launchSpam2, true, 1.0),
                 shoot,
@@ -392,7 +393,7 @@ public class Red18BallSpamLinear extends NextFTCOpMode {
                 intakeSet2 = follower.pathBuilder().addPath(
                                 new BezierCurve(
                                         new Pose(100.000, 100.000),
-                                        new Pose(88.516, 56.798),
+                                        new Pose(85, 56.798),
                                         new Pose(130, 62.000)
                                 )
                         ).setLinearHeadingInterpolation(Math.toRadians(46), Math.toRadians(-15))
@@ -405,26 +406,25 @@ public class Red18BallSpamLinear extends NextFTCOpMode {
 
                 launchSet2 = follower.pathBuilder().addPath(
                                 new BezierCurve(
-                                        new Pose(124.000, 62.000),
+                                        new Pose(130, 62.000),
                                         new Pose(104.000, 67.000),
-                                        new Pose(89.000, 86.000)
+                                        new Pose(92.000, 94.000)
                                 )
                         ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(47))
-                        .setVelocityConstraint(1.0)
-                        .setTValueConstraint(0.8)
+                        .setVelocityConstraint(0.3)
+                        .setTValueConstraint(0.95)
                         //.addTemporalCallback(0.7,reverseIntakeForMe)
                         //.addTemporalCallback(0.2,transferOff)
-                        .addPoseCallback(new Pose(90,85),shoot,0.9)
 
                         .build();
 
                 resetAndIntake1 = follower.pathBuilder().addPath(
                                 new BezierCurve(
-                                        new Pose(89.000, 86.000),
+                                        new Pose(92.000, 94.000),
                                         new Pose(104.000, 67.000),
-                                        new Pose(129.5, 58.5)
+                                        new Pose(128.75, 59.25)
                                 )
-                        ).setLinearHeadingInterpolation(Math.toRadians(47), Math.toRadians(10))
+                        ).setLinearHeadingInterpolation(Math.toRadians(47), Math.toRadians(23))
                         .setVelocityConstraint(1.0)
                         .setTValueConstraint(0.8)
                         .addTemporalCallback(0.1,intakeMotorOn)
@@ -434,26 +434,25 @@ public class Red18BallSpamLinear extends NextFTCOpMode {
 
                 launchSpam1 = follower.pathBuilder().addPath(
                                 new BezierCurve(
-                                        new Pose(129.5, 58.5),
+                                        new Pose(128.75, 59.25),
                                         new Pose(104.000, 67.000),
-                                        new Pose(89.000, 86.000)
+                                        new Pose(92.000, 94.000)
                                 )
-                        ).setLinearHeadingInterpolation(Math.toRadians(10), Math.toRadians(44))
-                        .setVelocityConstraint(1.0)
-                        .setTValueConstraint(0.8)
-                        //.addTemporalCallback(0.7,reverseIntakeForMe)
-
-                        .addPoseCallback(new Pose(90,85),shoot,0.9)
+                        ).setLinearHeadingInterpolation(Math.toRadians(23), Math.toRadians(44))
+                        .setVelocityConstraint(0.3)
+                        .setTValueConstraint(0.95)
+                        //.addTemporalCallback(0.9,reverseIntakeForMe)
+                        .addPoseCallback(new Pose(118,64),reverseIntakeForMe,0.4)
 
                         .build();
 
                 resetAndIntake2 = follower.pathBuilder().addPath(
                                 new BezierCurve(
-                                        new Pose(89.000, 86.000),
+                                        new Pose(92.000, 94.000),
                                         new Pose(104.000, 67.000),
-                                        new Pose(129.5, 58.85)
+                                        new Pose(128.75, 59.25)
                                 )
-                        ).setLinearHeadingInterpolation(Math.toRadians(44), Math.toRadians(10))
+                        ).setLinearHeadingInterpolation(Math.toRadians(44), Math.toRadians(23))
                         .setVelocityConstraint(1.0)
                         .setTValueConstraint(0.8)
                         .addTemporalCallback(0.1,intakeMotorOn)
@@ -463,17 +462,17 @@ public class Red18BallSpamLinear extends NextFTCOpMode {
 
                 launchSpam2 = follower.pathBuilder().addPath(
                                 new BezierCurve(
-                                        new Pose(129.5, 58.85),
+                                        new Pose(128.75, 59.25),
                                         new Pose(104.000, 67.000),
                                         new Pose(89.000, 85.000)
                                 )
-                        ).setLinearHeadingInterpolation(Math.toRadians(10), Math.toRadians(44))
-                        .setVelocityConstraint(1.0)
-                        .setTValueConstraint(0.8)
-                        .addPoseCallback(new Pose(90,85),shoot,0.9)
+                        ).setLinearHeadingInterpolation(Math.toRadians(23), Math.toRadians(44))
+                        .setVelocityConstraint(0.3)
+                        .setTValueConstraint(0.95)
+                        .addPoseCallback(new Pose(118,64),reverseIntakeForMe,0.4)
 
 
-                        //.addTemporalCallback(0.7,reverseIntakeForMe)
+                        //.addTemporalCallback(0.9,reverseIntakeForMe)
                        // .addTemporalCallback(0.7,transferOff)
 
 
@@ -481,7 +480,7 @@ public class Red18BallSpamLinear extends NextFTCOpMode {
 
                 intakeSet1 = follower.pathBuilder().addPath(
                                 new BezierLine(
-                                        new Pose(89.000, 86.000),
+                                        new Pose(89, 85),
 
                                         new Pose(124.665, 86.898)
                                 )
@@ -498,23 +497,22 @@ public class Red18BallSpamLinear extends NextFTCOpMode {
                                 new BezierLine(
                                         new Pose(124.665, 86.898),
 
-                                        new Pose(89.000, 86.000)
+                                        new Pose(92.000, 94.000)
                                 )
                         ).setLinearHeadingInterpolation(Math.toRadians(1), Math.toRadians(47))
-                        .setVelocityConstraint(1.0)
-                        .setTValueConstraint(0.8)
+                        .setVelocityConstraint(0.3)
+                        .setTValueConstraint(0.95)
 
                         //.addTemporalCallback(0.7,reverseIntakeForMe)
                         //.addTemporalCallback(0.7,transferOff)
-                        .addPoseCallback(new Pose(90,85),shoot,0.9)
 
                         .build();
 
                 intakeSet3 = follower.pathBuilder().addPath(
                                 new BezierCurve(
-                                        new Pose(89.000, 86.000),
+                                        new Pose(92.000, 94.000),
                                         new Pose(88.000, 89.500),
-                                        new Pose(84.672, 28.615),
+                                        new Pose(75, 28.615),
                                         new Pose(129.151, 34.938)
                                 )
                         ).setLinearHeadingInterpolation(Math.toRadians(44), Math.toRadians(0))
@@ -529,12 +527,11 @@ public class Red18BallSpamLinear extends NextFTCOpMode {
                                 new BezierLine(
                                         new Pose(129.151, 34.938),
 
-                                        new Pose(89.000, 86.000)
+                                        new Pose(92.000, 94.000)
                                 )
                         ).setLinearHeadingInterpolation(Math.toRadians(1), Math.toRadians(45))
-                        .setVelocityConstraint(1.0)
-                        .setTValueConstraint(0.8)
-                        .addPoseCallback(new Pose(90,85),shoot,0.9)
+                        .setVelocityConstraint(0.3)
+                        .setTValueConstraint(0.95)
 
                         //.addTemporalCallback(0.7,reverseIntakeForMe)
                         //.addTemporalCallback(0.7,transferOff)
@@ -543,7 +540,7 @@ public class Red18BallSpamLinear extends NextFTCOpMode {
 
                 teleOpPark = follower.pathBuilder().addPath(
                                 new BezierLine(
-                                        new Pose(89.000, 86.000),
+                                        new Pose(92.000, 94.000),
 
                                         new Pose(89.168, 63.953)
                                 )

@@ -281,7 +281,7 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
 
 
                 new FollowPath(paths.resetAndIntake2, true, 1.0),
-                new Delay(1.75),
+                new Delay(1.85),
                 //reverseIntakeForMe,
 
                 new FollowPath(paths.launchSpam2, true, 1.0),
@@ -466,9 +466,9 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
                             new BezierCurve(
                                     new Pose(52.000, 94.000),
                                     new Pose(40.000, 67.000),
-                                    new Pose(11, 59.289)
+                                    new Pose(10.5, 59.2)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(136), Math.toRadians(165))
+                    ).setLinearHeadingInterpolation(Math.toRadians(136), Math.toRadians(166))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
                     .addTemporalCallback(0.1, intakeMotorOn)

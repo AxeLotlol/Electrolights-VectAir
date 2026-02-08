@@ -226,10 +226,10 @@ public class DriveTrain implements Subsystem {
         imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
         Pose startingpose = new Pose (72, 72, Math.toRadians(90));
         if(alliance ==-1){
-            startingpose=new Pose (72, 72, Math.toRadians(90));
+            startingpose=new Pose (89, 63, Math.toRadians(90));
         }
         if(alliance ==1){
-            startingpose=new Pose (72, 72, Math.toRadians(90));
+            startingpose=new Pose (54, 63, Math.toRadians(90));
         }
 
         hoodServo1n= ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo1");
@@ -341,7 +341,7 @@ public class DriveTrain implements Subsystem {
     public static void shoot(){
         if(shooting==false){
             shooting = true;
-            SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.1), transferOn, new Delay(0.25), transferOff, closeTransfer, shootFalse);
+            SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.1), transferOn, new Delay(0.4), transferOff, closeTransfer, shootFalse);
             shoot.schedule();
         }
     }

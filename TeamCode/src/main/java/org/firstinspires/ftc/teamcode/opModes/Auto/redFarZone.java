@@ -3,16 +3,19 @@ package org.firstinspires.ftc.teamcode.opModes.Auto;
 
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
+import static org.firstinspires.ftc.teamcode.subsystems.AutoShooterCalc.calculateShotVectorandUpdateHeading;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.Vector;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
@@ -20,6 +23,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
+import dev.nextftc.core.commands.groups.ParallelGroup;
 import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.components.BindingsComponent;
@@ -33,6 +37,7 @@ import dev.nextftc.hardware.impl.Direction;
 import dev.nextftc.hardware.impl.IMUEx;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
+import dev.nextftc.hardware.positionable.SetPosition;
 
 
 @Autonomous(name = "Red Far Zone", group = "Autonomous")
@@ -123,7 +128,11 @@ public class redFarZone extends NextFTCOpMode {
             .setStart(() -> shoottps = findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
     Command findTPSPreload = new LambdaCommand()
             .setStart(() -> preloadtps = findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
+    private static Servo hoodServo1n;
+    private static Servo hoodServo2n;
 
+    private static ServoEx hoodServo1 = new ServoEx(() -> hoodServo1n);
+    private static ServoEx hoodServo2 = new ServoEx(() -> hoodServo2n);
     public void onInit() {
         telemetry.addLine("Initializing Follower...");
 
@@ -132,6 +141,9 @@ public class redFarZone extends NextFTCOpMode {
         /*Limelight3A limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(APRILTAG_PIPELINE);
         limelight.start();*/
+
+        hoodServo1n= ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo1");
+        hoodServo2n=  ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo2");
 
 
         IMUEx imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
@@ -214,12 +226,26 @@ public class redFarZone extends NextFTCOpMode {
     Command preloadSpun = new LambdaCommand().setStart(() -> preloadspinreal = true);
     Command preloadSpunReal = new LambdaCommand().setStart(() -> preloadspinreal = false);
 
-
+    public static double hoodToPos(double runtime) {
+        if(Double.isNaN(runtime)!=true) {
+            ActiveOpMode.telemetry().addData("runtime", runtime);
+            ParallelGroup HoodRunUp = new ParallelGroup(
+                    new SetPosition(hoodServo1, runtime),
+                    new SetPosition(hoodServo2, -1*runtime)
+            );
+            HoodRunUp.schedule();
+            return runtime;
+        }
+        else {
+            ActiveOpMode.telemetry().addLine("NaN");
+            return 0;
+        }
+    }
     public Command Auto() {
         return new SequentialGroup(
                 new FollowPath(paths.Path1),
 
-                new Delay(3.0),
+                new Delay(1.0),
                 shoot,
                 new Delay(0.5),
                 intakeMotorOn,
@@ -259,7 +285,7 @@ public class redFarZone extends NextFTCOpMode {
     public void onUpdate() {
         follower.update();
 
-        if (preloadspinreal) {
+        /*if (preloadspinreal) {
             shooter(1285);
         } else {
             if (DistanceRed.INSTANCE.getDistanceFromTag() != 0) {
@@ -268,7 +294,16 @@ public class redFarZone extends NextFTCOpMode {
             } else if (DistanceRed.INSTANCE.getDistanceFromTag() == 0) {
                 shooter(1285);
             }
-        }
+        }*/
+        Pose currPose = follower.getPose();
+        double robotHeading = follower.getPose().getHeading();
+        Vector robotToGoalVector = new Vector(follower.getPose().distanceFrom(new Pose(6, 138)), Math.atan2(138 - currPose.getY(), 6 - currPose.getX()));
+        //Vector v = new Vector(new Pose(138, 138));
+        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity());
+        double flywheelSpeed = results[0];
+        shooter((float) flywheelSpeed);
+        double hoodAngle = results[1];
+        hoodToPos(hoodAngle);
 
     }
 
@@ -292,7 +327,7 @@ public class redFarZone extends NextFTCOpMode {
 
                                     new Pose(89.030, 11.372)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(63))
+                    ).setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(67))
 
                     .build();
 
@@ -300,9 +335,9 @@ public class redFarZone extends NextFTCOpMode {
                             new BezierLine(
                                     new Pose(89.030, 11.372),
 
-                                    new Pose(135.728, 9.167)
+                                    new Pose(131, 9.167)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(63), Math.toRadians(-3))
+                    ).setLinearHeadingInterpolation(Math.toRadians(67), Math.toRadians(-3))
 
                     .build();
 

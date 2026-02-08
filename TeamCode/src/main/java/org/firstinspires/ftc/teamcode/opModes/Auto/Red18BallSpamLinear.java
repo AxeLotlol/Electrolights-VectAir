@@ -558,7 +558,7 @@ public class Red18BallSpamLinear extends NextFTCOpMode {
                                 new BezierLine(
                                         new Pose(92.000, 94.000),
 
-                                        new Pose(89.168, 63.953)
+                                        new Pose(89, 63)
                                 )
                         ).setConstantHeadingInterpolation(Math.toRadians(90))
 

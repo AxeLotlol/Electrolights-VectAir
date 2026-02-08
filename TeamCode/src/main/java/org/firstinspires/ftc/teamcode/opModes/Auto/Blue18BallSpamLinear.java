@@ -552,7 +552,7 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
                                     new Pose(52.000, 94.000),
                                     new Pose(54, 63)
                             )
-                    ).setConstantHeadingInterpolation(Math.toRadians(90))
+                    ).setLinearHeadingInterpolation(Math.toRadians(135),Math.toRadians(90))
                     .build();
         }
     }

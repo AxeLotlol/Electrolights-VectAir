@@ -171,6 +171,8 @@ public class redFarZone extends NextFTCOpMode {
 
     Command transferOn = new LambdaCommand()
             .setStart(() -> transfer1.setPower(-1));
+
+
     Command transferOff = new LambdaCommand()
             .setStart(() -> transfer1.setPower(0));
     Command transferOnForIntake = new LambdaCommand()
@@ -187,7 +189,8 @@ public class redFarZone extends NextFTCOpMode {
                 transfer2.setPosition(0.7);
             });
 
-    public SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.35), transferOn, new Delay(0.87), transferOff, closeTransfer);
+    public SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.05), transferOn, new Delay(0.4), transferOff, closeTransfer);
+
 
     public boolean spinup = true;
     public Command spinupfalse = new LambdaCommand()
@@ -214,20 +217,20 @@ public class redFarZone extends NextFTCOpMode {
 
     public Command Auto() {
         return new SequentialGroup(
-                new FollowPath(paths.Shoot1),
+                new FollowPath(paths.Path1),
 
                 new Delay(3.0),
                 shoot,
                 new Delay(0.5),
                 intakeMotorOn,
                 transferOnForIntake,
-                new FollowPath(paths.Intake1),
+                new FollowPath(paths.Path2),
                 new Delay(1.0),
                 intakeMotorOff,
-                new FollowPath(paths.Shoot2),
+                new FollowPath(paths.Path3),
                 shoot,
-                new Delay(0.5),
-                new FollowPath(paths.Leave)
+                new Delay(0.5)
+                //new FollowPath(paths.Leave)
 
 
         );
@@ -278,49 +281,38 @@ public class redFarZone extends NextFTCOpMode {
     }
 
     public class Paths {
-        public PathChain Shoot1;
-        public PathChain Intake1;
-        public PathChain Shoot2;
-        public PathChain Leave;
+        public PathChain Path1;
+        public PathChain Path2;
+        public PathChain Path3;
 
         public Paths(Follower follower) {
-            Shoot1 = follower.pathBuilder().addPath(
+            Path1 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(80.837, 8.692),
+                                    new Pose(87.501, 8.113),
 
-                                    new Pose(80.837, 16.009)
+                                    new Pose(89.030, 11.372)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(67))
+                    ).setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(63))
 
                     .build();
 
-            Intake1 = follower.pathBuilder().addPath(
-                            new BezierCurve(
-                                    new Pose(84.104, 16.008),
-                                    new Pose(113.052, 9.595),
-                                    new Pose(122, 9.293)
-                            )
-                    ).setTangentHeadingInterpolation()
-
-                    .build();
-
-            Shoot2 = follower.pathBuilder().addPath(
-                            new BezierCurve(
-                                    new Pose(135.102, 9.293),
-                                    new Pose(82.321, 12.129),
-                                    new Pose(80.837, 16.009)
-                            )
-                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(67))
-
-                    .build();
-
-            Leave = follower.pathBuilder().addPath(
+            Path2 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(84.104, 16.008),
+                                    new Pose(89.030, 11.372),
 
-                                    new Pose(105.245, 11.956)
+                                    new Pose(135.728, 9.167)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(65), Math.toRadians(90))
+                    ).setLinearHeadingInterpolation(Math.toRadians(63), Math.toRadians(-3))
+
+                    .build();
+
+            Path3 = follower.pathBuilder().addPath(
+                            new BezierLine(
+                                    new Pose(135.728, 9.167),
+
+                                    new Pose(89.030, 11.372)
+                            )
+                    ).setLinearHeadingInterpolation(Math.toRadians(-3), Math.toRadians(63))
 
                     .build();
         }

@@ -252,6 +252,9 @@ public class DriveTrain implements Subsystem {
     double goalY = 138;
     double goalX = 138;
 
+    static double localizeX;
+    double localizeY;
+
     double goalYDist = 138;
     double goalXDist = 138;
 
@@ -346,6 +349,10 @@ public class DriveTrain implements Subsystem {
         }
     }
 
+    public static void relocalize(){
+        follower.setPose(new Pose(localizeX, 8));
+    }
+
     public boolean isInLaunchZone(double x, double y) {
 
         // Vertices: (-8, 144), (152, 144), (72, 64)
@@ -386,6 +393,7 @@ public class DriveTrain implements Subsystem {
 
             Gamepads.gamepad1().triangle().whenBecomesTrue(() -> autolocktrue())
                     .whenBecomesFalse(() -> autolockfalse());
+            Gamepads.gamepad1().square().whenBecomesTrue(() -> relocalize());
             Gamepads.gamepad1().cross().whenBecomesTrue(() -> hoodControl());
             Gamepads.gamepad1().rightTrigger().greaterThan(0.3).whenBecomesTrue(shooter);
             intakeMotor = new MotorEx("intake");
@@ -408,10 +416,12 @@ public class DriveTrain implements Subsystem {
         if (isBlue() == true) {
             goalXDist = 6;
             goalX = 6;
+            localizeX = 136;
         }
         if (isRed() == true) {
             goalXDist = 138;
             goalX = 138;
+            localizeX = 8;
         }
         Pose currPose = follower.getPose();
         double robotHeading = follower.getPose().getHeading();

@@ -32,8 +32,8 @@ public class Flywheel implements Subsystem {
 
     public static MotorEx flywheel2 = new MotorEx("launchingmotor2");
 
-    public static PIDCoefficients myPidCoeff = new PIDCoefficients(0.15, 0.005, 0.00);
-    public static BasicFeedforwardParameters myFF = new BasicFeedforwardParameters(0.0067, 0, 0.01);
+    public static PIDCoefficients myPidCoeff = new PIDCoefficients(0.025, 0.005, 0.00);
+    public static BasicFeedforwardParameters myFF = new BasicFeedforwardParameters(0.00045, 0, 0.0);
 
 
     public static double configvelocity = 1400; //far zone - ~1500. near zone - ~1200-1300

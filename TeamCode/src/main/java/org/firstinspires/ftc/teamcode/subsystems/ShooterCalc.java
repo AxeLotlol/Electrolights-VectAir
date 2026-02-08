@@ -21,6 +21,8 @@ public class ShooterCalc implements Subsystem {
 
 
     public static double requiredRPM;
+
+    public static double rpmoffset = 90;
     public static double requiredTPS = (28*requiredRPM)/60;
 
     public static Double[] calculateShotVectorandUpdateHeading(double robotHeading, Vector robotToGoalVector, Vector robotVel){
@@ -53,7 +55,7 @@ public class ShooterCalc implements Subsystem {
         double perpendicularComponent = Math.sin(coordinateTheta) * robotVelocity.getMagnitude();
 
         double vz = flywheelSpeed * Math.sin(hoodAngle);
-        double time = x / (flywheelSpeed * Math.cos(hoodAngle));
+        double time = 1.05*(x / (flywheelSpeed * Math.cos(hoodAngle)));
         double ivr = x / time + parallelComponent;
         double nvr = Math.sqrt(ivr * ivr + perpendicularComponent * perpendicularComponent);
         double ndr = nvr * time;
@@ -74,7 +76,7 @@ public class ShooterCalc implements Subsystem {
         double headingVelCompOffset = Math.atan(perpendicularComponent / ivr);
         double headingAngle = Math.toDegrees(robotHeading - robotToGoalVector.getTheta() + headingVelCompOffset);
 
-        requiredRPM = 1.4286* Math.pow(flywheelSpeed, 3) - 39.264*Math.pow(flywheelSpeed, 2) + 863.57*flywheelSpeed-1373.9;
+        requiredRPM = 1.4286* Math.pow(flywheelSpeed, 3) - 39.264*Math.pow(flywheelSpeed, 2) + 863.57*flywheelSpeed-1373.9 + rpmoffset;
         requiredTPS = (28 * requiredRPM) / 60;
 
         double what = Math.toDegrees(hoodAngle);

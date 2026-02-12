@@ -425,7 +425,7 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
                             new BezierCurve(
                                     new Pose(52.000, 94.000),
                                     new Pose(40.000, 67.000),
-                                    new Pose(11, 59.25)
+                                    new Pose(8, 59.25)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(133), Math.toRadians(157))
                     .setVelocityConstraint(1.0)
@@ -438,10 +438,10 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
             // Heading: 23 -> 157, 30 -> 150
             moverBacker = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(11, 59.25),
+                                    new Pose(8, 59.25),
                                     new Pose(13.233, 55.091)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(157), Math.toRadians(145))
+                    ).setLinearHeadingInterpolation(Math.toRadians(157), Math.toRadians(140))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
                     .build();
@@ -466,7 +466,7 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
                             new BezierCurve(
                                     new Pose(52.000, 94.000),
                                     new Pose(40.000, 67.000),
-                                    new Pose(10.5, 59.2)
+                                    new Pose(10.5, 63)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(136), Math.toRadians(166))
                     .setVelocityConstraint(1.0)

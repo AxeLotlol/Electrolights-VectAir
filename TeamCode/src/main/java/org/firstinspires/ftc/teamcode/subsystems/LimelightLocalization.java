@@ -1,14 +1,22 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpBlue.isBlue;
+import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpRed.isRed;
+import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
+
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.teamcode.pedroPathing.Tuning;
 
 import dev.nextftc.core.subsystems.Subsystem;
+import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.ftc.ActiveOpMode;
 
 /**
@@ -29,7 +37,8 @@ public class LimelightLocalization implements Subsystem {
     public static final LimelightLocalization INSTANCE =
             new LimelightLocalization();
 
-    private LimelightLocalization() {}
+    private LimelightLocalization() {
+    }
 
     private Limelight3A limelight;
     private IMU imu;
@@ -43,8 +52,17 @@ public class LimelightLocalization implements Subsystem {
 
     private static final double METERS_TO_INCHES = 39.3701;
 
+    public int alliance;
+
     @Override
     public void initialize() {
+
+        if(isBlue()==true) {
+            alliance=1;
+        }
+        if(isRed()==true){
+            alliance=-1;
+        }
 
         limelight = ActiveOpMode.hardwareMap()
                 .get(Limelight3A.class, "limelight");
@@ -55,20 +73,24 @@ public class LimelightLocalization implements Subsystem {
         // AprilTag pipeline
         limelight.pipelineSwitch(0);
         limelight.start();
+
+        //Pose startingpose = new Pose (72, 72, Math.toRadians(90));
+        //follower = PedroComponent.follower();
+        //follower.setStartingPose(startingpose);
+        //follower.update();
     }
+
+
 
     @Override
     public void periodic() {
 
         // ---------------- IMU HEADING ----------------
-        YawPitchRollAngles orientation =
-                imu.getRobotYawPitchRollAngles();
 
-        double yawDeg = orientation.getYaw(AngleUnit.DEGREES);
-        headingRad = Math.toRadians(yawDeg);
-
+        //follower.update();
+        double headingnow = follower.getHeading();
         // Provide heading to Limelight
-        limelight.updateRobotOrientation(yawDeg);
+        //limelight.updateRobotOrientation((90 - headingnow + 360) % 360);
 
         // ---------------- LIMELIGHT POSE ----------------
         LLResult result = limelight.getLatestResult();
@@ -77,42 +99,21 @@ public class LimelightLocalization implements Subsystem {
             return;
         }
 
-        Pose3D botPose = result.getBotpose_MT2();
+        Pose3D botPose = result.getBotpose();
         if (botPose == null) {
             hasPose = false;
             return;
         }
 
-        // Limelight pose (meters)
-        double llX = botPose.getPosition().x; // right
-        double llY = botPose.getPosition().y; // forward
 
         // Convert to Pedro coordinate frame (inches)
-        xInches =  llY * METERS_TO_INCHES;
-        yInches = -llX * METERS_TO_INCHES;
+        xInches =  botPose.getPosition().y * METERS_TO_INCHES + 72;
+        yInches = -1*botPose.getPosition().x * METERS_TO_INCHES + 72;
+
+        ActiveOpMode.telemetry().addData("LL X inches:", xInches);
+        ActiveOpMode.telemetry().addData("LL Y inches:", yInches);
 
         hasPose = true;
     }
 
-    // ---------------- PUBLIC GETTERS ----------------
-
-    /** Pedro X (forward, inches) */
-    public double getX() {
-        return xInches;
-    }
-
-    /** Pedro Y (left, inches) */
-    public double getY() {
-        return yInches;
-    }
-
-    /** Pedro heading (radians, CCW+) */
-    public double getHeading() {
-        return headingRad;
-    }
-
-    /** Whether Limelight currently has a valid field pose */
-    public boolean hasValidPose() {
-        return hasPose;
-    }
 }

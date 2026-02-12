@@ -437,7 +437,7 @@ public class Red18BallSpamLinear extends NextFTCOpMode {
                 moverBacker = follower.pathBuilder().addPath(
                                 new BezierLine(
                                         new Pose(131, 59.25),
-                                        new Pose(125, 56.25)
+                                        new Pose(127, 56.25)
                                 )
                         ).setLinearHeadingInterpolation(Math.toRadians(23), Math.toRadians(33))
                         .setVelocityConstraint(1.0)

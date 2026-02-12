@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.DistanceBlue;
 import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
+import org.firstinspires.ftc.teamcode.subsystems.LimelightLocalization;
 import org.firstinspires.ftc.teamcode.subsystems.PositionalHood;
 import org.firstinspires.ftc.teamcode.subsystems.TempHood;
 
@@ -40,7 +41,7 @@ public class TeleOpRed extends NextFTCOpMode {
     public TeleOpRed() {
         addComponents(
                 new PedroComponent(Constants::createFollower),
-                new SubsystemComponent(DistanceRed.INSTANCE, TempHood.INSTANCE, PositionalHood.INSTANCE, DriveTrain.INSTANCE/*, Intake.INSTANCE, Spindexer.INSTANCE*/),
+                new SubsystemComponent(DistanceRed.INSTANCE, TempHood.INSTANCE, PositionalHood.INSTANCE, DriveTrain.INSTANCE, LimelightLocalization.INSTANCE/*, Intake.INSTANCE, Spindexer.INSTANCE*/),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE
 
@@ -114,9 +115,9 @@ public class TeleOpRed extends NextFTCOpMode {
     private static final int APRILTAG_PIPELINE = 7;
     @Override
     public void onInit() {
-//        Limelight3A limelight = hardwareMap.get(Limelight3A.class, "limelight");
-//        limelight.pipelineSwitch(APRILTAG_PIPELINE);
-//        limelight.start();
+        Limelight3A limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight.pipelineSwitch(0);
+        limelight.start();
         red=true;
         intakeMotor = new MotorEx("intake").reversed();
         transfer = new MotorEx("transfer").reversed();

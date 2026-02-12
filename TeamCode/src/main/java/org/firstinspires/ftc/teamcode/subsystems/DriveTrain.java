@@ -225,12 +225,12 @@ public class DriveTrain implements Subsystem {
         }
         imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
         Pose startingpose = new Pose (72, 72, Math.toRadians(90));
-        if(alliance ==-1){
-            startingpose=new Pose (89, 63, Math.toRadians(90));
+        /*if(alliance ==-1){
+            startingpose=new Pose (8, 8, Math.toRadians(90));
         }
         if(alliance ==1){
-            startingpose=new Pose (54, 63, Math.toRadians(90));
-        }
+            startingpose=new Pose (136, 8, Math.toRadians(90));
+        }*/
 
         hoodServo1n= ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo1");
         hoodServo2n=  ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo2");
@@ -350,7 +350,7 @@ public class DriveTrain implements Subsystem {
     }
 
     public static void relocalize(){
-        follower.setPose(new Pose(localizeX, 8));
+        follower.setPose(new Pose(localizeX, 8, 90));
     }
 
     public boolean isInLaunchZone(double x, double y) {
@@ -393,7 +393,6 @@ public class DriveTrain implements Subsystem {
 
             Gamepads.gamepad1().triangle().whenBecomesTrue(() -> autolocktrue())
                     .whenBecomesFalse(() -> autolockfalse());
-            Gamepads.gamepad1().square().whenBecomesTrue(() -> relocalize());
             Gamepads.gamepad1().cross().whenBecomesTrue(() -> hoodControl());
             Gamepads.gamepad1().rightTrigger().greaterThan(0.3).whenBecomesTrue(shooter);
             intakeMotor = new MotorEx("intake");

@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.opModes.Auto;
 
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
-import static org.firstinspires.ftc.teamcode.subsystems.AutoShooterCalc.calculateShotVectorandUpdateHeading;
+import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
@@ -62,7 +62,7 @@ public class Red18BallSpamLinear extends NextFTCOpMode {
 
     int tagId = 0;
 
-    public Pose start = new Pose(119.4,126.4, Math.toRadians(49));
+    public Pose start = new Pose(112.158,135.289, Math.toRadians(90));
 
 
     private MotorEx transfer1;
@@ -153,7 +153,7 @@ public class Red18BallSpamLinear extends NextFTCOpMode {
         transfer1 = new MotorEx("transfer");
         transfer2 = new ServoEx("transferServo1");
         //hoodServo1n= ActiveOpMode.hardwareMap().get(CRServo.class, "hoodServo1");
-       // hoodServo2n=  ActiveOpMode.hardwareMap().get(CRServo.class, "hoodServo2");
+        // hoodServo2n=  ActiveOpMode.hardwareMap().get(CRServo.class, "hoodServo2");
         pathTimer = new Timer();
         actionTimer = new Timer();
         opmodeTimer = new Timer();
@@ -211,9 +211,9 @@ public class Red18BallSpamLinear extends NextFTCOpMode {
 
     public Command closeTransfer = new LambdaCommand()
             .setStart(() -> {
-                transfer2.setPosition(0.7);
+                transfer2.setPosition(0.67);
             });
-
+//niggers are black = (NO SHIT SHERLOCK);
     public SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.05), transferOn, new Delay(0.4), transferOff, closeTransfer);
 
     public boolean spinup = true;
@@ -259,6 +259,7 @@ public class Red18BallSpamLinear extends NextFTCOpMode {
                 shoot,
                 intakeMotorOn,
                 transferOn,
+                new Delay(0.1),
 
                 new FollowPath(paths.intakeSet2,true,1.0),
 
@@ -270,6 +271,7 @@ public class Red18BallSpamLinear extends NextFTCOpMode {
                 transferOn,
 
                 new FollowPath(paths.resetAndIntake1,true,1.0),
+                new Delay(0.2),
                 new FollowPath(paths.moverBacker,true,1.0),
                 new Delay(1.0),
                 //reverseIntakeForMe,
@@ -281,7 +283,7 @@ public class Red18BallSpamLinear extends NextFTCOpMode {
 
 
                 new FollowPath(paths.resetAndIntake2, true, 1.0),
-                new Delay(1.85),
+                new Delay(2.0),
                 //reverseIntakeForMe,
 
                 new FollowPath(paths.launchSpam2, true, 1.0),
@@ -347,7 +349,7 @@ public class Red18BallSpamLinear extends NextFTCOpMode {
         //Vector v = new Vector(new Pose(138, 138));
         Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity());
         double flywheelSpeed = results[0];
-        shooter((float) flywheelSpeed);
+        shooter((float) (flywheelSpeed));
         double hoodAngle = results[1];
         hoodToPos(hoodAngle);
 
@@ -365,205 +367,204 @@ public class Red18BallSpamLinear extends NextFTCOpMode {
 
 
     public class Paths {
-            public PathChain preloadLaunch;
-            public PathChain intakeSet2;
-            public PathChain launchSet2;
-            public PathChain resetAndIntake1;
-            public PathChain moverBacker;
-            public PathChain launchSpam1;
-            public PathChain resetAndIntake2;
-            public PathChain launchSpam2;
-            public PathChain intakeSet1;
-            public PathChain launchSet1;
-            public PathChain intakeSet3;
-            public PathChain launchSet3;
-            public PathChain teleOpPark;
+        public PathChain preloadLaunch;
+        public PathChain intakeSet2;
+        public PathChain launchSet2;
+        public PathChain resetAndIntake1;
+        public PathChain moverBacker;
+        public PathChain launchSpam1;
+        public PathChain resetAndIntake2;
+        public PathChain launchSpam2;
+        public PathChain intakeSet1;
+        public PathChain launchSet1;
+        public PathChain intakeSet3;
+        public PathChain launchSet3;
+        public PathChain teleOpPark;
 
-            public Paths(Follower follower) {
-                preloadLaunch = follower.pathBuilder().addPath(
-                                new BezierCurve(
-                                        new Pose(119.400, 126.400),
-                                        new Pose(110.000, 110.500),
-                                        new Pose(100.000, 100.000)
-                                )
-                        ).setTangentHeadingInterpolation()
-                        .setVelocityConstraint(1.0)
-                        .setTValueConstraint(0.8)
-                        .setReversed()
-                        .build();
+        public Paths(Follower follower) {
+            preloadLaunch = follower.pathBuilder().addPath(
+                            new BezierCurve(
+                                    new Pose(112.158,135.289),
+                                    new Pose(110.000, 110.500),
+                                    new Pose(100.000, 100.000)
+                            )
+                    ).setLinearHeadingInterpolation(Math.toRadians(90),Math.toRadians(46))
+                    .setVelocityConstraint(1.0)
+                    .setTValueConstraint(0.8)
 
-                intakeSet2 = follower.pathBuilder().addPath(
-                                new BezierCurve(
-                                        new Pose(100.000, 100.000),
-                                        new Pose(85, 56.798),
-                                        new Pose(130, 60.000)
-                                )
-                        ).setLinearHeadingInterpolation(Math.toRadians(46), Math.toRadians(-15))
-                        .setVelocityConstraint(1.0)
-                        .setTValueConstraint(0.8)
+                    .build();
 
-
-
-                        .build();
-
-                launchSet2 = follower.pathBuilder().addPath(
-                                new BezierCurve(
-                                        new Pose(130, 60.000),
-                                        new Pose(104.000, 67.000),
-                                        new Pose(92.000, 94.000)
-                                )
-                        ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(47))
-                        .setVelocityConstraint(0.3)
-                        .setTValueConstraint(0.95)
-                        //.addTemporalCallback(0.7,reverseIntakeForMe)
-                        //.addTemporalCallback(0.2,transferOff)
-
-                        .build();
-
-                resetAndIntake1 = follower.pathBuilder().addPath(
-                                new BezierCurve(
-                                        new Pose(92.000, 94.000),
-                                        new Pose(104.000, 67.000),
-                                        new Pose(131, 59.25)
-                                )
-                        ).setLinearHeadingInterpolation(Math.toRadians(47), Math.toRadians(23))
-                        .setVelocityConstraint(1.0)
-                        .setTValueConstraint(0.8)
-                        .addTemporalCallback(0.1,intakeMotorOn)
-                        .addTemporalCallback(0.1,transferOn)
-
-                        .build();
-
-                moverBacker = follower.pathBuilder().addPath(
-                                new BezierLine(
-                                        new Pose(131, 59.25),
-                                        new Pose(127, 56.25)
-                                )
-                        ).setLinearHeadingInterpolation(Math.toRadians(23), Math.toRadians(33))
-                        .setVelocityConstraint(1.0)
-                        .setTValueConstraint(0.8)
-
-                        .build();
-
-                launchSpam1 = follower.pathBuilder().addPath(
-                                new BezierCurve(
-                                        new Pose(125, 56.25),
-                                        new Pose(104.000, 67.000),
-                                        new Pose(92.000, 94.000)
-                                )
-                        ).setLinearHeadingInterpolation(Math.toRadians(30), Math.toRadians(44))
-                        .setVelocityConstraint(0.3)
-                        .setTValueConstraint(0.95)
-                        //.addTemporalCallback(0.9,reverseIntakeForMe)
-                        .addPoseCallback(new Pose(124,61),reverseIntakeForMe,0.3)
-
-                        .build();
-
-                resetAndIntake2 = follower.pathBuilder().addPath(
-                                new BezierCurve(
-                                        new Pose(92.000, 94.000),
-                                        new Pose(104.000, 67.000),
-                                        new Pose(130, 59.25)
-                                )
-                        ).setLinearHeadingInterpolation(Math.toRadians(44), Math.toRadians(23))
-                        .setVelocityConstraint(1.0)
-                        .setTValueConstraint(0.8)
-                        .addTemporalCallback(0.1,intakeMotorOn)
-                        .addTemporalCallback(0.1,transferOn)
-
-                        .build();
-
-                launchSpam2 = follower.pathBuilder().addPath(
-                                new BezierCurve(
-                                        new Pose(130, 59.25),
-                                        new Pose(104.000, 67.000),
-                                        new Pose(92, 94)
-                                )
-                        ).setLinearHeadingInterpolation(Math.toRadians(23), Math.toRadians(45))
-                        .setVelocityConstraint(0.3)
-                        .setTValueConstraint(0.95)
-                        .addPoseCallback(new Pose(118,64),reverseIntakeForMe,0.4)
+            intakeSet2 = follower.pathBuilder().addPath(
+                            new BezierCurve(
+                                    new Pose(100.000, 100.000),
+                                    new Pose(85, 56.798),
+                                    new Pose(130, 60.000)
+                            )
+                    ).setLinearHeadingInterpolation(Math.toRadians(46), Math.toRadians(-15))
+                    .setVelocityConstraint(1.0)
+                    .setTValueConstraint(0.8)
 
 
-                        //.addTemporalCallback(0.9,reverseIntakeForMe)
-                       // .addTemporalCallback(0.7,transferOff)
+
+                    .build();
+
+            launchSet2 = follower.pathBuilder().addPath(
+                            new BezierCurve(
+                                    new Pose(130, 60.000),
+                                    new Pose(104.000, 67.000),
+                                    new Pose(92.000, 94.000)
+                            )
+                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(47))
+                    .setVelocityConstraint(0.3)
+                    .setTValueConstraint(0.95)
+                    //.addTemporalCallback(0.7,reverseIntakeForMe)
+                    //.addTemporalCallback(0.2,transferOff)
+
+                    .build();
+
+            resetAndIntake1 = follower.pathBuilder().addPath(
+                            new BezierCurve(
+                                    new Pose(92.000, 94.000),
+                                    new Pose(104.000, 67.000),
+                                    new Pose(130.5, 63.5)
+                            )
+                    ).setLinearHeadingInterpolation(Math.toRadians(47), Math.toRadians(10))
+                    .setVelocityConstraint(1.0)
+                    .setTValueConstraint(0.8)
+                    .addTemporalCallback(0.1,intakeMotorOn)
+                    .addTemporalCallback(0.1,transferOn)
+
+                    .build();
+
+            moverBacker = follower.pathBuilder().addPath(
+                            new BezierLine(
+                                    new Pose(130.5, 63.5),
+                                    new Pose(128.5, 56.25)
+                            )
+                    ).setLinearHeadingInterpolation(Math.toRadians(10), Math.toRadians(30))
+                    .setVelocityConstraint(1.0)
+                    .setTValueConstraint(0.8)
+
+                    .build();
+
+            launchSpam1 = follower.pathBuilder().addPath(
+                            new BezierCurve(
+                                    new Pose(128.5, 56.25),
+                                    new Pose(104.000, 67.000),
+                                    new Pose(92.000, 94.000)
+                            )
+                    ).setLinearHeadingInterpolation(Math.toRadians(30), Math.toRadians(46))
+                    .setVelocityConstraint(0.3)
+                    .setTValueConstraint(0.95)
+                    //.addTemporalCallback(0.9,reverseIntakeForMe)
+                    .addPoseCallback(new Pose(124,61),reverseIntakeForMe,0.3)
+
+                    .build();
+
+            resetAndIntake2 = follower.pathBuilder().addPath(
+                            new BezierCurve(
+                                    new Pose(92.000, 94.000),
+                                    new Pose(104.000, 67.000),
+                                    new Pose(128.75, 63)
+                            )
+                    ).setLinearHeadingInterpolation(Math.toRadians(44), Math.toRadians(17))
+                    .setVelocityConstraint(1.0)
+                    .setTValueConstraint(0.8)
+                    .addTemporalCallback(0.1,intakeMotorOn)
+                    .addTemporalCallback(0.1,transferOn)
+
+                    .build();
+
+            launchSpam2 = follower.pathBuilder().addPath(
+                            new BezierCurve(
+                                    new Pose(128.75, 63),
+                                    new Pose(104.000, 67.000),
+                                    new Pose(92, 94)
+                            )
+                    ).setLinearHeadingInterpolation(Math.toRadians(17), Math.toRadians(45))
+                    .setVelocityConstraint(0.3)
+                    .setTValueConstraint(0.95)
+                    .addPoseCallback(new Pose(118,64),reverseIntakeForMe,0.4)
 
 
-                        .build();
-
-                intakeSet1 = follower.pathBuilder().addPath(
-                                new BezierCurve(
-                                        new Pose(92, 94),
-                                        new Pose(104,87),
-
-                                        new Pose(124.665, 86.898)
-                                )
-                        ).setTangentHeadingInterpolation()
-                        .setVelocityConstraint(1.0)
-                        .setTValueConstraint(0.8)
-                        .addTemporalCallback(0.1,intakeMotorOn)
-                        .addTemporalCallback(0.1,transferOn)
+                    //.addTemporalCallback(0.9,reverseIntakeForMe)
+                    // .addTemporalCallback(0.7,transferOff)
 
 
-                        .build();
+                    .build();
 
-                launchSet1 = follower.pathBuilder().addPath(
-                                new BezierLine(
-                                        new Pose(124.665, 86.898),
+            intakeSet1 = follower.pathBuilder().addPath(
+                            new BezierCurve(
+                                    new Pose(92, 94),
+                                    new Pose(104,87),
 
-                                        new Pose(92.000, 94.000)
-                                )
-                        ).setLinearHeadingInterpolation(Math.toRadians(1), Math.toRadians(47))
-                        .setVelocityConstraint(0.3)
-                        .setTValueConstraint(0.95)
-                        .addPoseCallback(new Pose(102,86),reverseIntakeForMe,0.4)
+                                    new Pose(124.665, 86.898)
+                            )
+                    ).setTangentHeadingInterpolation()
+                    .setVelocityConstraint(1.0)
+                    .setTValueConstraint(0.8)
+                    .addTemporalCallback(0.1,intakeMotorOn)
+                    .addTemporalCallback(0.1,transferOn)
 
-                        //.addTemporalCallback(0.7,reverseIntakeForMe)
-                        //.addTemporalCallback(0.7,transferOff)
 
-                        .build();
+                    .build();
 
-                intakeSet3 = follower.pathBuilder().addPath(
-                                new BezierCurve(
-                                        new Pose(92.000, 94.000),
-                                        new Pose(88.000, 89.500),
-                                        new Pose(75, 28.615),
-                                        new Pose(129.151, 34.938)
-                                )
-                        ).setLinearHeadingInterpolation(Math.toRadians(44), Math.toRadians(0))
-                        .setVelocityConstraint(1.0)
-                        .setTValueConstraint(0.8)
-                        .addTemporalCallback(0.1,intakeMotorOn)
-                        .addTemporalCallback(0.1,transferOn)
+            launchSet1 = follower.pathBuilder().addPath(
+                            new BezierLine(
+                                    new Pose(124.665, 86.898),
 
-                        .build();
+                                    new Pose(92.000, 94.000)
+                            )
+                    ).setLinearHeadingInterpolation(Math.toRadians(1), Math.toRadians(47))
+                    .setVelocityConstraint(0.3)
+                    .setTValueConstraint(0.95)
+                    .addPoseCallback(new Pose(102,86),reverseIntakeForMe,0.4)
 
-                launchSet3 = follower.pathBuilder().addPath(
-                                new BezierLine(
-                                        new Pose(129.151, 34.938),
+                    //.addTemporalCallback(0.7,reverseIntakeForMe)
+                    //.addTemporalCallback(0.7,transferOff)
 
-                                        new Pose(92.000, 94.000)
-                                )
-                        ).setLinearHeadingInterpolation(Math.toRadians(1), Math.toRadians(45))
-                        .setVelocityConstraint(0.3)
-                        .setTValueConstraint(0.95)
-                        .addPoseCallback(new Pose(109,59),reverseIntakeForMe,0.55)
+                    .build();
 
-                        //.addTemporalCallback(0.7,reverseIntakeForMe)
-                        //.addTemporalCallback(0.7,transferOff)
+            intakeSet3 = follower.pathBuilder().addPath(
+                            new BezierCurve(
+                                    new Pose(92.000, 94.000),
+                                    new Pose(88.000, 89.500),
+                                    new Pose(75, 28.615),
+                                    new Pose(129.151, 38)
+                            )
+                    ).setLinearHeadingInterpolation(Math.toRadians(44), Math.toRadians(0))
+                    .setVelocityConstraint(1.0)
+                    .setTValueConstraint(0.8)
+                    .addTemporalCallback(0.1,intakeMotorOn)
+                    .addTemporalCallback(0.1,transferOn)
 
-                        .build();
+                    .build();
 
-                teleOpPark = follower.pathBuilder().addPath(
-                                new BezierLine(
-                                        new Pose(92.000, 94.000),
+            launchSet3 = follower.pathBuilder().addPath(
+                            new BezierLine(
+                                    new Pose(129.151, 36.938),
 
-                                        new Pose(89, 63)
-                                )
-                        ).setLinearHeadingInterpolation(Math.toRadians(45), Math.toRadians(90))
-                        .setVelocityConstraint(0.3)
+                                    new Pose(92.000, 94.000)
+                            )
+                    ).setLinearHeadingInterpolation(Math.toRadians(1), Math.toRadians(47))
+                    .setVelocityConstraint(0.3)
+                    .setTValueConstraint(0.95)
+                    .addPoseCallback(new Pose(107,69),reverseIntakeForMe,0.7)
 
-                        .build();
-            }
+                    //.addTemporalCallback(0.7,reverseIntakeForMe)
+                    //.addTemporalCallback(0.7,transferOff)
+
+                    .build();
+
+            teleOpPark = follower.pathBuilder().addPath(
+                            new BezierLine(
+                                    new Pose(92.000, 94.000),
+
+                                    new Pose(89.168, 63.953)
+                            )
+                    ).setConstantHeadingInterpolation(Math.toRadians(90))
+
+                    .build();
         }
     }
+}

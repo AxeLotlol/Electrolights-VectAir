@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.opModes.Auto;
 
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
-import static org.firstinspires.ftc.teamcode.subsystems.AutoShooterCalc.calculateShotVectorandUpdateHeading;
+import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
@@ -62,7 +62,7 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
 
     int tagId = 0;
 
-    public Pose start = new Pose(24.6,126.4, Math.toRadians(131));
+    public Pose start = new Pose(32.421, 135.289, Math.toRadians(90));
 
 
     private MotorEx transfer1;
@@ -259,6 +259,7 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
                 shoot,
                 intakeMotorOn,
                 transferOn,
+                new Delay(0.1),
 
                 new FollowPath(paths.intakeSet2,true,1.0),
 
@@ -270,6 +271,7 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
                 transferOn,
 
                 new FollowPath(paths.resetAndIntake1,true,1.0),
+                new Delay(0.2),
                 new FollowPath(paths.moverBacker,true,1.0),
                 new Delay(1.0),
                 //reverseIntakeForMe,
@@ -281,7 +283,7 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
 
 
                 new FollowPath(paths.resetAndIntake2, true, 1.0),
-                new Delay(1.85),
+                new Delay(2.0),
                 //reverseIntakeForMe,
 
                 new FollowPath(paths.launchSpam2, true, 1.0),
@@ -380,37 +382,31 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
         public PathChain teleOpPark;
 
         public Paths(Follower follower) {
-            // Preload Launch: X (119.4 -> 24.6), X (110 -> 34), X (100 -> 44)
             preloadLaunch = follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(24.600, 126.400),
+                                    new Pose(31.842, 135.289), // 144 - 112.158
                                     new Pose(34.000, 110.500),
                                     new Pose(44.000, 100.000)
                             )
-                    ).setTangentHeadingInterpolation()
+                    ).setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(134)) // 180 - 46
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
-                    .setReversed()
                     .build();
 
-            // intakeSet2: X (100 -> 44, 85 -> 59, 130 -> 14)
-            // Heading: 46 -> 134, -15 -> 195
             intakeSet2 = follower.pathBuilder().addPath(
                             new BezierCurve(
                                     new Pose(44.000, 100.000),
                                     new Pose(59.000, 56.798),
-                                    new Pose(10, 60.000)
+                                    new Pose(8, 60.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(134), Math.toRadians(195))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
                     .build();
 
-            // launchSet2: X (130 -> 14, 104 -> 40, 92 -> 52)
-            // Heading: 0 -> 180, 47 -> 133
             launchSet2 = follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(10, 60.000),
+                                    new Pose(8, 60.000),
                                     new Pose(40.000, 67.000),
                                     new Pose(52.000, 94.000)
                             )
@@ -419,82 +415,71 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
                     .setTValueConstraint(0.95)
                     .build();
 
-            // resetAndIntake1: X (92 -> 52, 104 -> 40, 129 -> 15)
-            // Heading: 47 -> 133, 23 -> 157
             resetAndIntake1 = follower.pathBuilder().addPath(
                             new BezierCurve(
                                     new Pose(52.000, 94.000),
                                     new Pose(40.000, 67.000),
-                                    new Pose(8, 59.25)
+                                    new Pose(11, 65)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(133), Math.toRadians(157))
+                    ).setLinearHeadingInterpolation(Math.toRadians(133), Math.toRadians(170))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
                     .addTemporalCallback(0.1, intakeMotorOn)
                     .addTemporalCallback(0.1, transferOn)
                     .build();
 
-            // moverBacker: X (129 -> 15, 125 -> 19)
-            // Heading: 23 -> 157, 30 -> 150
             moverBacker = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(8, 59.25),
-                                    new Pose(13.233, 55.091)
+                                    new Pose(11, 65),
+                                    new Pose(12, 56.25)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(157), Math.toRadians(140))
+                    ).setLinearHeadingInterpolation(Math.toRadians(170), Math.toRadians(150))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
                     .build();
 
-            // launchSpam1: X (125 -> 19, 104 -> 40, 92 -> 52)
-            // Heading: 30 -> 150, 44 -> 136
             launchSpam1 = follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(13.233, 55.091),
+                                    new Pose(15.5, 56.25),
                                     new Pose(40.000, 67.000),
                                     new Pose(52.000, 94.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(150), Math.toRadians(136))
+                    ).setLinearHeadingInterpolation(Math.toRadians(150), Math.toRadians(134))
                     .setVelocityConstraint(0.3)
                     .setTValueConstraint(0.95)
-                    .addPoseCallback(new Pose(20.0, 61.0), reverseIntakeForMe, 0.3) // 144 - 124 = 20
+                    .addPoseCallback(new Pose(20, 61), reverseIntakeForMe, 0.3)
                     .build();
 
-            // resetAndIntake2: X (92 -> 52, 104 -> 40, 128.75 -> 15.25)
-            // Heading: 44 -> 136, 23 -> 157
             resetAndIntake2 = follower.pathBuilder().addPath(
                             new BezierCurve(
                                     new Pose(52.000, 94.000),
                                     new Pose(40.000, 67.000),
                                     new Pose(10.5, 63)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(136), Math.toRadians(166))
+                    ).setLinearHeadingInterpolation(Math.toRadians(136), Math.toRadians(159))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
                     .addTemporalCallback(0.1, intakeMotorOn)
                     .addTemporalCallback(0.1, transferOn)
                     .build();
 
-            // launchSpam2: X (128.75 -> 15.25, 104 -> 40, 92 -> 52)
-            // Heading: 23 -> 157, 47 -> 133
             launchSpam2 = follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(13.448, 59.289),
-                                    new Pose(40.000, 67.000),
-                                    new Pose(52.000, 94.000)
+                                    new Pose(10.5, 63),
+                                    new Pose(45.000, 67.000),
+                                    new Pose(52, 94)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(165), Math.toRadians(133))
+                    ).setLinearHeadingInterpolation(Math.toRadians(159), Math.toRadians(135))
                     .setVelocityConstraint(0.3)
                     .setTValueConstraint(0.95)
-                    .addPoseCallback(new Pose(26.0, 64.0), reverseIntakeForMe, 0.4) // 144 - 118 = 26
+                    .addPoseCallback(new Pose(26, 64), reverseIntakeForMe, 0.4)
                     .build();
 
-            // intakeSet1: X (92 -> 52, 104 -> 40, 124.665 -> 19.335)
             intakeSet1 = follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(52.000, 94.000),
-                                    new Pose(40.000, 87.000),
-                                    new Pose(17, 86.898)
+                                    new Pose(52, 94),
+                                    new Pose(40, 87),
+                                    new Pose(14, 86.898)
                             )
                     ).setTangentHeadingInterpolation()
                     .setVelocityConstraint(1.0)
@@ -503,27 +488,23 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
                     .addTemporalCallback(0.1, transferOn)
                     .build();
 
-            // launchSet1: X (124.665 -> 19.335, 92 -> 52)
-            // Heading: 1 -> 179, 47 -> 133
             launchSet1 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(17, 86.898),
+                                    new Pose(14, 86.898),
                                     new Pose(52.000, 94.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(179), Math.toRadians(133))
                     .setVelocityConstraint(0.3)
                     .setTValueConstraint(0.95)
-                    .addPoseCallback(new Pose(42.0, 86.0), reverseIntakeForMe, 0.4) // 144 - 102 = 42
+                    .addPoseCallback(new Pose(42, 86), reverseIntakeForMe, 0.4)
                     .build();
 
-            // intakeSet3: X (92 -> 52, 88 -> 56, 75 -> 69, 129.151 -> 14.849)
-            // Heading: 44 -> 136, 0 -> 180
             intakeSet3 = follower.pathBuilder().addPath(
                             new BezierCurve(
                                     new Pose(52.000, 94.000),
                                     new Pose(56.000, 89.500),
-                                    new Pose(69.000, 28.615),
-                                    new Pose(8, 34.938)
+                                    new Pose(69, 28.615),
+                                    new Pose(8, 43)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(136), Math.toRadians(180))
                     .setVelocityConstraint(1.0)
@@ -532,27 +513,23 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
                     .addTemporalCallback(0.1, transferOn)
                     .build();
 
-            // launchSet3: X (129.151 -> 14.849, 92 -> 52)
-            // Heading: 1 -> 179, 45 -> 135
             launchSet3 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(8, 34.938),
+                                    new Pose(8, 36.938),
                                     new Pose(52.000, 94.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(179), Math.toRadians(135))
+                    ).setLinearHeadingInterpolation(Math.toRadians(179), Math.toRadians(133))
                     .setVelocityConstraint(0.3)
                     .setTValueConstraint(0.95)
-                    .addPoseCallback(new Pose(35.0, 59.0), reverseIntakeForMe, 0.55) // 144 - 109 = 35
+                    .addPoseCallback(new Pose(37, 69), reverseIntakeForMe, 0.7)
                     .build();
 
-            // teleOpPark: X (92 -> 52, 89.168 -> 54.832)
-            // Heading: 180 - 90 = 90
             teleOpPark = follower.pathBuilder().addPath(
                             new BezierLine(
                                     new Pose(52.000, 94.000),
-                                    new Pose(54, 63)
+                                    new Pose(54.832, 63.953)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(135),Math.toRadians(90))
+                    ).setConstantHeadingInterpolation(Math.toRadians(90))
                     .build();
         }
     }

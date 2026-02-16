@@ -1,27 +1,23 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
-
 import com.bylazar.configurables.annotations.Configurable;
 
-import dev.nextftc.bindings.*;
-import dev.nextftc.control.KineticState;
+import dev.nextftc.bindings.BindingManager;
 import dev.nextftc.control.ControlSystem;
-
+import dev.nextftc.control.KineticState;
 import dev.nextftc.control.feedback.PIDCoefficients;
 import dev.nextftc.control.feedforward.BasicFeedforwardParameters;
 import dev.nextftc.core.subsystems.Subsystem;
-import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.hardware.impl.MotorEx;
+
 @Configurable
-public class Flywheel implements Subsystem {
-    public Flywheel() {
+public class NewFlywheel implements Subsystem {
+    public NewFlywheel() {
 
     }
 
-    public static final Flywheel INSTANCE = new Flywheel();
+    public static final NewFlywheel INSTANCE = new NewFlywheel();
     public static double flywheelvelocity;
 
     public static double flywheelvelocity2;
@@ -32,8 +28,8 @@ public class Flywheel implements Subsystem {
 
     public static MotorEx flywheel2 = new MotorEx("launchingmotor2");
 
-    public static PIDCoefficients myPidCoeff = new PIDCoefficients(0.025, 0.005, 0.00);
-    public static BasicFeedforwardParameters myFF = new BasicFeedforwardParameters(0.00045, 0, 0.0);
+    public static PIDCoefficients myPidCoeff = new PIDCoefficients(0.15, 0.005, 0.00);
+    public static BasicFeedforwardParameters myFF = new BasicFeedforwardParameters(0.0067, 0, 0.01);
 
 
     public static double configvelocity = 1400; //far zone - ~1500. near zone - ~1200-1300

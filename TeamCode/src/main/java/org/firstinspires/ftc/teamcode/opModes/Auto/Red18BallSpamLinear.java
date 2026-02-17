@@ -19,7 +19,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
-import org.firstinspires.ftc.teamcode.subsystems.NewFlywheel;
 
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
@@ -45,7 +44,7 @@ import dev.nextftc.hardware.positionable.SetPosition;
 public class Red18BallSpamLinear extends NextFTCOpMode {
     public Red18BallSpamLinear(){
         addComponents(
-                new SubsystemComponent(NewFlywheel.INSTANCE,DistanceRed.INSTANCE),
+                new SubsystemComponent(Flywheel.INSTANCE,DistanceRed.INSTANCE),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE,
                 new PedroComponent(hwMap -> Constants.createFollower(hwMap))

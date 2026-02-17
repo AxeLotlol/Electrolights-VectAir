@@ -528,7 +528,7 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
             teleOpPark = follower.pathBuilder().addPath(
                             new BezierLine(
                                     new Pose(50.000, 94.000),
-                                    new Pose(52.832, 63.953)    // 142 - 89.168
+                                    new Pose(31, 70)    // 142 - 89.168
                             )
                     ).setConstantHeadingInterpolation(Math.toRadians(90))
                     .build();

@@ -75,9 +75,9 @@ public class DriveTrain implements Subsystem {
     private boolean slow = false;
     // === AprilTag/Limelight align tuning ===
     private static final int APRILTAG_PIPELINE = 8;   // <-- set to your AprilTag pipeline index
-    private static final double YAW_KP = 0.050;      // deg -> yaw power (flip sign if turning wrong way)
+    private static final double YAW_KP = 0.08;      // deg -> yaw power (flip sign if turning wrong way)
     private static final double YAW_MAX = 0.7;        // yaw cap
-    private static final double YAW_DEADBAND_DEG = 1.0;
+    private static final double YAW_DEADBAND_DEG = 0.25;
 
     public double currentHoodState = 0;
 
@@ -434,8 +434,13 @@ public class DriveTrain implements Subsystem {
         else{
             //double offset = -8/17 * currPose.distanceFrom(new Pose( 138, 138)) + 746/17;
             shooter((float) ((float) flywheelSpeed));
-            if(follower.getVelocity().getMagnitude()<2){
-                aimMultiplier = 0.4;
+            if(Math.abs(follower.getVelocity().getMagnitude())<8){
+                if(headingError>-10&&headingError<10) {
+                    aimMultiplier = 0.4;
+                }
+                else {
+                    aimMultiplier = 0.4;
+                }
             }
             else{
                 aimMultiplier = 0.575;

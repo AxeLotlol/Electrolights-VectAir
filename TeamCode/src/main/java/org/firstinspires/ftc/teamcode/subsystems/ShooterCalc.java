@@ -19,8 +19,12 @@ public class ShooterCalc implements Subsystem {
 
     double dist;
 
+    public static double farzoneangle = -0.60006585;
+
 
     public static double requiredRPM;
+
+    public static double RPMlol = 3100;
 
     public static double rpmoffset = 90;
     public static double requiredTPS = (28*requiredRPM)/60;
@@ -34,7 +38,7 @@ public class ShooterCalc implements Subsystem {
         //double y = SCORE_HEIGHT;
         double a = ShooterConstants.SCORE_ANGLE;
         if(robotToGoalVector.getMagnitude()>118){
-            a=-0.54906585;
+            a=farzoneangle;
         }
         else{
             a = ShooterConstants.SCORE_ANGLE;
@@ -62,7 +66,7 @@ public class ShooterCalc implements Subsystem {
         double perpendicularComponent = Math.sin(coordinateTheta) * robotVelocity.getMagnitude();
 
         double vz = flywheelSpeed * Math.sin(hoodAngle);
-        double time = 1.05*(x / (flywheelSpeed * Math.cos(hoodAngle)));
+        double time = (x / (flywheelSpeed * Math.cos(hoodAngle)));
         double ivr = x / time + parallelComponent;
         double nvr = Math.sqrt(ivr * ivr + perpendicularComponent * perpendicularComponent);
         double ndr = nvr * time;

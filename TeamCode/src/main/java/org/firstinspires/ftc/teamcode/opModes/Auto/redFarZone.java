@@ -30,6 +30,9 @@ import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
 import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.extensions.pedro.PedroComponent;
+
+import dev.nextftc.extensions.pedro.TurnTo;
+
 import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
@@ -223,6 +226,13 @@ public class redFarZone extends NextFTCOpMode {
     boolean lowerangle = false;
     private Boolean preloadspinreal = false;
 
+    public Command turnTo(Pose targetPose, double timeoutSeconds) {
+        return new LambdaCommand("Turn to " + targetPose.getHeading())
+                .setStart(() -> follower.holdPoint(targetPose))
+                .setIsDone(() -> false)
+                .raceWith(new Delay(timeoutSeconds));
+    }
+
     Command preloadSpun = new LambdaCommand().setStart(() -> preloadspinreal = true);
     Command preloadSpunReal = new LambdaCommand().setStart(() -> preloadspinreal = false);
 
@@ -245,17 +255,29 @@ public class redFarZone extends NextFTCOpMode {
         return new SequentialGroup(
                 new FollowPath(paths.Path1),
 
-                new Delay(1.0),
+                new Delay(3.0),
                 shoot,
                 new Delay(0.5),
                 intakeMotorOn,
                 transferOnForIntake,
+                //turnTo(new Pose(140,7),0.7),
+
                 new FollowPath(paths.Path2),
-                new Delay(1.0),
+                new Delay(2.0),
                 intakeMotorOff,
                 new FollowPath(paths.Path3),
                 shoot,
-                new Delay(0.5)
+                new Delay(0.5),
+                intakeMotorOn,
+                new FollowPath(paths.Path2,false,1.0),
+                new Delay(2.0),
+
+                intakeMotorOff,
+                new FollowPath(paths.Path3),
+                shoot,
+                new FollowPath(paths.Path4)
+
+
                 //new FollowPath(paths.Leave)
 
 
@@ -271,7 +293,7 @@ public class redFarZone extends NextFTCOpMode {
         flywheel2.setPower(-1);*/
 
         preloadspinreal = true;
-        shooter(1300);
+        shooter(1500);
 
         //int tag=MotifScanning.INSTANCE.findMotif();
         Auto().schedule();
@@ -320,12 +342,14 @@ public class redFarZone extends NextFTCOpMode {
         public PathChain Path2;
         public PathChain Path3;
 
+        public PathChain Path4;
+
         public Paths(Follower follower) {
             Path1 = follower.pathBuilder().addPath(
                             new BezierLine(
                                     new Pose(87.501, 8.113),
 
-                                    new Pose(89.030, 11.372)
+                                    new Pose(86, 11.372)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(67))
 
@@ -345,10 +369,20 @@ public class redFarZone extends NextFTCOpMode {
                             new BezierLine(
                                     new Pose(135.728, 9.167),
 
-                                    new Pose(89.030, 11.372)
+                                    new Pose(86, 11.372)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(-3), Math.toRadians(63))
+                    ).setLinearHeadingInterpolation(Math.toRadians(-3), Math.toRadians(67))
 
+                    .build();
+            Path4 = follower.pathBuilder().addPath(
+                    new BezierLine(
+                            new Pose(86, 11.372),
+                            new Pose(96,8.5)
+
+                    )
+
+            )
+                    .setLinearHeadingInterpolation(Math.toRadians(67),Math.toRadians(90))
                     .build();
         }
     }

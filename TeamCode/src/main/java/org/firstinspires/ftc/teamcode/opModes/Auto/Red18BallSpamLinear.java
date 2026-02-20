@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.opModes.Auto;
 
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
-import static org.firstinspires.ftc.teamcode.subsystems.AutoShooterCalc.calculateShotVectorandUpdateHeading;
+import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
@@ -345,11 +345,11 @@ public class Red18BallSpamLinear extends NextFTCOpMode {
 
         Pose currPose = follower.getPose();
         double robotHeading = follower.getPose().getHeading();
-        Vector robotToGoalVector = new Vector(follower.getPose().distanceFrom(new Pose(138, 138)), Math.atan2(138 - currPose.getY(), 138 - currPose.getX()));
+        Vector robotToGoalVector = new Vector(follower.getPose().distanceFrom(new Pose(138, 141)), Math.atan2(141 - currPose.getY(), 138 - currPose.getX()));
         //Vector v = new Vector(new Pose(138, 138));
         Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity());
         double flywheelSpeed = results[0];
-        shooter((float) (flywheelSpeed));
+        shooter((float) (flywheelSpeed+10));
         double hoodAngle = results[1];
         hoodToPos(hoodAngle);
 

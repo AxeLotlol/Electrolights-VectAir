@@ -346,11 +346,11 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
 
         Pose currPose = follower.getPose();
         double robotHeading = follower.getPose().getHeading();
-        Vector robotToGoalVector = new Vector(follower.getPose().distanceFrom(new Pose(4, 139)), Math.atan2(139 - currPose.getY(), 4 - currPose.getX()));
+        Vector robotToGoalVector = new Vector(follower.getPose().distanceFrom(new Pose(2, 141)), Math.atan2(141 - currPose.getY(), 2 - currPose.getX()));
         //Vector v = new Vector(new Pose(138, 138));
         Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity());
         double flywheelSpeed = results[0];
-        shooter((float) flywheelSpeed);
+        shooter((float) flywheelSpeed+10);
         double hoodAngle = results[1];
         hoodToPos(hoodAngle);
 
@@ -528,9 +528,9 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
             teleOpPark = follower.pathBuilder().addPath(
                             new BezierLine(
                                     new Pose(50.000, 94.000),
-                                    new Pose(31, 79)    // 142 - 89.168
+                                    new Pose(19, 74.5)    // 142 - 89.168
                             )
-                    ).setConstantHeadingInterpolation(Math.toRadians(90))
+                    ).setLinearHeadingInterpolation(Math.toRadians(133),Math.toRadians(90))
                     .build();
         }
     }

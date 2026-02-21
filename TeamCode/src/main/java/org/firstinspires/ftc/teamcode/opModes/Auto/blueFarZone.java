@@ -35,7 +35,7 @@ import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
 
 
-@Autonomous(name = "Blue Farzone", group = "Autonomous")
+@Autonomous
 @Configurable
 public class blueFarZone extends NextFTCOpMode {
     public blueFarZone() {

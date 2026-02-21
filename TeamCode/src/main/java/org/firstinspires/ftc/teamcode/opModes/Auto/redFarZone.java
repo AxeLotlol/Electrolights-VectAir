@@ -43,7 +43,7 @@ import dev.nextftc.hardware.impl.ServoEx;
 import dev.nextftc.hardware.positionable.SetPosition;
 
 
-@Autonomous(name = "Red Far Zone", group = "Autonomous")
+@Autonomous
 @Configurable
 public class redFarZone extends NextFTCOpMode {
     public redFarZone() {
@@ -68,6 +68,7 @@ public class redFarZone extends NextFTCOpMode {
     int tagId = 0;
 
     public Pose start = new Pose(80.837, 8.692, Math.toRadians(90));
+
 
 
     private MotorEx transfer1;
@@ -255,7 +256,7 @@ public class redFarZone extends NextFTCOpMode {
         return new SequentialGroup(
                 new FollowPath(paths.Path1),
 
-                new Delay(3.0),
+                new Delay(2),
                 shoot,
                 new Delay(0.5),
                 intakeMotorOn,
@@ -269,13 +270,19 @@ public class redFarZone extends NextFTCOpMode {
                 shoot,
                 new Delay(0.5),
                 intakeMotorOn,
-                new FollowPath(paths.Path2,false,1.0),
+                new FollowPath(paths.Path2),
                 new Delay(2.0),
-
                 intakeMotorOff,
                 new FollowPath(paths.Path3),
                 shoot,
-                new FollowPath(paths.Path4)
+                new Delay(0.5),
+                intakeMotorOn,
+                new FollowPath(paths.Path2),
+                new Delay(2.0),
+                intakeMotorOff,
+                new FollowPath(paths.Path3),
+                shoot,
+                new FollowPath(paths.Path4,true)
 
 
                 //new FollowPath(paths.Leave)
@@ -347,42 +354,43 @@ public class redFarZone extends NextFTCOpMode {
         public Paths(Follower follower) {
             Path1 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(87.501, 8.113),
+                                    new Pose(87.5, 8.1),
 
-                                    new Pose(86, 11.372)
+                                    new Pose(86, 13)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(67))
+                    ).setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(68))
 
                     .build();
 
             Path2 = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    new Pose(89.030, 11.372),
-
-                                    new Pose(131, 9.167)
+                            new BezierCurve(
+                                    new Pose(86, 13),
+                                    new Pose(96.5225, 34.473),
+                                    new Pose(97.56, 10.498),
+                                    new Pose(123, 8)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(67), Math.toRadians(-3))
+                    ).setLinearHeadingInterpolation(Math.toRadians(68), Math.toRadians(-3))
 
                     .build();
 
             Path3 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(135.728, 9.167),
+                                    new Pose(123, 8),
 
-                                    new Pose(86, 11.372)
+                                    new Pose(86, 13)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(-3), Math.toRadians(67))
+                    ).setLinearHeadingInterpolation(Math.toRadians(-3), Math.toRadians(70))
 
                     .build();
             Path4 = follower.pathBuilder().addPath(
                     new BezierLine(
-                            new Pose(86, 11.372),
-                            new Pose(96,8.5)
+                            new Pose(86, 13),
+                            new Pose(106,10)
 
                     )
 
             )
-                    .setLinearHeadingInterpolation(Math.toRadians(67),Math.toRadians(90))
+                    .setLinearHeadingInterpolation(Math.toRadians(67),Math.toRadians(92))
                     .build();
         }
     }

@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.INCH;
 import static org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit.DEGREES;
+import static org.firstinspires.ftc.teamcode.opModes.TeleOp.FarzoneTeleOpBlue.isBlueFar;
+import static org.firstinspires.ftc.teamcode.opModes.TeleOp.FarzoneTeleOpRed.isRedFar;
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS44;
@@ -122,6 +124,8 @@ public class DriveTrain implements Subsystem {
     public boolean firsttime = true;
 
     public int alliance;
+    public boolean far;
+    public boolean bum = false;
 
     public Supplier<Double> yVCtx;
 
@@ -141,18 +145,52 @@ public class DriveTrain implements Subsystem {
         }
     }
 
+    Pose startingpose = new Pose(72,72, Math.toRadians(90));
+
     @Override
     public Command getDefaultCommand() {
 
-        if(isBlue()==true) {
-            alliance=1;
-        }
-        if(isRed()==true){
-            alliance=-1;
-        }
-        else if(isBlue()!=true && isRed()!=true) {
+        if(isBlue()!=true && isRed()!=true && isRedFar()!=true && isBlueFar()!=true) {
             ActiveOpMode.telemetry().addLine("No direction set");
+            bum=true;
         }
+        else{
+            Pose check = new Pose(72, 72, Math.toRadians(90));
+            //bum = false;
+            if(isBlue()==true) {
+                alliance=1;
+                far = false;
+
+                if(startingpose == check){
+                    startingpose=new Pose (24, 72, Math.toRadians(90));
+                    follower.setStartingPose(startingpose);
+                }
+            }
+            if(isRed()==true){
+                alliance=-1;
+                far = false;
+                if(startingpose == check){
+                    startingpose = new Pose(120, 72, Math.toRadians(90));
+                    follower.setStartingPose(startingpose);
+                }
+            }
+            if(isRedFar()==true){
+                alliance=-1;
+                far = true;
+                if(startingpose == check){
+                    startingpose=new Pose (120, 9, Math.toRadians(90));
+                    follower.setStartingPose(startingpose);
+                }
+            }
+            if(isBlueFar()==true){
+                alliance=1;
+                far = true;
+                if(startingpose == check){
+                    startingpose=new Pose (24, 9, Math.toRadians(90));
+                    follower.setStartingPose(startingpose);
+                }
+            }}
+        follower.update();
         Pose currPose = follower.getPose();
         double robotHeading = follower.getPose().getHeading();
         Vector robotToGoalVector = new Vector(follower.getPose().distanceFrom(new Pose(goalX, goalY)), Math.atan2(goalY - currPose.getY(), goalX - currPose.getX()));
@@ -213,31 +251,59 @@ public class DriveTrain implements Subsystem {
         firsttime = true;
         shooting = false;
         autolock = false;
-
+        follower = follower();
+        if(isBlue()!=true && isRed()!=true && isRedFar()!=true && isBlueFar()!=true) {
+            ActiveOpMode.telemetry().addLine("No direction set");
+            bum=true;
+        }
+        else{
+            bum = false;
         if(isBlue()==true) {
             alliance=1;
+            far = false;
         }
         if(isRed()==true){
             alliance=-1;
+            far = false;
         }
-        else if(isBlue()!=true && isRed()!=true) {
-            ActiveOpMode.telemetry().addLine("No direction set");
+        if(isRedFar()==true){
+            alliance=-1;
+            far = true;
         }
+        if(isBlueFar()==true){
+            alliance=1;
+            far = true;
+        }}
         imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
-        Pose startingpose = new Pose (72, 72, Math.toRadians(90));
-        if(alliance ==-1){
-            startingpose=new Pose (120, 72, Math.toRadians(90));
+
+        /*if(alliance ==-1){
+            if(far==true){
+                startingpose=new Pose (110, 9, Math.toRadians(90));
+                follower.setStartingPose(startingpose);
+            }
+            else if(far==false) {
+                startingpose = new Pose(120, 72, Math.toRadians(90));
+                follower.setStartingPose(startingpose);
+            }
         }
         if(alliance ==1){
-            startingpose=new Pose (24, 72, Math.toRadians(90));
-        }
+            if(far==true){
+                startingpose=new Pose (34, 9, Math.toRadians(90));
+                follower.setStartingPose(startingpose);
+            }
+            else if(far==false) {
+                startingpose=new Pose (24, 72, Math.toRadians(90));
+                follower.setStartingPose(startingpose);
+            }
+
+        }*/
 
         hoodServo1n= ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo1");
         hoodServo2n=  ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo2");
 
 
-        follower = follower();
-        follower.setStartingPose(startingpose);
+
+
         follower.update();
 
 
@@ -289,17 +355,17 @@ public class DriveTrain implements Subsystem {
         if(lift==false){
             lift=true;
             lowerangle=true;
-            ActiveOpMode.telemetry().addLine("HoodUp");
+            //ActiveOpMode.telemetry().addLine("HoodUp");
         }
         else if (lift==true) {
             lift=false;
             lowerangle=false;
-            ActiveOpMode.telemetry().addLine("HoodDown");
+            //ActiveOpMode.telemetry().addLine("HoodDown");
         }
         else if (lift!=true&&lift!=false) {
             lift=true;
             lowerangle=true;
-            ActiveOpMode.telemetry().addLine("HoodUp");
+            //ActiveOpMode.telemetry().addLine("HoodUp");
         }
 
     }
@@ -405,7 +471,7 @@ public class DriveTrain implements Subsystem {
         }
         follower.update();
 
-        ActiveOpMode.telemetry().addData("Lowangle:", lowerangle);
+        //ActiveOpMode.telemetry().addData("Lowangle:", lowerangle);
 
 
         if (isBlue() == true) {
@@ -453,32 +519,35 @@ public class DriveTrain implements Subsystem {
         double s1speed = 60 * flywheel.getVelocity()/28;
         double s2speed = 60 * flywheel2.getVelocity()/28;
 
-        ActiveOpMode.telemetry().addData("Motor1Speed", s1speed);
-        ActiveOpMode.telemetry().addData("Motor2Speed", s2speed);
-        ActiveOpMode.telemetry().addData("servo1pos", hoodServo1.getPosition());
-        ActiveOpMode.telemetry().addData("servo2pos", hoodServo2.getPosition());
+        //ActiveOpMode.telemetry().addData("Motor1Speed", s1speed);
+        //ActiveOpMode.telemetry().addData("Motor2Speed", s2speed);
+        ActiveOpMode.telemetry().addData("far", far);
+        ActiveOpMode.telemetry().addData("alliance", alliance);
+        //ActiveOpMode.telemetry().addData("bum", bum);
+        //ActiveOpMode.telemetry().addData("servo1pos", hoodServo1.getPosition());
+        //ActiveOpMode.telemetry().addData("servo2pos", hoodServo2.getPosition());
 
-        double frontLeftRPM = 28 / 60 * fL.getVelocity();
-        double frontRightRPM = 28 / 60 * fR.getVelocity();
-        double backLeftRPM = 28 / 60 * bL.getVelocity();
-        double backRightRPM = 28 / 60 * bR.getVelocity();
-        ActiveOpMode.telemetry().addData("frontRightRPM", frontRightRPM);
-        ActiveOpMode.telemetry().addData("backRightRPM", backRightRPM);
-        ActiveOpMode.telemetry().addData("frontLeftRPM", frontLeftRPM);
-        ActiveOpMode.telemetry().addData("backLeftRPM", backLeftRPM);
+        //double frontLeftRPM = 28 / 60 * fL.getVelocity();
+        //double frontRightRPM = 28 / 60 * fR.getVelocity();
+        //double backLeftRPM = 28 / 60 * bL.getVelocity();
+        //double backRightRPM = 28 / 60 * bR.getVelocity();
+        //ActiveOpMode.telemetry().addData("frontRightRPM", frontRightRPM);
+        //ActiveOpMode.telemetry().addData("backRightRPM", backRightRPM);
+        //ActiveOpMode.telemetry().addData("frontLeftRPM", frontLeftRPM);
+        //ActiveOpMode.telemetry().addData("backLeftRPM", backLeftRPM);
 
         ActiveOpMode.telemetry().addData("aimMultipler", aimMultiplier);
-        ActiveOpMode.telemetry().addData("goalX", goalX);
-        ActiveOpMode.telemetry().addData("goalY", goalY);
+        //ActiveOpMode.telemetry().addData("goalX", goalX);
+        //ActiveOpMode.telemetry().addData("goalY", goalY);
         ActiveOpMode.telemetry().addData("RobotX", currPose.getX());
         ActiveOpMode.telemetry().addData("RobotY", currPose.getY());
-        ActiveOpMode.telemetry().addData("goalXDist", goalXDist);
-        ActiveOpMode.telemetry().addData("goalYDist", goalYDist);
-        ActiveOpMode.telemetry().addData("robotHeading", Math.toDegrees(robotHeading));
-        ActiveOpMode.telemetry().addData("velocity", follower.getVelocity());
+        //ActiveOpMode.telemetry().addData("goalXDist", goalXDist);
+        //ActiveOpMode.telemetry().addData("goalYDist", goalYDist);
+        //ActiveOpMode.telemetry().addData("robotHeading", Math.toDegrees(robotHeading));
+        //ActiveOpMode.telemetry().addData("velocity", follower.getVelocity());
         ActiveOpMode.telemetry().addData("headingError", headingError);
-        ActiveOpMode.telemetry().addData("distance", distance);
-        ActiveOpMode.telemetry().addData("yVCtx", visionYawCommand(headingError));
+        //ActiveOpMode.telemetry().addData("distance", distance);
+        //ActiveOpMode.telemetry().addData("yVCtx", visionYawCommand(headingError));
         ActiveOpMode.telemetry().update();
     }
 }

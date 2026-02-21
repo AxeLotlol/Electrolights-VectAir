@@ -100,7 +100,7 @@ public class ShooterCalc implements Subsystem {
 
         double hoodTime = why + when;/*Math.toDegrees(hoodAngle) * ShooterConstants.RAISE_TIME / 18.8;*/
 
-        ActiveOpMode.telemetry().addData("v0", flywheelSpeed);
+        /*ActiveOpMode.telemetry().addData("v0", flywheelSpeed);
         ActiveOpMode.telemetry().addData("rpm", requiredRPM);
         ActiveOpMode.telemetry().addData("angle", Math.toDegrees(hoodAngle));
         ActiveOpMode.telemetry().addData("time", hoodTime);
@@ -108,7 +108,7 @@ public class ShooterCalc implements Subsystem {
         ActiveOpMode.telemetry().addData("why", why);
         ActiveOpMode.telemetry().addData("when", when);
         ActiveOpMode.telemetry().addData("distance", robotToGoalVector.getMagnitude()/39.37);
-
+*/
         Double[] returnvalue = {requiredTPS, hoodTime, headingAngle};
         return returnvalue;
     }

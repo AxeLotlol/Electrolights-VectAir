@@ -19,7 +19,7 @@ public class ShooterCalc implements Subsystem {
 
     double dist;
 
-    public static double farzoneangle = -0.60006585;
+    public static double farzoneangle = -0.54006585;
 
 
     public static double requiredRPM;
@@ -38,7 +38,7 @@ public class ShooterCalc implements Subsystem {
         //double y = SCORE_HEIGHT;
         double a = ShooterConstants.SCORE_ANGLE;
         if(robotToGoalVector.getMagnitude()>118){
-            a=farzoneangle;
+            a=DriveTrain.farangle;
         }
         else{
             a = ShooterConstants.SCORE_ANGLE;

@@ -372,6 +372,18 @@ public class DriveTrain implements Subsystem {
 
     public boolean decrease = false;
 
+    public static double farangle = -0.54006585;
+
+    public static void farAngle(){
+        if(farangle ==-0.54006585){
+            farangle=-0.04006585;
+        }
+        else if (farangle ==-0.04006585) {
+            farangle = -0.54006585;
+        }
+
+    }
+
     public void hoodControl(){
         if(decrease!=true&&hoodAngleDriver<1){
             hoodAngleDriver = hoodAngleDriver+0.1;
@@ -456,6 +468,7 @@ public class DriveTrain implements Subsystem {
             Gamepads.gamepad1().triangle().whenBecomesTrue(() -> autolocktrue())
                     .whenBecomesFalse(() -> autolockfalse());
             Gamepads.gamepad1().cross().whenBecomesTrue(() -> hoodControl());
+            Gamepads.gamepad1().square().whenBecomesTrue(() -> farAngle());
             Gamepads.gamepad1().rightTrigger().greaterThan(0.3).whenBecomesTrue(shooter);
             intakeMotor = new MotorEx("intake");
             transfer1 = new MotorEx("transfer");

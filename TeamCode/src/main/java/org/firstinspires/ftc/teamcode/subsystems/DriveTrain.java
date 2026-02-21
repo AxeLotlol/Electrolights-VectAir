@@ -75,7 +75,7 @@ public class DriveTrain implements Subsystem {
     private boolean slow = false;
     // === AprilTag/Limelight align tuning ===
     private static final int APRILTAG_PIPELINE = 8;   // <-- set to your AprilTag pipeline index
-    private static final double YAW_KP = 0.08;      // deg -> yaw power (flip sign if turning wrong way)
+    private static final double YAW_KP = 0.075;      // deg -> yaw power (flip sign if turning wrong way)
     private static final double YAW_MAX = 0.7;        // yaw cap
     private static final double YAW_DEADBAND_DEG = 0.25;
 
@@ -327,11 +327,11 @@ public class DriveTrain implements Subsystem {
     public static Command opentransfer = new LambdaCommand()
             .setStart(()-> {
                 //`5transfer2.setPosition(-0.25);
-                transfer2.setPosition(0.3);
+                transfer2.setPosition(0.35);
             }).setIsDone(() -> true);
     public static Command closeTransfer = new LambdaCommand()
             .setStart(() -> {
-                transfer2.setPosition(0.7);
+                transfer2.setPosition(0.635);
             }).setIsDone(() -> true);
     static Command transferOn = new LambdaCommand()
             .setStart(()-> transfer1.setPower(transferpower))
@@ -429,7 +429,7 @@ public class DriveTrain implements Subsystem {
         double flywheelSpeed = results[0];
         if(headingError<-50||headingError>50) {
             shooter((float) ((float) flywheelSpeed * 0.75));
-            aimMultiplier = 0.8;
+            aimMultiplier = 0.7;
             transferpower = -1;
         }
         else{
@@ -438,14 +438,14 @@ public class DriveTrain implements Subsystem {
             shooter((float) ((float) flywheelSpeed));
             if(Math.abs(follower.getVelocity().getMagnitude())<8){
                 if(headingError>-10&&headingError<10) {
-                    aimMultiplier = 0.4;
+                    aimMultiplier = 0.375;
                 }
                 else {
-                    aimMultiplier = 0.4;
+                    aimMultiplier = 0.385;
                 }
             }
             else{
-                aimMultiplier = 0.575;
+                aimMultiplier = 0.5;
             }
         }
         double hoodAngle = results[1];

@@ -201,7 +201,7 @@ public class redFarZone extends NextFTCOpMode {
 
     public Command closeTransfer = new LambdaCommand()
             .setStart(() -> {
-                transfer2.setPosition(0.7);
+                transfer2.setPosition(0.635);
             });
 
     public SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.05), transferOn, new Delay(0.4), transferOff, closeTransfer);

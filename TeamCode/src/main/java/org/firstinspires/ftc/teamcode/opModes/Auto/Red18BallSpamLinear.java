@@ -211,7 +211,7 @@ public class Red18BallSpamLinear extends NextFTCOpMode {
 
     public Command closeTransfer = new LambdaCommand()
             .setStart(() -> {
-                transfer2.setPosition(0.67);
+                transfer2.setPosition(0.635);
             });
 //niggers are black = (NO SHIT SHERLOCK);
     public SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.05), transferOn, new Delay(0.4), transferOff, closeTransfer);

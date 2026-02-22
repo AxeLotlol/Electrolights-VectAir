@@ -276,7 +276,7 @@ public class DriveTrain implements Subsystem {
         }}
         imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
 
-        /*if(alliance ==-1){
+        if(alliance ==-1){
             if(far==true){
                 startingpose=new Pose (110, 9, Math.toRadians(90));
                 follower.setStartingPose(startingpose);
@@ -296,7 +296,7 @@ public class DriveTrain implements Subsystem {
                 follower.setStartingPose(startingpose);
             }
 
-        }*/
+        }
 
         hoodServo1n= ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo1");
         hoodServo2n=  ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo2");

@@ -420,7 +420,7 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
                             new BezierCurve(
                                     new Pose(50.000, 94.000),
                                     new Pose(38.000, 67.000),
-                                    new Pose(11.5, 65.000)      // 142 - 130.5
+                                    new Pose(11.5, 66.000)      // 142 - 130.5
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(133), Math.toRadians(170))
                     .setVelocityConstraint(1.0)
@@ -431,8 +431,8 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
 
             moverBacker = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(11.5, 65),
-                                    new Pose(11, 59.25)       // 142 - 129.5
+                                    new Pose(11.5, 66),
+                                    new Pose(11, 60.25)       // 142 - 129.5
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(170), Math.toRadians(140))
                     .setVelocityConstraint(1.0)
@@ -441,7 +441,7 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
 
             launchSpam1 = follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(11, 59.25),
+                                    new Pose(11, 60.25),
                                     new Pose(38.000, 67.000),
                                     new Pose(50.000, 94.000)
                             )
@@ -528,7 +528,7 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
             teleOpPark = follower.pathBuilder().addPath(
                             new BezierLine(
                                     new Pose(50.000, 94.000),
-                                    new Pose(19, 74.5)    // 142 - 89.168
+                                    new Pose(18, 77)    // 142 - 89.168
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(133),Math.toRadians(90))
                     .build();

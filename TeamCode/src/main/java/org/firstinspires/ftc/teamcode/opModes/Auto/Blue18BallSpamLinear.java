@@ -19,6 +19,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
+import org.firstinspires.ftc.teamcode.subsystems.Storage;
 
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
@@ -353,6 +354,7 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
         shooter((float) flywheelSpeed+10);
         double hoodAngle = results[1];
         hoodToPos(hoodAngle);
+        Storage.currentPose = follower.getPose();
 
     }
 

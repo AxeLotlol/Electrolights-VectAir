@@ -19,7 +19,7 @@ public class ShooterCalc implements Subsystem {
 
     double dist;
 
-    public static double farzoneangle = -0.54006585;
+    public static double farzoneangle = -0.34006585;
 
 
     public static double requiredRPM;
@@ -34,11 +34,15 @@ public class ShooterCalc implements Subsystem {
         double g = 32.174*12;
         double x = robotToGoalVector.getMagnitude()-ShooterConstants.PASS_THROUGH_POINT_RADIUS;
         double temp = x/39.37;
-        double y = /*SCORE_HEIGHT*/ -2.6045*temp*temp*temp + 16.148*temp*temp - 33.009*temp + 51.203;
+        //double y = /*SCORE_HEIGHT*/ -2.6045*temp*temp*temp + 16.148*temp*temp - 33.009*temp + 51.203;
+        double y = -4.5745*temp*temp*temp + 25.978*temp*temp - 48.395*temp + 58.675;
         //double y = SCORE_HEIGHT;
         double a = ShooterConstants.SCORE_ANGLE;
-        if(robotToGoalVector.getMagnitude()>118){
+        if(robotToGoalVector.getMagnitude()>115){
+            x = robotToGoalVector.getMagnitude()+10;
+            ActiveOpMode.telemetry().addData("farzone", farzoneangle);
             a=DriveTrain.farangle;
+            y=15;
         }
         else{
             a = ShooterConstants.SCORE_ANGLE;
@@ -80,8 +84,11 @@ public class ShooterCalc implements Subsystem {
 
         double newtemp = (ndr+5)/39.37;
 
-        y = /*SCORE_HEIGHT*/ -2.6045*newtemp*newtemp*newtemp + 16.148*newtemp*newtemp - 33.009*newtemp + 51.203; // -0.7135x2 + 0.8315x + 33.532
-
+        //y = /*SCORE_HEIGHT*/ -2.6045*newtemp*newtemp*newtemp + 16.148*newtemp*newtemp - 33.009*newtemp + 51.203; // -0.7135x2 + 0.8315x + 33.532
+        //y= -4.5745*newtemp*newtemp*newtemp + 25.978*newtemp*newtemp - 48.395*newtemp + 58.675;
+        if(y!=15) {
+            y = /*SCORE_HEIGHT*/ -4.5745*newtemp*newtemp*newtemp + 25.978*newtemp*newtemp - 48.395*newtemp + 58.675; // -0.7135x2 + 0.8315x + 33.532
+        }
         flywheelSpeed = Math.sqrt(g * ndr * ndr / (2 * Math.pow(Math.cos(hoodAngle), 2) * (ndr * Math. tan(hoodAngle) - y)));
         flywheelSpeed = flywheelSpeed/ 39.37;
         double headingVelCompOffset = Math.atan(perpendicularComponent / ivr);

@@ -145,51 +145,53 @@ public class DriveTrain implements Subsystem {
         }
     }
 
-    Pose startingpose = Storage.currentPose;
 
+
+    //Pose startingpose = Storage.currentPose;
+    Pose startingpose = new Pose(72,72, Math.toRadians(90));
     @Override
     public Command getDefaultCommand() {
 
-        if(isBlue()!=true && isRed()!=true && isRedFar()!=true && isBlueFar()!=true) {
+        if (isBlue() != true && isRed() != true && isRedFar() != true && isBlueFar() != true) {
             ActiveOpMode.telemetry().addLine("No direction set");
-            bum=true;
-        }
-        else{
+            bum = true;
+        } else {
             Pose check = new Pose(72, 72, Math.toRadians(90));
             //bum = false;
-            if(isBlue()==true) {
-                alliance=1;
+            if (isBlue() == true) {
+                alliance = 1;
                 far = false;
 
-                if(startingpose == check){
-                    startingpose=new Pose (24, 72, Math.toRadians(90));
+                if (startingpose == check) {
+                    startingpose = new Pose(24, 72, Math.toRadians(90));
                     follower.setStartingPose(startingpose);
                 }
             }
-            if(isRed()==true){
-                alliance=-1;
+            if (isRed() == true) {
+                alliance = -1;
                 far = false;
-                if(startingpose == check){
+                if (startingpose == check) {
                     startingpose = new Pose(120, 72, Math.toRadians(90));
                     follower.setStartingPose(startingpose);
                 }
             }
-            if(isRedFar()==true){
-                alliance=-1;
+            if (isRedFar() == true) {
+                alliance = -1;
                 far = true;
-                if(startingpose == check){
-                    startingpose=new Pose (120, 9, Math.toRadians(90));
+                if (startingpose == check) {
+                    startingpose = new Pose(120, 9, Math.toRadians(90));
                     follower.setStartingPose(startingpose);
                 }
             }
-            if(isBlueFar()==true){
-                alliance=1;
+            if (isBlueFar() == true) {
+                alliance = 1;
                 far = true;
-                if(startingpose == check){
-                    startingpose=new Pose (24, 9, Math.toRadians(90));
+                if (startingpose == check) {
+                    startingpose = new Pose(24, 9, Math.toRadians(90));
                     follower.setStartingPose(startingpose);
                 }
-            }}
+            }
+        }
         follower.update();
         Pose currPose = follower.getPose();
         double robotHeading = follower.getPose().getHeading();
@@ -197,23 +199,33 @@ public class DriveTrain implements Subsystem {
         Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity());
 
 
-
-
         if (autolock == true) {
 
             double finalHeadingError = results[2];
-            yVCtx = () -> visionYawCommand(finalHeadingError);
+            /*if (follower().getPose().getY() < 20 && follower().getVelocity().getMagnitude() < 10) {
+                if (alliance == -1) {
+                    follower.turnTo(Math.atan2((144 - follower().getPose().getY()), 139 - follower().getPose().getX()));
+                    return null;
+                }
 
-            return new MecanumDriverControlled(
-                    fL,
-                    fR,
-                    bL,
-                    bR,
-                    Gamepads.gamepad1().leftStickX().map(it -> alliance * it),
-                    Gamepads.gamepad1().leftStickY().map(it -> alliance * it),
-                    yVCtx,
-                    new FieldCentric(imu)
-            );
+                if (alliance == 1) {
+                    follower.turnTo(Math.atan2((144 - follower().getPose().getY()), 6 - follower().getPose().getX()));
+                    return null;
+                }
+            } else {*/
+                yVCtx = () -> visionYawCommand(finalHeadingError);
+                return new MecanumDriverControlled(
+                        fL,
+                        fR,
+                        bL,
+                        bR,
+                        Gamepads.gamepad1().leftStickX().map(it -> alliance * it),
+                        Gamepads.gamepad1().leftStickY().map(it -> alliance * it),
+                        yVCtx,
+                        new FieldCentric(imu)
+                );
+        //}
+
         }
         else// IF AUTOLOCK IS NOT ON
         {
@@ -243,6 +255,7 @@ public class DriveTrain implements Subsystem {
                 );
             }
         }
+        //return null;
     }
 
     @Override
@@ -276,7 +289,7 @@ public class DriveTrain implements Subsystem {
         }}
         imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
 
-       /* if(alliance ==-1){
+        if(alliance ==-1){
             if(far==true){
                 startingpose=new Pose (110, 9, Math.toRadians(90));
                 follower.setStartingPose(startingpose);
@@ -296,9 +309,9 @@ public class DriveTrain implements Subsystem {
                 follower.setStartingPose(startingpose);
             }
 
-        }*/
-        startingpose = Storage.currentPose;
-        follower.setStartingPose(startingpose);
+        }
+        //startingpose = Storage.currentPose;
+        //follower.setStartingPose(startingpose);
 
         hoodServo1n= ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo1");
         hoodServo2n=  ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo2");
@@ -515,7 +528,12 @@ public class DriveTrain implements Subsystem {
         }
         else{
             //double offset = -8/17 * currPose.distanceFrom(new Pose( 138, 138)) + 746/17;
-            transferpower = -0.75;
+            if(robotToGoalVector.getMagnitude() > 110) {
+                transferpower = -0.75;
+            }
+            else{
+                transferpower = -1;
+            }
             shooter((float) ((float) flywheelSpeed));
             if(Math.abs(follower.getVelocity().getMagnitude())<8){
                 if(headingError>-10&&headingError<10) {

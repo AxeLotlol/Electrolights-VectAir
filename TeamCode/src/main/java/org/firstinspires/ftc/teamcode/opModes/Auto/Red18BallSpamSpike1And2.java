@@ -447,9 +447,9 @@
                     moverBacker = follower.pathBuilder().addPath(
                                     new BezierLine(
                                             new Pose(130.5, 63.5),
-                                            new Pose(129.5, 58.25)
+                                            new Pose(130, 59.75)
                                     )
-                            ).setLinearHeadingInterpolation(Math.toRadians(10), Math.toRadians(40))
+                            ).setLinearHeadingInterpolation(Math.toRadians(10), Math.toRadians(45))
                             .setVelocityConstraint(1.0)
                             .setTValueConstraint(0.8)
 
@@ -457,11 +457,11 @@
 
                     launchSpam1 = follower.pathBuilder().addPath(
                                     new BezierCurve(
-                                            new Pose(129.5, 58.25),
+                                            new Pose(130, 58.25),
                                             new Pose(104.000, 67.000),
                                             new Pose(92.000, 94.000)
                                     )
-                            ).setLinearHeadingInterpolation(Math.toRadians(40), Math.toRadians(46))
+                            ).setLinearHeadingInterpolation(Math.toRadians(45), Math.toRadians(46))
                             .setVelocityConstraint(0.3)
                             .setTValueConstraint(0.95)
                             //.addTemporalCallback(0.9,reverseIntakeForMe)
@@ -473,9 +473,9 @@
                                     new BezierCurve(
                                             new Pose(92.000, 94.000),
                                             new Pose(104.000, 67.000),
-                                            new Pose(131, 62)
+                                            new Pose(130.5, 62)
                                     )
-                            ).setLinearHeadingInterpolation(Math.toRadians(44), Math.toRadians(23))
+                            ).setLinearHeadingInterpolation(Math.toRadians(46), Math.toRadians(23))
                             .setVelocityConstraint(1.0)
                             .setTValueConstraint(0.8)
                             .addTemporalCallback(0.1,intakeMotorOn)
@@ -485,7 +485,7 @@
 
                     launchSpam2 = follower.pathBuilder().addPath(
                                     new BezierCurve(
-                                            new Pose(131, 63),
+                                            new Pose(130.5, 63),
                                             new Pose(104.000, 67.000),
                                             new Pose(92, 94)
                                     )

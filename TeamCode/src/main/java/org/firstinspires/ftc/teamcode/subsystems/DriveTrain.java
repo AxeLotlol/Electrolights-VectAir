@@ -291,27 +291,27 @@ public class DriveTrain implements Subsystem {
 
         if(alliance ==-1){
             if(far==true){
-                startingpose=new Pose (110, 9, Math.toRadians(90));
-                follower.setStartingPose(startingpose);
+                /*startingpose=new Pose (110, 9, Math.toRadians(90));
+                follower.setStartingPose(startingpose);*/
             }
             else if(far==false) {
-                startingpose = new Pose(120, 72, Math.toRadians(90));
-                follower.setStartingPose(startingpose);
+               /* startingpose = new Pose(120, 72, Math.toRadians(90));
+                follower.setStartingPose(startingpose);*/
             }
         }
         if(alliance ==1){
             if(far==true){
-                startingpose=new Pose (34, 9, Math.toRadians(90));
-                follower.setStartingPose(startingpose);
+                /*startingpose=new Pose (34, 9, Math.toRadians(90));
+                follower.setStartingPose(startingpose);*/
             }
             else if(far==false) {
-                startingpose=new Pose (24, 72, Math.toRadians(90));
-                follower.setStartingPose(startingpose);
+                /*startingpose=new Pose (24, 72, Math.toRadians(90));
+                follower.setStartingPose(startingpose);*/
             }
 
         }
-        //startingpose = Storage.currentPose;
-        //follower.setStartingPose(startingpose);
+        startingpose = Storage.currentPose;
+        follower.setStartingPose(startingpose);
 
         hoodServo1n= ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo1");
         hoodServo2n=  ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo2");

@@ -434,16 +434,16 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
             moverBacker = follower.pathBuilder().addPath(
                             new BezierLine(
                                     new Pose(11.5, 66),
-                                    new Pose(11, 60.25)       // 142 - 129.5
+                                    new Pose(10, 60.25)       // 142 - 129.5
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(170), Math.toRadians(140))
+                    ).setLinearHeadingInterpolation(Math.toRadians(170), Math.toRadians(137))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
                     .build();
 
             launchSpam1 = follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(11, 60.25),
+                                    new Pose(10, 60.25),
                                     new Pose(38.000, 67.000),
                                     new Pose(50.000, 94.000)
                             )
@@ -457,9 +457,9 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
                             new BezierCurve(
                                     new Pose(50.000, 94.000),
                                     new Pose(38.000, 67.000),
-                                    new Pose(10, 64)      // 142 - 129.5
+                                    new Pose(10, 63)      // 142 - 129.5
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(136), Math.toRadians(165))
+                    ).setLinearHeadingInterpolation(Math.toRadians(136), Math.toRadians(162))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
                     .addTemporalCallback(0.1, intakeMotorOn)
@@ -468,11 +468,11 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
 
             launchSpam2 = follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(10, 64),       // 142 - 129
+                                    new Pose(10, 63),       // 142 - 129
                                     new Pose(38.000, 67.000),
                                     new Pose(50.0, 94.0)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(165), Math.toRadians(135))
+                    ).setLinearHeadingInterpolation(Math.toRadians(162), Math.toRadians(135))
                     .setVelocityConstraint(0.3)
                     .setTValueConstraint(0.95)
                     .addPoseCallback(new Pose(24, 64), reverseIntakeForMe, 0.4) // 142 - 118

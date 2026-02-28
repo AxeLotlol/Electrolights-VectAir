@@ -16,7 +16,8 @@ import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightLocalization;
 import org.firstinspires.ftc.teamcode.subsystems.PositionalHood;
 import org.firstinspires.ftc.teamcode.subsystems.TempHood;
-
+import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
+import static dev.nextftc.extensions.pedro.PedroComponent.follower;
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
 import dev.nextftc.core.commands.groups.SequentialGroup;
@@ -131,7 +132,7 @@ public class TeleOpRed extends NextFTCOpMode {
                 .whenBecomesFalse(() -> intakeMotor.setPower(0));
         Gamepads.gamepad1().rightBumper().whenBecomesTrue(() -> DriveTrain.opentransfer.schedule())
                 .whenBecomesFalse(() -> DriveTrain.closeTransfer.schedule());
-
+        Gamepads.gamepad1().x().whenBecomesTrue(()->follower.setPose(new Pose(79.967,9.271,Math.toRadians(90))));
 
 
 

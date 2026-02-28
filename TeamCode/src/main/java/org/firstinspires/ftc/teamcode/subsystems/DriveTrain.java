@@ -213,18 +213,18 @@ public class DriveTrain implements Subsystem {
                     return null;
                 }
             } else {*/
-                yVCtx = () -> visionYawCommand(finalHeadingError);
-                return new MecanumDriverControlled(
-                        fL,
-                        fR,
-                        bL,
-                        bR,
-                        Gamepads.gamepad1().leftStickX().map(it -> alliance * it),
-                        Gamepads.gamepad1().leftStickY().map(it -> alliance * it),
-                        yVCtx,
-                        new FieldCentric(imu)
-                );
-        //}
+            yVCtx = () -> visionYawCommand(finalHeadingError);
+            return new MecanumDriverControlled(
+                    fL,
+                    fR,
+                    bL,
+                    bR,
+                    Gamepads.gamepad1().leftStickX().map(it -> alliance * it),
+                    Gamepads.gamepad1().leftStickY().map(it -> alliance * it),
+                    yVCtx,
+                    new FieldCentric(imu)
+            );
+            //}
 
         }
         else// IF AUTOLOCK IS NOT ON
@@ -271,22 +271,22 @@ public class DriveTrain implements Subsystem {
         }
         else{
             bum = false;
-        if(isBlue()==true) {
-            alliance=1;
-            far = false;
-        }
-        if(isRed()==true){
-            alliance=-1;
-            far = false;
-        }
-        if(isRedFar()==true){
-            alliance=-1;
-            far = true;
-        }
-        if(isBlueFar()==true){
-            alliance=1;
-            far = true;
-        }}
+            if(isBlue()==true) {
+                alliance=1;
+                far = false;
+            }
+            if(isRed()==true){
+                alliance=-1;
+                far = false;
+            }
+            if(isRedFar()==true){
+                alliance=-1;
+                far = true;
+            }
+            if(isBlueFar()==true){
+                alliance=1;
+                far = true;
+            }}
         imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
 
         if(alliance ==-1){

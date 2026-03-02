@@ -77,9 +77,9 @@ public class DriveTrain implements Subsystem {
     private boolean slow = false;
     // === AprilTag/Limelight align tuning ===
     private static final int APRILTAG_PIPELINE = 8;   // <-- set to your AprilTag pipeline index
-    private static final double YAW_KP = 0.075;      // deg -> yaw power (flip sign if turning wrong way)
-    private static final double YAW_MAX = 0.7;        // yaw cap
-    private static final double YAW_DEADBAND_DEG = 0.25;
+    private static final double YAW_KP = 0.09;      // deg -> yaw power (flip sign if turning wrong way)
+    private static final double YAW_MAX = 0.7;       // yaw cap
+    private static final double YAW_DEADBAND_DEG = 0.3;
 
     public double currentHoodState = 0;
 
@@ -291,27 +291,27 @@ public class DriveTrain implements Subsystem {
 
         if(alliance ==-1){
             if(far==true){
-                /*startingpose=new Pose (110, 9, Math.toRadians(90));
-                follower.setStartingPose(startingpose);*/
+                startingpose=new Pose (110, 9, Math.toRadians(90));
+                follower.setStartingPose(startingpose);
             }
             else if(far==false) {
-               /* startingpose = new Pose(120, 72, Math.toRadians(90));
-                follower.setStartingPose(startingpose);*/
+                startingpose = new Pose(120, 72, Math.toRadians(90));
+                follower.setStartingPose(startingpose);
             }
         }
         if(alliance ==1){
             if(far==true){
-                /*startingpose=new Pose (34, 9, Math.toRadians(90));
-                follower.setStartingPose(startingpose);*/
+                startingpose=new Pose (34, 9, Math.toRadians(90));
+                follower.setStartingPose(startingpose);
             }
             else if(far==false) {
-                /*startingpose=new Pose (24, 72, Math.toRadians(90));
-                follower.setStartingPose(startingpose);*/
+                startingpose=new Pose (24, 72, Math.toRadians(90));
+                follower.setStartingPose(startingpose);
             }
 
         }
-        startingpose = Storage.currentPose;
-        follower.setStartingPose(startingpose);
+        /*startingpose = Storage.currentPose;
+        follower.setStartingPose(startingpose);*/
 
         hoodServo1n= ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo1");
         hoodServo2n=  ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo2");

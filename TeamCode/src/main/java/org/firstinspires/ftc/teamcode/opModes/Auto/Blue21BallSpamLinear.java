@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opModes.Auto;
+    package org.firstinspires.ftc.teamcode.opModes.Auto;
 
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
@@ -19,7 +19,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
-import org.firstinspires.ftc.teamcode.subsystems.Storage;
 
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
@@ -42,8 +41,8 @@ import dev.nextftc.hardware.positionable.SetPosition;
 
 @Autonomous
 @Configurable
-public class Blue18BallSpamLinear extends NextFTCOpMode {
-    public Blue18BallSpamLinear(){
+public class Blue21BallSpamLinear extends NextFTCOpMode {
+    public Blue21BallSpamLinear(){
         addComponents(
                 new SubsystemComponent(Flywheel.INSTANCE,DistanceRed.INSTANCE),
                 BulkReadComponent.INSTANCE,
@@ -63,7 +62,7 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
 
     int tagId = 0;
 
-    public Pose start = new Pose(29.842, 135.289, Math.toRadians(90));
+    public Pose start = new Pose(31.842, 135.289, Math.toRadians(90));
 
 
     private MotorEx transfer1;
@@ -74,49 +73,49 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
 
     public static MotorEx flywheel2 = new MotorEx("launchingmotor2");
 
-   /* private CRServo hoodServo1n;
-    private CRServo hoodServo2n;
+           /* private CRServo hoodServo1n;
+            private CRServo hoodServo2n;
 
-    private CRServoEx hoodServo1 = new CRServoEx(() -> hoodServo1n);
-    private CRServoEx hoodServo2 = new CRServoEx(() -> hoodServo2n);
-
-
+            private CRServoEx hoodServo1 = new CRServoEx(() -> hoodServo1n);
+            private CRServoEx hoodServo2 = new CRServoEx(() -> hoodServo2n);
 
 
 
 
-    ParallelGroup HoodRunUp=new ParallelGroup(
-            new SetPower(hoodServo1,-1),
-            new SetPower(hoodServo2,1)
-    );
 
-    public ParallelGroup HoodPowerZero=new ParallelGroup(
-            new SetPower(hoodServo1,0),
-            new SetPower(hoodServo2,0)
-    );
 
-    public SequentialGroup HoodUp=new SequentialGroup(
-            HoodRunUp,
-            new Delay(0.18),
-            HoodPowerZero
-    );
+            ParallelGroup HoodRunUp=new ParallelGroup(
+                    new SetPower(hoodServo1,-1),
+                    new SetPower(hoodServo2,1)
+            );
 
-    ParallelGroup HoodRunDown=new ParallelGroup(
-            new SetPower(hoodServo1,1),
-            new SetPower(hoodServo2,-1)
-    );
+            public ParallelGroup HoodPowerZero=new ParallelGroup(
+                    new SetPower(hoodServo1,0),
+                    new SetPower(hoodServo2,0)
+            );
 
-    public SequentialGroup HoodDown=new SequentialGroup(
-            HoodRunDown,
-            new Delay(0.17),
-            HoodPowerZero
-    );
+            public SequentialGroup HoodUp=new SequentialGroup(
+                    HoodRunUp,
+                    new Delay(0.18),
+                    HoodPowerZero
+            );
 
-    public SequentialGroup HoodUpAuto=new SequentialGroup(
-            HoodRunUp,
-            new Delay(0.12),
-            HoodPowerZero
-    );*/
+            ParallelGroup HoodRunDown=new ParallelGroup(
+                    new SetPower(hoodServo1,1),
+                    new SetPower(hoodServo2,-1)
+            );
+
+            public SequentialGroup HoodDown=new SequentialGroup(
+                    HoodRunDown,
+                    new Delay(0.17),
+                    HoodPowerZero
+            );
+
+            public SequentialGroup HoodUpAuto=new SequentialGroup(
+                    HoodRunUp,
+                    new Delay(0.12),
+                    HoodPowerZero
+            );*/
 
     private Boolean preloadspin;
 
@@ -139,9 +138,9 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
 
         telemetry.update();
         follower = PedroComponent.follower();
-        /*Limelight3A limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.pipelineSwitch(APRILTAG_PIPELINE);
-        limelight.start();*/
+                /*Limelight3A limelight = hardwareMap.get(Limelight3A.class, "limelight");
+                limelight.pipelineSwitch(APRILTAG_PIPELINE);
+                limelight.start();*/
 
 
         IMUEx imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
@@ -214,8 +213,8 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
             .setStart(() -> {
                 transfer2.setPosition(0.635);
             });
-
-    public SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.05), transferOn, new Delay(0.4), transferOff, closeTransfer);
+    //niggers are black = (NO SHIT SHERLOCK);
+    public SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.05), transferOn, new Delay(0.3), transferOff, closeTransfer);
 
     public boolean spinup = true;
     public Command spinupfalse = new LambdaCommand()
@@ -253,14 +252,14 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
     public Command Auto(){
         return new SequentialGroup(
 
-                /*spinupPLEASEEIsagiINEEDTHIS,
-                preloadSpun*/
-                new Delay(0.5),
+                        /*spinupPLEASEEIsagiINEEDTHIS,
+                        preloadSpun*/
+                new Delay(0.3),
                 new FollowPath(paths.preloadLaunch,true,1.0),
                 shoot,
                 intakeMotorOn,
                 transferOn,
-                new Delay(0.1),
+                closeTransfer,
 
                 new FollowPath(paths.intakeSet2,true,1.0),
 
@@ -270,12 +269,11 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
                 shoot,
                 intakeMotorOn,
                 transferOn,
-                closeTransfer,
 
                 new FollowPath(paths.resetAndIntake1,true,1.0),
-                new Delay(0.2),
+                new Delay(0.1),
                 new FollowPath(paths.moverBacker,true,1.0),
-                new Delay(1.0),
+                new Delay(0.5),
                 //reverseIntakeForMe,
                 new FollowPath(paths.launchSpam1, true, 1.0),
                 shoot,
@@ -285,7 +283,15 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
 
 
                 new FollowPath(paths.resetAndIntake2, true, 1.0),
-                new Delay(2.0),
+                new Delay(1.3),
+                //reverseIntakeForMe,
+
+                new FollowPath(paths.launchSpam2, true, 1.0),
+                shoot,
+                intakeMotorOn,
+                transferOn,
+                new FollowPath(paths.resetAndIntake2, true, 1.0),
+                new Delay(1.6),
                 //reverseIntakeForMe,
 
                 new FollowPath(paths.launchSpam2, true, 1.0),
@@ -301,7 +307,7 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
                 transferOn,
                 new FollowPath(paths.intakeSet3,true,1.0),
                 new FollowPath(paths.launchSet3,true,1.0),
-                shoot,
+
 
                 new FollowPath(paths.teleOpPark,true,1.0)
         );
@@ -310,8 +316,8 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
     public void onStartButtonPressed() {
         opmodeTimer.resetTimer();
         pathTimer.resetTimer();
-        /*flywheel.setPower(1);
-        flywheel2.setPower(-1);*/
+                /*flywheel.setPower(1);
+                flywheel2.setPower(-1);*/
 
         preloadspinreal = true;
         shooter(1085);
@@ -327,23 +333,23 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
     public void onUpdate(){
         follower.update();
 
-        /*if(preloadspinreal) {
-            shooter(1080);
-        }
-        else{
-            if (DistanceRed.INSTANCE.getDistanceFromTag() != 0) {
-                shooter(findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
-                ActiveOpMode.telemetry().addData("Limelight!", findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
-            } else if (DistanceRed.INSTANCE.getDistanceFromTag() == 0 && !intake3&&!intakeSpam) {
-                shooter(1065);
-            }
-            else if(intake3){
-                shooter(1070);
-            }
-            else if(intakeSpam){
-                shooter(1065);
-            }
-        }*/
+                /*if(preloadspinreal) {
+                    shooter(1080);
+                }
+                else{
+                    if (DistanceRed.INSTANCE.getDistanceFromTag() != 0) {
+                        shooter(findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
+                        ActiveOpMode.telemetry().addData("Limelight!", findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
+                    } else if (DistanceRed.INSTANCE.getDistanceFromTag() == 0 && !intake3&&!intakeSpam) {
+                        shooter(1065);
+                    }
+                    else if(intake3){
+                        shooter(1070);
+                    }
+                    else if(intakeSpam){
+                        shooter(1065);
+                    }
+                }*/
 
         Pose currPose = follower.getPose();
         double robotHeading = follower.getPose().getHeading();
@@ -351,10 +357,10 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
         //Vector v = new Vector(new Pose(138, 138));
         Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity());
         double flywheelSpeed = results[0];
-        shooter((float) flywheelSpeed+10);
+        shooter((float) (flywheelSpeed+30));
         double hoodAngle = results[1];
         hoodToPos(hoodAngle);
-        Storage.currentPose = follower.getPose();
+        //Storage.currentPose = follower.getPose();
 
     }
 
@@ -363,6 +369,7 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
 
     @Override
     public void onStop() {
+        //Storage.currentPose = follower.getPose();
         follower.breakFollowing();
         telemetry.addLine("Autonomous Stopped.");
         telemetry.update();
@@ -433,10 +440,10 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
 
             moverBacker = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(11.5, 66),
-                                    new Pose(10, 60.25)       // 142 - 129.5
+                                    new Pose(11, 66),
+                                    new Pose(10, 58.75)       // 142 - 129.5
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(170), Math.toRadians(137))
+                    ).setLinearHeadingInterpolation(Math.toRadians(170), Math.toRadians(143))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
                     .build();
@@ -457,9 +464,9 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
                             new BezierCurve(
                                     new Pose(50.000, 94.000),
                                     new Pose(38.000, 67.000),
-                                    new Pose(10, 63)      // 142 - 129.5
+                                    new Pose(10, 62)      // 142 - 129.5
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(134), Math.toRadians(156))
+                    ).setLinearHeadingInterpolation(Math.toRadians(134), Math.toRadians(147))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
                     .addTemporalCallback(0.1, intakeMotorOn)
@@ -519,20 +526,21 @@ public class Blue18BallSpamLinear extends NextFTCOpMode {
             launchSet3 = follower.pathBuilder().addPath(
                             new BezierLine(
                                     new Pose(8, 42),
-                                    new Pose(50.000, 94.000)
+                                    new Pose(60, 103)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(179), Math.toRadians(133))
-                    .setVelocityConstraint(0.3)
-                    .setTValueConstraint(0.95)
-                    .addPoseCallback(new Pose(35, 69), reverseIntakeForMe, 0.8) // 142 - 107
+                    ).setLinearHeadingInterpolation(Math.toRadians(179), Math.toRadians(153))
+                    .setVelocityConstraint(2)
+                    .setTValueConstraint(0.8)
+                    .addPoseCallback(new Pose(35, 69), reverseIntakeForMe, 0.7) // 142 - 107
+                    .addPoseCallback(new Pose(45,85),shoot,0.8)
                     .build();
 
             teleOpPark = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(50.000, 94.000),
-                                    new Pose(18, 72)    // 142 - 89.168
+                                    new Pose(60, 103),
+                                    new Pose(53, 115)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(133),Math.toRadians(90))
+                    ).setLinearHeadingInterpolation(Math.toRadians(160), Math.toRadians(90))
                     .build();
         }
     }

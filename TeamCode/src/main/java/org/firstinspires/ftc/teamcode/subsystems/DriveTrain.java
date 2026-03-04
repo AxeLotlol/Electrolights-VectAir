@@ -78,7 +78,7 @@ public class DriveTrain implements Subsystem {
     // === AprilTag/Limelight align tuning ===
     private static final int APRILTAG_PIPELINE = 8;   // <-- set to your AprilTag pipeline index
     private static final double YAW_KP = 0.09;      // deg -> yaw power (flip sign if turning wrong way)
-    private static final double YAW_KD = 0.12;      // <-- ADDED: D-Gain for dampening oscillation
+    private static final double YAW_KD = 0.1;      // <-- ADDED: D-Gain for dampening oscillation
     private static final double YAW_MAX = 0.7;       // yaw cap
     private static final double YAW_DEADBAND_DEG = 0.3;
 

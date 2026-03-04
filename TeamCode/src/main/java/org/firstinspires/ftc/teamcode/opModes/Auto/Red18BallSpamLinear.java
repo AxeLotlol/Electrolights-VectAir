@@ -429,7 +429,7 @@ public class Red18BallSpamLinear extends NextFTCOpMode {
                             new BezierCurve(
                                     new Pose(92.000, 94.000),
                                     new Pose(104.000, 67.000),
-                                    new Pose(130.5, 63)
+                                    new Pose(131, 63)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(47), Math.toRadians(10))
                     .setVelocityConstraint(1.0)
@@ -470,7 +470,7 @@ public class Red18BallSpamLinear extends NextFTCOpMode {
                                     new Pose(104.000, 67.000),
                                     new Pose(130.5, 62)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(46), Math.toRadians(23))
+                    ).setLinearHeadingInterpolation(Math.toRadians(46), Math.toRadians(20))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
                     .addTemporalCallback(0.1,intakeMotorOn)

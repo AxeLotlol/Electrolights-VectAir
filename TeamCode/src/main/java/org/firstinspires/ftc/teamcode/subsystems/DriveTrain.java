@@ -78,8 +78,13 @@ public class DriveTrain implements Subsystem {
     // === AprilTag/Limelight align tuning ===
     private static final int APRILTAG_PIPELINE = 8;   // <-- set to your AprilTag pipeline index
     private static final double YAW_KP = 0.09;      // deg -> yaw power (flip sign if turning wrong way)
+    private static final double YAW_KD = 0.12;      // <-- ADDED: D-Gain for dampening oscillation
     private static final double YAW_MAX = 0.7;       // yaw cap
     private static final double YAW_DEADBAND_DEG = 0.3;
+
+    // ADDED: Fields to track error over time for D term
+    private double lastError = 0;
+    private double lastTime = 0;
 
     public double currentHoodState = 0;
 
@@ -92,8 +97,37 @@ public class DriveTrain implements Subsystem {
 
 
     private double visionYawCommand(double txDeg) {
-        if (Math.abs(txDeg) < YAW_DEADBAND_DEG) return 0.0;
-        return aimMultiplier*clip(YAW_KP * txDeg, -YAW_MAX, YAW_MAX);
+        if (Math.abs(txDeg) < YAW_DEADBAND_DEG) {
+            lastError = 0;
+            return 0.0;
+        }
+
+        // 1. Use System time for consistent math
+        double currentTime = System.currentTimeMillis() / 1000.0;
+        double deltaTime = currentTime - lastTime;
+        if (deltaTime <= 0) deltaTime = 0.001;
+
+        // 2. Only calculate D if the vision frame actually updated
+        // This prevents the "zero-derivative" jitter
+        double errorDerivative = 0;
+        if (txDeg != lastError) {
+            errorDerivative = (txDeg - lastError) / deltaTime;
+        }
+
+        // 3. Power Calculation
+        double pTerm = YAW_KP * txDeg;
+        double dTerm = YAW_KD * errorDerivative;
+
+        // 4. Add a small 'kS' (Static friction) to help it finish the move
+        // This allows you to lower KP and KD overall.
+        double kS = 0.05 * Math.signum(txDeg);
+
+        double power = pTerm + dTerm + kS;
+
+        lastError = txDeg;
+        lastTime = currentTime;
+
+        return aimMultiplier * clip(power, -YAW_MAX, YAW_MAX);
     }
 
     private void autolocktrue(){

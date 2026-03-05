@@ -302,7 +302,7 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
                 new FollowPath(paths.resetAndIntake1,true,1.0),
                 new Delay(0.1),
                 new FollowPath(paths.moverBacker,true,1.0),
-                new Delay(0.5),
+                new Delay(0.3),
                 //reverseIntakeForMe,
                 new FollowPath(paths.launchSpam1, true, 1.0),
                 shoot,

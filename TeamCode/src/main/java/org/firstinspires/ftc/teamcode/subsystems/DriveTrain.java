@@ -437,7 +437,7 @@ public class DriveTrain implements Subsystem {
 
     public boolean decrease = false;
 
-    public static double farangle = -0.54006585;
+    public static double farangle = -0.04006585;
 
     public static void farAngle(){
         if(farangle ==-0.54006585){
@@ -582,7 +582,7 @@ public class DriveTrain implements Subsystem {
         double flywheelSpeed = results[0];
         if(headingError<-50||headingError>50) {
             shooter((float) ((float) flywheelSpeed * 0.75));
-            aimMultiplier = 0.7;
+            aimMultiplier = 0.95;
             transferpower = -1;
         }
         else{
@@ -603,7 +603,12 @@ public class DriveTrain implements Subsystem {
                 }
             }
             else{
-                aimMultiplier = 0.5;
+                if(headingError>-20&&headingError<20) {
+                    aimMultiplier = 0.5;
+                }
+                else {
+                    aimMultiplier = 0.9;
+                }
             }
         }
         double hoodAngle = results[1];

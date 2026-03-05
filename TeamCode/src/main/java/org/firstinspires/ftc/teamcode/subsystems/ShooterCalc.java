@@ -42,7 +42,7 @@ public class ShooterCalc implements Subsystem {
             x = robotToGoalVector.getMagnitude()+10;
             ActiveOpMode.telemetry().addData("farzone", farzoneangle);
             a=DriveTrain.farangle;
-            y=15;
+            y=20;
         }
         else{
             a = ShooterConstants.SCORE_ANGLE;

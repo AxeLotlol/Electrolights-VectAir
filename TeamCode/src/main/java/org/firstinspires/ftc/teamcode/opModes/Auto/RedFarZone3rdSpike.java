@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.opModes.Auto;
 
 
+import static org.firstinspires.ftc.teamcode.subsystems.AutoShooterCalc.calculateShotVectorandUpdateHeading;
 import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
-import static org.firstinspires.ftc.teamcode.subsystems.AutoShooterCalc.calculateShotVectorandUpdateHeading;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
@@ -30,9 +30,6 @@ import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
 import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.extensions.pedro.PedroComponent;
-
-import dev.nextftc.extensions.pedro.TurnTo;
-
 import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
@@ -45,8 +42,8 @@ import dev.nextftc.hardware.positionable.SetPosition;
 
 @Autonomous
 @Configurable
-public class redFarZone extends NextFTCOpMode {
-    public redFarZone() {
+public class RedFarZone3rdSpike extends NextFTCOpMode {
+    public RedFarZone3rdSpike() {
         addComponents(
                 new SubsystemComponent(Flywheel.INSTANCE, DistanceRed.INSTANCE),
                 BulkReadComponent.INSTANCE,
@@ -256,36 +253,39 @@ public class redFarZone extends NextFTCOpMode {
         return new SequentialGroup(
                 new FollowPath(paths.Path1),
 
-                new Delay(2),
+                new Delay(1.5),
                 shoot,
                 new Delay(0.5),
                 intakeMotorOn,
                 transferOn,
                 transferOnForIntake,
                 //turnTo(new Pose(140,7),0.7),
+                new FollowPath(paths.IntakeSpike),
+                new FollowPath(paths.IntakeSpikeLaunch),
+                shoot,
 
                 new FollowPath(paths.Path2),
-                new Delay(2.0),
+                new Delay(1),
                 intakeMotorOff,
                 new FollowPath(paths.Path3),
                 shoot,
                 new Delay(0.5),
                 intakeMotorOn,
                 new FollowPath(paths.Path2),
-                new Delay(2.0),
+                new Delay(1),
                 intakeMotorOff,
                 new FollowPath(paths.Path3),
                 shoot,
                 new Delay(0.5),
                 intakeMotorOn,
                 new FollowPath(paths.Path2),
-                new Delay(2.0),
+                new Delay(1),
                 intakeMotorOff,
                 new FollowPath(paths.Path3),
                 shoot,
                 intakeMotorOn,
                 new FollowPath(paths.Path2),
-                new Delay(2.0),
+                new Delay(1),
                 intakeMotorOff,
                 new FollowPath(paths.Path3),
                 shoot,
@@ -355,6 +355,8 @@ public class redFarZone extends NextFTCOpMode {
 
     public class Paths {
         public PathChain Path1;
+        public PathChain IntakeSpike;
+        public PathChain IntakeSpikeLaunch;
         public PathChain Path2;
         public PathChain Path3;
 
@@ -368,6 +370,26 @@ public class redFarZone extends NextFTCOpMode {
                                     new Pose(86, 13)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(68))
+
+                    .build();
+            IntakeSpike = follower.pathBuilder().addPath(
+                            new BezierCurve(
+                                    new Pose(86, 13),
+                                    new Pose(85.197, 32.846),
+
+                                    new Pose(126.406, 36.579)
+                            )
+                    ).setLinearHeadingInterpolation(Math.toRadians(68), Math.toRadians(-3))
+
+                    .build();
+            IntakeSpikeLaunch = follower.pathBuilder().addPath(
+                            new BezierLine(
+
+
+                                    new Pose(126.406, 36.579),
+                                    new Pose(86,13)
+                            )
+                    ).setLinearHeadingInterpolation(Math.toRadians(-3), Math.toRadians(70))
 
                     .build();
 

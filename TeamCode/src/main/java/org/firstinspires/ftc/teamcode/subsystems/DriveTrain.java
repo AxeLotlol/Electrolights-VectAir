@@ -78,7 +78,7 @@ public class DriveTrain implements Subsystem {
     // === AprilTag/Limelight align tuning ===
     private static final int APRILTAG_PIPELINE = 8;   // <-- set to your AprilTag pipeline index
     private static final double YAW_KP = 0.09;      // deg -> yaw power (flip sign if turning wrong way)
-    private static final double YAW_KD = 0.1;      // <-- ADDED: D-Gain for dampening oscillation
+    private static final double YAW_KD = 0.01;      // <-- ADDED: D-Gain for dampening oscillation
     private static final double YAW_MAX = 0.7;       // yaw cap
     private static final double YAW_DEADBAND_DEG = 0.3;
 
@@ -292,6 +292,10 @@ public class DriveTrain implements Subsystem {
         //return null;
     }
 
+    public Command localize;
+
+
+
     @Override
     public void initialize() {
 
@@ -327,11 +331,17 @@ public class DriveTrain implements Subsystem {
             if(far==true){
                 startingpose=new Pose (110, 9, Math.toRadians(90));
                 follower.setStartingPose(startingpose);
+
+
             }
             else if(far==false) {
                 startingpose = new Pose(120, 72, Math.toRadians(90));
                 follower.setStartingPose(startingpose);
             }
+
+            localize = new LambdaCommand()
+                    .setStart(()->follower.setPose(new Pose(129,90,Math.toRadians(90))));
+
         }
         if(alliance ==1){
             if(far==true){
@@ -342,8 +352,12 @@ public class DriveTrain implements Subsystem {
                 startingpose=new Pose (24, 72, Math.toRadians(90));
                 follower.setStartingPose(startingpose);
             }
+            localize = new LambdaCommand()
+                    .setStart(()->follower.setPose(new Pose(15,90,Math.toRadians(90))));
 
         }
+
+
         /*startingpose = Storage.currentPose;
         follower.setStartingPose(startingpose);*/
 
@@ -358,6 +372,8 @@ public class DriveTrain implements Subsystem {
 
 
     }
+
+
 
     public double anglechange;
     private MotorEx intakeMotor;
@@ -510,14 +526,23 @@ public class DriveTrain implements Subsystem {
     private static ServoEx hoodServo2 = new ServoEx(() -> hoodServo2n);
     Command shooter = new LambdaCommand()
             .setStart(()-> shoot());
+    public Command Localize(){
+        return localize;
+    }
+
     @Override
     public void periodic() {
         if (firsttime == true) {
 
+
             Gamepads.gamepad1().triangle().whenBecomesTrue(() -> autolocktrue())
                     .whenBecomesFalse(() -> autolockfalse());
+            // Schedule the command stored in the localize variable
+            Gamepads.gamepad1().x().whenBecomesTrue((()->Localize().schedule()));
+
+
             Gamepads.gamepad1().cross().whenBecomesTrue(() -> hoodControl());
-            Gamepads.gamepad1().square().whenBecomesTrue(() -> farAngle());
+            //Gamepads.gamepad1().square().whenBecomesTrue(() -> farAngle());
             Gamepads.gamepad1().rightTrigger().greaterThan(0.3).whenBecomesTrue(shooter);
             intakeMotor = new MotorEx("intake");
             transfer1 = new MotorEx("transfer");

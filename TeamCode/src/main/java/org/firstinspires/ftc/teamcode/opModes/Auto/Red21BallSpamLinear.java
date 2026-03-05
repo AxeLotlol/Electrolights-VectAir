@@ -231,7 +231,35 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
             });
     public Command reverseIntakeForMe = new LambdaCommand()
             .setStart(() -> intakeMotor.setPower(0.5));
+    public Command aimAtGoal = new LambdaCommand()
+            .setStart(() -> {
+                Pose currPose = follower.getPose();
 
+                // 1. Calculate the vector to the goal (138, 141)
+                Vector robotToGoalVector = new Vector(
+                        follower.getPose().distanceFrom(new Pose(138, 141)),
+                        Math.atan2(141 - currPose.getY(), 138 - currPose.getX())
+                );
+
+                // 2. Get the required heading and flywheel/hood specs from your utility
+                Double[] results = calculateShotVectorandUpdateHeading(
+                        currPose.getHeading(),
+                        robotToGoalVector,
+                        follower.getVelocity()
+                );
+
+                double targetHeading = results[2]; // Assuming index 2 is the target heading from your calc
+                double flywheelSpeed = results[0];
+                double hoodAngle = results[1];
+
+                // 3. Update Hardware
+                shooter((float) (flywheelSpeed + 30));
+                hoodToPos(hoodAngle);
+
+                // 4. Force Pedro Pathing to face the goal
+                // This overrides the path's heading interpolation with the live target
+                follower.turn(targetHeading);
+            });
     public boolean lift;
     boolean lowerangle = false;
     private Boolean preloadspinreal = false;

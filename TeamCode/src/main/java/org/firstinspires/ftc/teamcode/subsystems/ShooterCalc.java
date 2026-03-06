@@ -42,7 +42,7 @@ public class ShooterCalc implements Subsystem {
             x = robotToGoalVector.getMagnitude()+10;
             ActiveOpMode.telemetry().addData("farzone", farzoneangle);
             a=DriveTrain.farangle;
-            y=20;
+            y=14.75;
         }
         else{
             a = ShooterConstants.SCORE_ANGLE;
@@ -86,7 +86,7 @@ public class ShooterCalc implements Subsystem {
 
         //y = /*SCORE_HEIGHT*/ -2.6045*newtemp*newtemp*newtemp + 16.148*newtemp*newtemp - 33.009*newtemp + 51.203; // -0.7135x2 + 0.8315x + 33.532
         //y= -4.5745*newtemp*newtemp*newtemp + 25.978*newtemp*newtemp - 48.395*newtemp + 58.675;
-        if(y!=15) {
+        if(y!=14.75) {
             y = /*SCORE_HEIGHT*/ -4.5745*newtemp*newtemp*newtemp + 25.978*newtemp*newtemp - 48.395*newtemp + 58.675; // -0.7135x2 + 0.8315x + 33.532
         }
         flywheelSpeed = Math.sqrt(g * ndr * ndr / (2 * Math.pow(Math.cos(hoodAngle), 2) * (ndr * Math. tan(hoodAngle) - y)));

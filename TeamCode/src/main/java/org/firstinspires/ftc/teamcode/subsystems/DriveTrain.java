@@ -329,14 +329,14 @@ public class DriveTrain implements Subsystem {
 
         if(alliance ==-1){
             if(far==true){
-                startingpose=new Pose (110, 9, Math.toRadians(90));
-                follower.setStartingPose(startingpose);
+                /*startingpose=new Pose (110, 9, Math.toRadians(90));
+                follower.setStartingPose(startingpose);*/
 
 
             }
             else if(far==false) {
-                startingpose = new Pose(120, 72, Math.toRadians(90));
-                follower.setStartingPose(startingpose);
+               /* startingpose = new Pose(120, 72, Math.toRadians(90));
+                follower.setStartingPose(startingpose);*/
             }
 
             localize = new LambdaCommand()
@@ -345,12 +345,12 @@ public class DriveTrain implements Subsystem {
         }
         if(alliance ==1){
             if(far==true){
-                startingpose=new Pose (34, 9, Math.toRadians(90));
-                follower.setStartingPose(startingpose);
+                /*startingpose=new Pose (34, 9, Math.toRadians(90));
+                follower.setStartingPose(startingpose);*/
             }
             else if(far==false) {
-                startingpose=new Pose (24, 72, Math.toRadians(90));
-                follower.setStartingPose(startingpose);
+                /*startingpose=new Pose (24, 72, Math.toRadians(90));
+                follower.setStartingPose(startingpose);*/
             }
             localize = new LambdaCommand()
                     .setStart(()->follower.setPose(new Pose(15,90,Math.toRadians(90))));
@@ -358,8 +358,8 @@ public class DriveTrain implements Subsystem {
         }
 
 
-        /*startingpose = Storage.currentPose;
-        follower.setStartingPose(startingpose);*/
+        startingpose = Storage.currentPose;
+        follower.setStartingPose(startingpose);
 
         hoodServo1n= ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo1");
         hoodServo2n=  ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo2");
@@ -437,7 +437,7 @@ public class DriveTrain implements Subsystem {
 
     public boolean decrease = false;
 
-    public static double farangle = -0.04006585;
+    public static double farangle = -0.37006585;
 
     public static void farAngle(){
         if(farangle ==-0.54006585){

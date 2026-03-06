@@ -20,6 +20,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
+import org.firstinspires.ftc.teamcode.subsystems.Storage;
 
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
@@ -167,6 +168,8 @@ public class redFarZone extends NextFTCOpMode {
         follower.setStartingPose(start);
 
 
+
+
         pathState = 0;
         telemetry.addLine("Follower + IMU + Odo Pods initialized successfully!");
         telemetry.addLine("Initialization complete!");
@@ -268,9 +271,11 @@ public class redFarZone extends NextFTCOpMode {
                 new Delay(2.0),
                 intakeMotorOff,
                 new FollowPath(paths.Path3),
+                transferOn,
                 shoot,
                 new Delay(0.5),
                 intakeMotorOn,
+                transferOn,
                 new FollowPath(paths.Path2),
                 new Delay(2.0),
                 intakeMotorOff,
@@ -278,12 +283,15 @@ public class redFarZone extends NextFTCOpMode {
                 shoot,
                 new Delay(0.5),
                 intakeMotorOn,
+                transferOn,
                 new FollowPath(paths.Path2),
+
                 new Delay(2.0),
                 intakeMotorOff,
                 new FollowPath(paths.Path3),
                 shoot,
                 intakeMotorOn,
+                transferOn,
                 new FollowPath(paths.Path2),
                 new Delay(2.0),
                 intakeMotorOff,
@@ -343,6 +351,9 @@ public class redFarZone extends NextFTCOpMode {
         double hoodAngle = results[1];
         hoodToPos(hoodAngle);
 
+        Storage.currentPose = follower.getPose();
+
+
     }
 
 
@@ -351,6 +362,7 @@ public class redFarZone extends NextFTCOpMode {
         follower.breakFollowing();
         telemetry.addLine("Autonomous Stopped.");
         telemetry.update();
+        Storage.currentPose = follower.getPose();
     }
 
     public class Paths {

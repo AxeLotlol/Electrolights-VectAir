@@ -20,6 +20,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
+import org.firstinspires.ftc.teamcode.subsystems.Storage;
 
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
@@ -263,14 +264,17 @@ public class RedFarZone3rdSpike extends NextFTCOpMode {
                 new FollowPath(paths.IntakeSpike),
                 new FollowPath(paths.IntakeSpikeLaunch),
                 shoot,
+                transferOn,
 
                 new FollowPath(paths.Path2),
+
                 new Delay(1),
                 intakeMotorOff,
                 new FollowPath(paths.Path3),
                 shoot,
                 new Delay(0.5),
                 intakeMotorOn,
+                transferOn,
                 new FollowPath(paths.Path2),
                 new Delay(1),
                 intakeMotorOff,
@@ -278,12 +282,14 @@ public class RedFarZone3rdSpike extends NextFTCOpMode {
                 shoot,
                 new Delay(0.5),
                 intakeMotorOn,
+                transferOn,
                 new FollowPath(paths.Path2),
                 new Delay(1),
                 intakeMotorOff,
                 new FollowPath(paths.Path3),
                 shoot,
                 intakeMotorOn,
+                transferOn,
                 new FollowPath(paths.Path2),
                 new Delay(1),
                 intakeMotorOff,
@@ -342,6 +348,7 @@ public class RedFarZone3rdSpike extends NextFTCOpMode {
         shooter((float) flywheelSpeed);
         double hoodAngle = results[1];
         hoodToPos(hoodAngle);
+        Storage.currentPose = follower.getPose();
 
     }
 

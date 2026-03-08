@@ -306,7 +306,7 @@ public class Red21BallSpamLinearSpike1And2 extends NextFTCOpMode {
                 new FollowPath(paths.launchSpam2, true, 1.0),
                 shoot,
                 new FollowPath(paths.intakeSet1,true,1.0),
-                new Delay(1.5),
+
                 new FollowPath(paths.launchSet1,true,1.0),
                 shoot,
 

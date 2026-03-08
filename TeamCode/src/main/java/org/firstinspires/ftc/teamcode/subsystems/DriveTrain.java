@@ -329,14 +329,14 @@ public class DriveTrain implements Subsystem {
 
         if(alliance ==-1){
             if(far==true){
-                /*startingpose=new Pose (110, 9, Math.toRadians(90));
-                follower.setStartingPose(startingpose);*/
+                startingpose=new Pose (110, 9, Math.toRadians(90));
+                follower.setStartingPose(startingpose);
 
 
             }
             else if(far==false) {
-               /* startingpose = new Pose(120, 72, Math.toRadians(90));
-                follower.setStartingPose(startingpose);*/
+                startingpose = new Pose(120, 72, Math.toRadians(90));
+                follower.setStartingPose(startingpose);
             }
 
             localize = new LambdaCommand()
@@ -345,12 +345,12 @@ public class DriveTrain implements Subsystem {
         }
         if(alliance ==1){
             if(far==true){
-                /*startingpose=new Pose (34, 9, Math.toRadians(90));
-                follower.setStartingPose(startingpose);*/
+                startingpose=new Pose (34, 9, Math.toRadians(90));
+                follower.setStartingPose(startingpose);
             }
             else if(far==false) {
-                /*startingpose=new Pose (24, 72, Math.toRadians(90));
-                follower.setStartingPose(startingpose);*/
+                startingpose=new Pose (24, 72, Math.toRadians(90));
+                follower.setStartingPose(startingpose);
             }
             localize = new LambdaCommand()
                     .setStart(()->follower.setPose(new Pose(15,90,Math.toRadians(90))));
@@ -588,7 +588,7 @@ public class DriveTrain implements Subsystem {
         else{
             //double offset = -8/17 * currPose.distanceFrom(new Pose( 138, 138)) + 746/17;
             if(robotToGoalVector.getMagnitude() > 110) {
-                transferpower = -0.75;
+                transferpower = -1;
             }
             else{
                 transferpower = -1;

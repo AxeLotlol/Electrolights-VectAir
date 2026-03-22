@@ -57,7 +57,7 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
 
-
+    
     private Paths paths;
     public MotorEx intakeMotor;
 
@@ -606,6 +606,6 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
                     ).setLinearHeadingInterpolation(Math.toRadians(30),Math.toRadians(90))
 
                     .build();
-        }
+        }   
     }
 }

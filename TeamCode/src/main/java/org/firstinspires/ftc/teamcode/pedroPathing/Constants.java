@@ -70,6 +70,7 @@ public class Constants {
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
             .xVelocity(79)
             .yVelocity(61);
+
     public static PinpointConstants localizerConstants = new PinpointConstants()
             .forwardPodY(5.5)
             .strafePodX(5.0)

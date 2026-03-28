@@ -399,7 +399,7 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
 
     @Override
     public void onStop() {
-        //Storage.currentPose = follower.getPose();
+        Storage.currentPose = follower.getPose();
         follower.breakFollowing();
         telemetry.addLine("Autonomous Stopped.");
         telemetry.update();

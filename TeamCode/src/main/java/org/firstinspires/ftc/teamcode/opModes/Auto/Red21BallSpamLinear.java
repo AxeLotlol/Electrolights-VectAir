@@ -406,6 +406,8 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
     }
 
 
+
+
     public class Paths {
         public PathChain preloadLaunch;
         public PathChain intakeSet2;
@@ -466,9 +468,9 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
                             new BezierCurve(
                                     new Pose(92.000, 94.000),
                                     new Pose(104.000, 67.000),
-                                    new Pose(132.5, 62.25)
+                                    new Pose(128, 64)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(47), Math.toRadians(10))
+                    ).setLinearHeadingInterpolation(Math.toRadians(47), Math.toRadians(20))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
                     .addTemporalCallback(0.1,intakeMotorOn)
@@ -478,10 +480,10 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
 
             moverBacker = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(131, 63.5),
+                                    new Pose(128, 64),
                                     new Pose(130, 59.75)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(10), Math.toRadians(45))
+                    ).setLinearHeadingInterpolation(Math.toRadians(20), Math.toRadians(45))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
 
@@ -505,9 +507,9 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
                             new BezierCurve(
                                     new Pose(92.000, 94.000),
                                     new Pose(104.000, 67.000),
-                                    new Pose(132.5, 62.25)
+                                    new Pose(130.5, 62)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(46), Math.toRadians(30))
+                    ).setLinearHeadingInterpolation(Math.toRadians(46), Math.toRadians(23))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
                     .addTemporalCallback(0.1,intakeMotorOn)
@@ -517,7 +519,7 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
 
             launchSpam2 = follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(132.5, 62.25),
+                                    new Pose(130.5, 63),
                                     new Pose(104.000, 67.000),
                                     new Pose(92, 94)
                             )
@@ -538,7 +540,7 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
                                     new Pose(92, 94),
                                     new Pose(104,87),
 
-                                    new Pose(124.665, 86.898)
+                                    new Pose(126.665, 86.898)
                             )
                     ).setTangentHeadingInterpolation()
                     .setVelocityConstraint(1.0)
@@ -551,7 +553,7 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
 
             launchSet1 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(124.665, 86.898),
+                                    new Pose(126.665, 86.898),
 
                                     new Pose(92.000, 94.000)
                             )

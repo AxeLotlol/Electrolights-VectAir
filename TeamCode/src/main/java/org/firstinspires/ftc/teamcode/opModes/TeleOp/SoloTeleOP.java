@@ -11,7 +11,6 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.Vector;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -53,12 +52,12 @@ public class SoloTeleOP extends NextFTCOpMode {
 
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
-    private boolean stopped = false;
-    private boolean parked = false;
+
+
 
     private Command fullRoutine;
 
-    public Pose start = new Pose(91, 115, Math.toRadians(90));
+    public Pose start = Storage.currentPose;
 
     private Paths paths;
     public MotorEx intakeMotor;
@@ -77,7 +76,7 @@ public class SoloTeleOP extends NextFTCOpMode {
         if (!Double.isNaN(runtime)) {
             ActiveOpMode.telemetry().addData("runtime", runtime);
             ParallelGroup HoodRunUp = new ParallelGroup(
-                    new SetPosition(hoodServo1,      runtime),
+                    new SetPosition(hoodServo1, runtime),
                     new SetPosition(hoodServo2, -1 * runtime)
             );
             HoodRunUp.schedule();
@@ -118,8 +117,16 @@ public class SoloTeleOP extends NextFTCOpMode {
     public Command reverseIntakeForMe = new LambdaCommand()
             .setStart(() -> intakeMotor.setPower(0.5));
 
-    private Command snapToLaunchPose = new LambdaCommand()
-            .setStart(() -> follower.setPose(new Pose(92, 94, Math.toRadians(46))));
+
+    private SequentialGroup park() {
+        return new SequentialGroup(
+                new FollowPath(paths.parkPath, true, 1.0),
+                intakeMotorOff,
+                transferOff
+
+        );
+    }
+
 
     private SequentialGroup oneCycle() {
         return new SequentialGroup(
@@ -129,7 +136,6 @@ public class SoloTeleOP extends NextFTCOpMode {
                 new FollowPath(paths.resetAndIntake2, true, 1.0),
                 new Delay(1.6),
                 new FollowPath(paths.launchSpam2, true, 1.0),
-                snapToLaunchPose,
                 shoot,
                 intakeMotorOn,
                 transferOn
@@ -144,10 +150,7 @@ public class SoloTeleOP extends NextFTCOpMode {
                 new FollowPath(paths.toIntakeSet1Pre, true, 1.0),
                 intakeMotorOn,
                 transferOn,
-                new FollowPath(paths.toIntakeSet1Final, true, 1.0),
-                new Delay(1.6),
                 new FollowPath(paths.launchFromSet1, true, 1.0),
-                snapToLaunchPose,
                 shoot,
                 intakeMotorOn,
                 transferOn
@@ -162,10 +165,7 @@ public class SoloTeleOP extends NextFTCOpMode {
                 new FollowPath(paths.toIntakeSet2Pre, true, 1.0),
                 intakeMotorOn,
                 transferOn,
-                new FollowPath(paths.toIntakeSet2Final, true, 1.0),
-                new Delay(1.6),
                 new FollowPath(paths.launchFromSet2, true, 1.0),
-                snapToLaunchPose,
                 shoot,
                 intakeMotorOn,
                 transferOn
@@ -180,10 +180,8 @@ public class SoloTeleOP extends NextFTCOpMode {
                 new FollowPath(paths.toIntakeSet3Pre, true, 1.0),
                 intakeMotorOn,
                 transferOn,
-                new FollowPath(paths.toIntakeSet3Final, true, 1.0),
-                new Delay(1.6),
-                new FollowPath(paths.launchFromSet3, true, 1.0),
-                snapToLaunchPose,
+                new FollowPath(paths.launchFromSet3),
+
                 shoot,
                 intakeMotorOn,
                 transferOn
@@ -196,9 +194,8 @@ public class SoloTeleOP extends NextFTCOpMode {
                 transferOn,
                 closeTransfer,
                 new FollowPath(paths.parkToIntake, true, 1.0),
-                new Delay(1.6),
+                new Delay(.9),
                 new FollowPath(paths.launchSpam2, true, 1.0),
-                snapToLaunchPose,
                 shoot,
                 intakeMotorOn,
                 transferOn,
@@ -212,27 +209,21 @@ public class SoloTeleOP extends NextFTCOpMode {
                 oneCycle(), oneCycle(), oneCycle(), oneCycle(),
 
                 intakeSet3Cycle(),
-                oneCycle(), oneCycle(), oneCycle(), oneCycle(),
-                oneCycle(), oneCycle(), oneCycle()
+                oneCycle(), oneCycle(), oneCycle(),oneCycle(), oneCycle(), beautifulTIming, park()
         );
         return fullRoutine;
     }
 
     @Override
     public void onInit() {
-        telemetry.addLine("Initializing RedGateCycleTeleOp...");
+        telemetry.addLine("Initializing Solo TeleOP...");
         telemetry.update();
 
         follower = PedroComponent.follower();
-        stopped = false;
-        parked = false;
+        endgame = false;
         fullRoutine = null;
 
         IMUEx imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
-
-        Limelight3A limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.pipelineSwitch(7);
-        limelight.start();
 
         intakeMotor = new MotorEx("intake");
         transfer1   = new MotorEx("transfer");
@@ -250,7 +241,7 @@ public class SoloTeleOP extends NextFTCOpMode {
 
         follower.update();
 
-        telemetry.addLine("RedGateCycleTeleOp ready!");
+        telemetry.addLine("Solo TeleOP Initialized");
         telemetry.update();
     }
 
@@ -261,44 +252,13 @@ public class SoloTeleOP extends NextFTCOpMode {
         shooter(1085);
         buildFullRoutine().schedule();
     }
+    public boolean endgame = false;
 
+    Command beautifulTIming = new LambdaCommand()
+            .setStart(()-> endgame= true);
     @Override
     public void onUpdate() {
         follower.update();
-
-        if (opmodeTimer.getElapsedTimeSeconds() >= 116 && !parked && !stopped) {
-            parked = true;
-            pathTimer.resetTimer();
-            if (fullRoutine != null) fullRoutine.cancel();
-            follower.breakFollowing();
-            intakeMotor.setPower(0);
-            transfer1.setPower(0);
-            shooter(0);
-            new FollowPath(paths.parkPath, true, 1.0).schedule();
-        }
-
-        if (parked && !stopped && (
-                opmodeTimer.getElapsedTimeSeconds() >= 119.5 ||
-                        (pathTimer.getElapsedTimeSeconds() > 0.5 && !follower.isBusy())
-        )) {
-            stopped = true;
-            follower.breakFollowing();
-            intakeMotor.setPower(0);
-            transfer1.setPower(0);
-            flywheel.setPower(0);
-            flywheel2.setPower(0);
-            transfer2.setPosition(0.635);
-            shooter(0);
-            return;
-        }
-
-        if (stopped) {
-            flywheel.setPower(0);
-            flywheel2.setPower(0);
-            shooter(0);
-            return;
-        }
-        if (parked) return;
 
         Pose currPose = follower.getPose();
         double robotHeading = follower.getPose().getHeading();
@@ -310,9 +270,16 @@ public class SoloTeleOP extends NextFTCOpMode {
                 robotHeading, robotToGoalVector, follower.getVelocity()
         );
         double flywheelSpeed = results[0];
-        shooter((float) (flywheelSpeed + 30));
-        double hoodAngle = results[1];
-        hoodToPos(hoodAngle);
+
+        if(!endgame) {
+
+            shooter((float) (flywheelSpeed + 30));
+            double hoodAngle = results[1];
+            hoodToPos(hoodAngle);
+        }
+        else{
+            shooter(0);
+        }
 
         Storage.currentPose = follower.getPose();
 
@@ -331,7 +298,7 @@ public class SoloTeleOP extends NextFTCOpMode {
         flywheel.setPower(0);
         flywheel2.setPower(0);
         shooter(0);
-        telemetry.addLine("RedGateCycleTeleOp Stopped.");
+        telemetry.addLine("Solo TeleOP Stopped.");
         telemetry.update();
     }
 
@@ -358,11 +325,11 @@ public class SoloTeleOP extends NextFTCOpMode {
 
             parkToIntake = follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(91, 115),
+                                    start,
                                     new Pose(104.000, 67.000),
-                                    new Pose(131.5, 59.25)
+                                    new Pose(132.5, 62.25)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(25))
+                    ).setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(30))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
                     .addTemporalCallback(0.1, intakeMotorOn)
@@ -371,11 +338,11 @@ public class SoloTeleOP extends NextFTCOpMode {
 
             resetAndIntake2 = follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(92.000, 94.000),
+                                    new Pose(92, 94),
                                     new Pose(104.000, 67.000),
-                                    new Pose(130.5, 60.75)
+                                    new Pose(132.5, 62.25)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(46), Math.toRadians(25))
+                    ).setLinearHeadingInterpolation(Math.toRadians(46), Math.toRadians(30))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
                     .addTemporalCallback(0.1, intakeMotorOn)
@@ -384,7 +351,7 @@ public class SoloTeleOP extends NextFTCOpMode {
 
             launchSpam2 = follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(131.5, 61.5),
+                                    new Pose(132.5, 62.52),
                                     new Pose(104.000, 67.000),
                                     new Pose(92, 94)
                             )
@@ -398,30 +365,30 @@ public class SoloTeleOP extends NextFTCOpMode {
                             new BezierCurve(
                                     new Pose(92.000, 94.000),
                                     new Pose(50.000, 87.000),
-                                    new Pose(22.000, 85.898)
+                                    new Pose(20, 93)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(46), Math.toRadians(179))
+                    ).setConstantHeadingInterpolation(Math.toRadians(180))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
                     .addTemporalCallback(0.1, intakeMotorOn)
                     .addTemporalCallback(0.1, transferOn)
                     .build();
 
-            toIntakeSet1Final = follower.pathBuilder().addPath(
+            /*toIntakeSet1Final = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(22.000, 85.898),
-                                    new Pose(12.000, 85.898)
+                                    new Pose(40, 93),
+                                    new Pose(20, 93)
                             )
                     ).setConstantHeadingInterpolation(Math.toRadians(179))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.9)
                     .addTemporalCallback(0.1, intakeMotorOn)
                     .addTemporalCallback(0.1, transferOn)
-                    .build();
+                    .build();*/
 
             launchFromSet1 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(13.000, 86.898),
+                                    new Pose(20, 88.898),
                                     new Pose(92.000, 94.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(179), Math.toRadians(46))
@@ -434,30 +401,30 @@ public class SoloTeleOP extends NextFTCOpMode {
                             new BezierCurve(
                                     new Pose(92.000, 94.000),
                                     new Pose(57.000, 56.798),
-                                    new Pose(17.660, 61.590)
+                                    new Pose(17.660, 64.590)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(46), Math.toRadians(195))
+                    ).setConstantHeadingInterpolation(Math.toRadians(180))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
                     .addTemporalCallback(0.1, intakeMotorOn)
                     .addTemporalCallback(0.1, transferOn)
                     .build();
 
-            toIntakeSet2Final = follower.pathBuilder().addPath(
+            /*toIntakeSet2Final = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(17.660, 61.590),
-                                    new Pose(8.000, 59.000)
+                                    new Pose(20.660, 64.590),
+                                    new Pose(15.000, 64.590)
                             )
                     ).setConstantHeadingInterpolation(Math.toRadians(195))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.9)
                     .addTemporalCallback(0.1, intakeMotorOn)
                     .addTemporalCallback(0.1, transferOn)
-                    .build();
+                    .build();*/
 
             launchFromSet2 = follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(8.000, 60.000),
+                                    new Pose(17.660, 64.590),
                                     new Pose(38.000, 67.000),
                                     new Pose(92.000, 94.000)
                             )
@@ -472,30 +439,30 @@ public class SoloTeleOP extends NextFTCOpMode {
                                     new Pose(92.000, 94.000),
                                     new Pose(54.000, 89.500),
                                     new Pose(67.000, 28.615),
-                                    new Pose(16.000, 42.000)
+                                    new Pose(20.660, 42.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(46), Math.toRadians(180))
+                    ).setConstantHeadingInterpolation(Math.toRadians(180))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
                     .addTemporalCallback(0.1, intakeMotorOn)
                     .addTemporalCallback(0.1, transferOn)
                     .build();
 
-            toIntakeSet3Final = follower.pathBuilder().addPath(
+            /*toIntakeSet3Final = follower.pathBuilder().addPath(
                             new BezierLine(
                                     new Pose(16.000, 42.000),
-                                    new Pose(6.000, 42.000)
+                                    new Pose(14, 42.000)
                             )
                     ).setConstantHeadingInterpolation(Math.toRadians(180))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.9)
                     .addTemporalCallback(0.1, intakeMotorOn)
                     .addTemporalCallback(0.1, transferOn)
-                    .build();
+                    .build();*/
 
             launchFromSet3 = follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(6.000, 42.000),
+                                    new Pose(20.660, 42.000),
                                     new Pose(38.000, 67.000),
                                     new Pose(92.000, 94.000)
                             )

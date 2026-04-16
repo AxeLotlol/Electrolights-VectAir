@@ -543,7 +543,7 @@ public class SpamTeleOp extends NextFTCOpMode {
 
     private Command fullRoutine;
 
-    public Pose start = new Pose(112.158,135.289, Math.toRadians(90));
+    public Pose start;
 
     private Paths paths;
     public MotorEx intakeMotor;
@@ -633,7 +633,7 @@ public class SpamTeleOp extends NextFTCOpMode {
                 transferOn,
                 closeTransfer,
                 new FollowPath(paths.resetAndIntake1, true, 1.0),
-                new Delay(0.2),
+                new Delay(0.05),
                 new FollowPath(paths.moverBacker, true, 1.0),
                 new Delay(1.3),
                 new FollowPath(paths.launchSpam2, true, 1.0),
@@ -649,7 +649,7 @@ public class SpamTeleOp extends NextFTCOpMode {
                 transferOn,
                 closeTransfer,
                 new FollowPath(paths.resetAndIntake1, true, 1.0),
-                new Delay(0.2),
+                new Delay(0.05),
                 new FollowPath(paths.moverBacker2, true, 1.0),
                 new Delay(1.3),
                 new FollowPath(paths.launchSpam2, true, 1.0),
@@ -711,23 +711,21 @@ public class SpamTeleOp extends NextFTCOpMode {
                 transferOn,
                 closeTransfer,
                 new FollowPath(paths.parkToIntake, true, 1.0),
-                new Delay(1.3),
+                new Delay(1),
                 new FollowPath(paths.launchSpam2, true, 1.0),
                 shoot,
                 intakeMotorOn,
                 transferOn,
 
                 oneCycle(), oneCycle(), oneCycle(), oneCycle(), oneCycle(), oneCycle(),
-                oneCycle(), oneCycle(), oneCycle(),
 
                 intakeSet1Cycle(),
 
-                oneCycleAfterSpike1(), oneCycle(), oneCycle(),
-                oneCycle(), oneCycle(), oneCycle(),
-
+                oneCycleAfterSpike1(), oneCycle(), oneCycle(), oneCycle(),
+                oneCycle(), oneCycle(),
                 intakeSet2Cycle(),
 
-                oneCycleAfterSpike2(), oneCycle(), oneCycle(), lastCall, park()
+                oneCycleAfterSpike2(), oneCycle(), oneCycle(), oneCycle(), lastCall, park()
         );
         return fullRoutine;
     }
@@ -741,7 +739,8 @@ public class SpamTeleOp extends NextFTCOpMode {
         endgame = false;
         fullRoutine = null;
 
-        start = new Pose(112.158,135.289, Math.toRadians(90));
+        //start = new Pose(112.158,135.289, Math.toRadians(90));
+        start = Storage.currentPose;
         follower.setStartingPose(start);
         paths = new Paths(follower);
 
@@ -768,6 +767,7 @@ public class SpamTeleOp extends NextFTCOpMode {
 
     @Override
     public void onStartButtonPressed() {
+        start = Storage.currentPose;
         opmodeTimer.resetTimer();
         pathTimer.resetTimer();
         shooter(1085);
@@ -849,10 +849,10 @@ public class SpamTeleOp extends NextFTCOpMode {
             parkToIntake = follower.pathBuilder().addPath(
                             new BezierCurve(
                                     start,
-                                    new Pose(104.000, 67.000),
+                                    new Pose(89.000, 67.000),
                                     new Pose(132.5, 62.25)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(30))
+                    ).setConstantHeadingInterpolation(Math.toRadians(30))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
                     .addTemporalCallback(0.1, intakeMotorOn)
@@ -865,7 +865,7 @@ public class SpamTeleOp extends NextFTCOpMode {
                                     new Pose(104.000, 67.000),
                                     new Pose(132.5, 62.25)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(44), Math.toRadians(30))
+                    ).setLinearHeadingInterpolation(Math.toRadians(43), Math.toRadians(30))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
                     .addTemporalCallback(0.1, intakeMotorOn)
@@ -878,7 +878,7 @@ public class SpamTeleOp extends NextFTCOpMode {
                                     new Pose(104.000, 67.000),
                                     new Pose(92, 94)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(17), Math.toRadians(44))
+                    ).setLinearHeadingInterpolation(Math.toRadians(17), Math.toRadians(43))
                     .setVelocityConstraint(0.3)
                     .setTValueConstraint(0.95)
                     .addPoseCallback(new Pose(118, 64), reverseIntakeForMe, 0.4)
@@ -903,7 +903,7 @@ public class SpamTeleOp extends NextFTCOpMode {
                                     new Pose(20, 99),
                                     new Pose(92.000, 94.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(177), Math.toRadians(44))
+                    ).setLinearHeadingInterpolation(Math.toRadians(177), Math.toRadians(43))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
                     .addPoseCallback(new Pose(40, 87), reverseIntakeForMe, 0.4)
@@ -929,7 +929,7 @@ public class SpamTeleOp extends NextFTCOpMode {
                                     new Pose(38.000, 67.000),
                                     new Pose(92.000, 94.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(44))
+                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(43))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.95)
                     .addPoseCallback(new Pose(24, 64), reverseIntakeForMe, 0.4)
@@ -955,7 +955,7 @@ public class SpamTeleOp extends NextFTCOpMode {
                                     new Pose(38.000, 67.000),
                                     new Pose(92.000, 94.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(44))
+                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(43))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.95)
                     .addPoseCallback(new Pose(35, 60), reverseIntakeForMe, 0.5)
@@ -965,9 +965,9 @@ public class SpamTeleOp extends NextFTCOpMode {
                             new BezierCurve(
                                     new Pose(92.000, 94.000),
                                     new Pose(104.000, 67.000),
-                                    new Pose(130, 64)
+                                    new Pose(131, 64)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(44), Math.toRadians(20))
+                    ).setLinearHeadingInterpolation(Math.toRadians(43), Math.toRadians(20))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
                     .addTemporalCallback(0.1,intakeMotorOn)
@@ -977,7 +977,7 @@ public class SpamTeleOp extends NextFTCOpMode {
 
             moverBacker = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(130, 64),
+                                    new Pose(131, 64),
                                     new Pose(130.75, 59)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(20), Math.toRadians(45))
@@ -1002,7 +1002,7 @@ public class SpamTeleOp extends NextFTCOpMode {
                                     new Pose(92, 94),
                                     new Pose(42.630, 40.572)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(44), Math.toRadians(90))
+                    ).setLinearHeadingInterpolation(Math.toRadians(43), Math.toRadians(90))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
                     .build();

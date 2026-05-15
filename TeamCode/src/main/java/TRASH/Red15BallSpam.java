@@ -30,8 +30,6 @@ import dev.nextftc.hardware.impl.ServoEx;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
-
 
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 

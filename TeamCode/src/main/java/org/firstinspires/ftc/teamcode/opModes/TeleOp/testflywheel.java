@@ -1,24 +1,15 @@
 package org.firstinspires.ftc.teamcode.opModes.TeleOp;
 
-import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 
 
-import android.os.Build;
-
 import com.bylazar.configurables.annotations.Configurable;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
 import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.commands.utility.LambdaCommand;
-import dev.nextftc.ftc.ActiveOpMode;
 
-import org.firstinspires.ftc.teamcode.subsystems.DistanceBlue;
-import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
-import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 import org.firstinspires.ftc.teamcode.subsystems.TempHood;
 
@@ -27,12 +18,8 @@ import dev.nextftc.ftc.Gamepads;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.ftc.components.BulkReadComponent;
-import dev.nextftc.hardware.impl.CRServoEx;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
-import dev.nextftc.hardware.powerable.SetPower;
-
-import java.time.*;
 
 
 @Configurable

@@ -15,7 +15,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 import org.firstinspires.ftc.teamcode.subsystems.Storage;
 
@@ -43,7 +42,7 @@ public class SoloTeleOP extends NextFTCOpMode {
 
     public SoloTeleOP() {
         addComponents(
-                new SubsystemComponent(Flywheel.INSTANCE, DistanceRed.INSTANCE),
+                new SubsystemComponent(Flywheel.INSTANCE),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE,
                 new PedroComponent(hwMap -> Constants.createFollower(hwMap))

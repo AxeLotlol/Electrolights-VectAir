@@ -18,7 +18,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 import org.firstinspires.ftc.teamcode.subsystems.Storage;
 
@@ -46,7 +45,7 @@ import dev.nextftc.hardware.positionable.SetPosition;
 public class RedFarZone3rdSpike extends NextFTCOpMode {
     public RedFarZone3rdSpike() {
         addComponents(
-                new SubsystemComponent(Flywheel.INSTANCE, DistanceRed.INSTANCE),
+                new SubsystemComponent(Flywheel.INSTANCE),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE,
                 new PedroComponent(hwMap -> Constants.createFollower(hwMap))
@@ -121,15 +120,6 @@ public class RedFarZone3rdSpike extends NextFTCOpMode {
             HoodPowerZero
     );*/
 
-    private Boolean preloadspin;
-
-    private double preloadtps;
-
-    private double shoottps;
-    Command findTPSShoot = new LambdaCommand()
-            .setStart(() -> shoottps = findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
-    Command findTPSPreload = new LambdaCommand()
-            .setStart(() -> preloadtps = findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
     private static Servo hoodServo1n;
     private static Servo hoodServo2n;
 

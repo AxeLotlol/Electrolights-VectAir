@@ -1,9 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
-
 import com.bylazar.configurables.annotations.Configurable;
 
 import dev.nextftc.bindings.*;

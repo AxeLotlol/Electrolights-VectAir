@@ -1,13 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.INCH;
-import static org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit.DEGREES;
-import static org.firstinspires.ftc.teamcode.opModes.TeleOp.FarzoneTeleOpBlue.isBlueFar;
-import static org.firstinspires.ftc.teamcode.opModes.TeleOp.FarzoneTeleOpRed.isRedFar;
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
-import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
-import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS44;
-import static org.firstinspires.ftc.teamcode.subsystems.Calculations.lowangle;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpBlue.isBlue;
 import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpRed.isRed;
@@ -86,7 +79,6 @@ public class DriveTrain implements Subsystem {
 
     public int alliance;
     public boolean far;
-    public boolean bum = false;
 
     public Supplier<Double> yVCtx;
 
@@ -122,12 +114,6 @@ public class DriveTrain implements Subsystem {
             if (isRed() == true) {
                 alliance = -1;
             }
-            if (isRedFar() == true) {
-                alliance = -1;
-            }
-            if (isBlueFar() == true) {
-                alliance = 1;
-            }
         }
         follower.update();
         Pose currPose = follower.getPose();
@@ -160,9 +146,8 @@ public class DriveTrain implements Subsystem {
         firsttime = true;
         shooting = false;
         follower = follower();
-        if(isBlue()!=true && isRed()!=true && isRedFar()!=true && isBlueFar()!=true) {
+        if(isBlue()!=true && isRed()!=true) {
             ActiveOpMode.telemetry().addLine("No direction set");
-            bum=true;
         }
         else{
             if(isBlue()==true) {
@@ -323,7 +308,6 @@ public class DriveTrain implements Subsystem {
         //ActiveOpMode.telemetry().addData("Motor2Speed", s2speed);
         ActiveOpMode.telemetry().addData("far", far);
         ActiveOpMode.telemetry().addData("alliance", alliance);
-        //ActiveOpMode.telemetry().addData("bum", bum);
         //ActiveOpMode.telemetry().addData("servo1pos", hoodServo1.getPosition());
         //ActiveOpMode.telemetry().addData("servo2pos", hoodServo2.getPosition());
 

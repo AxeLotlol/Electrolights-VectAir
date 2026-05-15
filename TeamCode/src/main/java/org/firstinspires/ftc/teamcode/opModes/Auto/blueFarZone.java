@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.opModes.Auto;
 
-import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 import static org.firstinspires.ftc.teamcode.subsystems.AutoShooterCalc.calculateShotVectorandUpdateHeading;
 
@@ -17,7 +16,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.subsystems.DistanceBlue;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 
 import dev.nextftc.core.commands.Command;
@@ -29,8 +27,6 @@ import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
 import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.extensions.pedro.PedroComponent;
-
-import dev.nextftc.extensions.pedro.TurnTo;
 
 import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.ftc.NextFTCOpMode;
@@ -46,7 +42,7 @@ import dev.nextftc.hardware.positionable.SetPosition;
 public class blueFarZone extends NextFTCOpMode {
     public blueFarZone() {
         addComponents(
-                new SubsystemComponent(Flywheel.INSTANCE, DistanceBlue.INSTANCE),
+                new SubsystemComponent(Flywheel.INSTANCE),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE,
                 new PedroComponent(hwMap -> Constants.createFollower(hwMap))
@@ -77,10 +73,6 @@ public class blueFarZone extends NextFTCOpMode {
     private double preloadtps;
 
     private double shoottps;
-    Command findTPSShoot = new LambdaCommand()
-            .setStart(() -> shoottps = findTPS(DistanceBlue.INSTANCE.getDistanceFromTag()));
-    Command findTPSPreload = new LambdaCommand()
-            .setStart(() -> preloadtps = findTPS(DistanceBlue.INSTANCE.getDistanceFromTag()));
     private static Servo hoodServo1n;
     private static Servo hoodServo2n;
 

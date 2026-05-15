@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.opModes.Auto;
 
-import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
 
@@ -17,7 +16,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 
 import dev.nextftc.core.commands.Command;
@@ -44,7 +42,7 @@ import dev.nextftc.hardware.positionable.SetPosition;
 public class Red21BallSpamLinearSpike1And2 extends NextFTCOpMode {
     public Red21BallSpamLinearSpike1And2(){
         addComponents(
-                new SubsystemComponent(Flywheel.INSTANCE,DistanceRed.INSTANCE),
+                new SubsystemComponent(Flywheel.INSTANCE),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE,
                 new PedroComponent(hwMap -> Constants.createFollower(hwMap))
@@ -122,10 +120,6 @@ public class Red21BallSpamLinearSpike1And2 extends NextFTCOpMode {
     private double preloadtps;
 
     private double shoottps;
-    Command findTPSShoot = new LambdaCommand()
-            .setStart(()->shoottps = findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
-    Command findTPSPreload = new LambdaCommand()
-            .setStart(()->preloadtps = findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
 
 
     private static Servo hoodServo1n;

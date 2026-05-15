@@ -2,7 +2,6 @@
 
 package org.firstinspires.ftc.teamcode.opModes.TeleOp;
 
-import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 
 import dev.nextftc.core.commands.Command;
@@ -21,16 +20,8 @@ import dev.nextftc.hardware.positionable.SetPosition;
 import dev.nextftc.hardware.powerable.SetPower;
 
 
-import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
-import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
-import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
-import org.firstinspires.ftc.teamcode.subsystems.TempHood;
-
-
-import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
 

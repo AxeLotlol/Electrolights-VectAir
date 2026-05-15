@@ -36,8 +36,6 @@ import dev.nextftc.hardware.powerable.SetPower;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
-
 
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 import org.firstinspires.ftc.teamcode.subsystems.MotifScanning;

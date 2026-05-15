@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.opModes.Auto;
 
 
-import static org.firstinspires.ftc.teamcode.subsystems.Calculations.findTPS;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 import static org.firstinspires.ftc.teamcode.subsystems.AutoShooterCalc.calculateShotVectorandUpdateHeading;
 
@@ -18,7 +17,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.subsystems.DistanceRed;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 import org.firstinspires.ftc.teamcode.subsystems.Storage;
 
@@ -31,8 +29,6 @@ import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
 import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.extensions.pedro.PedroComponent;
-
-import dev.nextftc.extensions.pedro.TurnTo;
 
 import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.ftc.NextFTCOpMode;
@@ -49,7 +45,7 @@ import dev.nextftc.hardware.positionable.SetPosition;
 public class redFarZone extends NextFTCOpMode {
     public redFarZone() {
         addComponents(
-                new SubsystemComponent(Flywheel.INSTANCE, DistanceRed.INSTANCE),
+                new SubsystemComponent(Flywheel.INSTANCE),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE,
                 new PedroComponent(hwMap -> Constants.createFollower(hwMap))
@@ -129,10 +125,6 @@ public class redFarZone extends NextFTCOpMode {
     private double preloadtps;
 
     private double shoottps;
-    Command findTPSShoot = new LambdaCommand()
-            .setStart(() -> shoottps = findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
-    Command findTPSPreload = new LambdaCommand()
-            .setStart(() -> preloadtps = findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
     private static Servo hoodServo1n;
     private static Servo hoodServo2n;
 

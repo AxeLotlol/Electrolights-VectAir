@@ -35,13 +35,9 @@ public class FlywheelTuning extends NextFTCOpMode {
 
     @Override
     public void onUpdate() {
-        float configvelocity=findTPS(2);
-        shooter(configvelocity);
         double ticksPerSecond = flywheel.getVelocity();
         double rpm = (ticksPerSecond / 28) * 60.0;
-        double goal = (configvelocity / 28) * 60.0;
         PanelsTelemetry.INSTANCE.getTelemetry().addData("Motor RPM", rpm);
-        PanelsTelemetry.INSTANCE.getTelemetry().addData("Required RPM", goal);
         PanelsTelemetry.INSTANCE.getTelemetry().update(telemetry);
 
     }

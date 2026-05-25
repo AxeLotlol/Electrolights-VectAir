@@ -15,8 +15,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(10.55)
-            .predictiveBrakingCoefficients(new PredictiveBrakingCoefficients(0.1, 0.1579597,0.00123647))
+            .mass(7.2)
+            .predictiveBrakingCoefficients(new PredictiveBrakingCoefficients(0.3, 0.150947964602673,0.001002049917550015))
             .forwardZeroPowerAcceleration(-47)
             .lateralZeroPowerAcceleration(-83)
             .translationalPIDFCoefficients(new PIDFCoefficients(
@@ -68,13 +68,13 @@ public class Constants {
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .xVelocity(79)
-            .yVelocity(61);
+            .xVelocity(97)
+            .yVelocity(80);
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(5.5)
-            .strafePodX(5.0)
-            .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
+            .forwardPodY(0)
+            .strafePodX(0)
+            .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED)
             .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED);
 
     public static PathConstraints pathConstraints = new PathConstraints(

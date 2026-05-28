@@ -16,21 +16,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
             .mass(7.2)
-            .predictiveBrakingCoefficients(new PredictiveBrakingCoefficients(0.3, 0.150947964602673,0.001002049917550015))
+            .predictiveBrakingCoefficients(new PredictiveBrakingCoefficients(0.04, 0.126952956326,0.0012794698))
             .forwardZeroPowerAcceleration(-47)
             .lateralZeroPowerAcceleration(-83)
-            .translationalPIDFCoefficients(new PIDFCoefficients(
-                    0.025,
-                    0,
-                    0.00001,
-                    0.029
-            ))
-            .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(
-                    0,
-                    0,
-                    0,
-                    0
-            ))
             .headingPIDFCoefficients(new PIDFCoefficients(
                     0.28,
                     0,
@@ -43,38 +31,24 @@ public class Constants {
                     0.1,
                     0.0005
             ))
-            .drivePIDFCoefficients(new FilteredPIDFCoefficients(
-                    0.01,
-                    0,
-                    0.000175,
-                    0.6,
-                    0.015
-            ))
-            .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(
-                    0.02,
-                    0,
-                    0.00025,
-                    0.6,
-                    0.01
-            ))
-            .centripetalScaling(0.0005);
+            .centripetalScaling(0);
     public static MecanumConstants driveConstants = new MecanumConstants()
             .useBrakeModeInTeleOp(true)
             .leftFrontMotorName("frontLeft")
             .leftRearMotorName("backLeft")
             .rightFrontMotorName("frontRight")
             .rightRearMotorName("backRight")
-            .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .xVelocity(97)
+            .leftFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
+            .leftRearMotorDirection(DcMotorSimple.Direction.FORWARD)
+            .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
+            .rightRearMotorDirection(DcMotorSimple.Direction.REVERSE)
+            .xVelocity(92.5617)
             .yVelocity(80);
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(0)
+            .forwardPodY(4.75)
             .strafePodX(0)
-            .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED)
+            .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
             .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED);
 
     public static PathConstraints pathConstraints = new PathConstraints(
@@ -86,6 +60,7 @@ public class Constants {
             3.5,
             10,
             1
+
     );
 
     public static Follower createFollower(HardwareMap hardwareMap) {

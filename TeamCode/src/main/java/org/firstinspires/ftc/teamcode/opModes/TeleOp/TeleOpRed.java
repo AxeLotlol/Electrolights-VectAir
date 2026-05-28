@@ -1,22 +1,34 @@
 package org.firstinspires.ftc.teamcode.opModes.TeleOp;
 
 
+import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
+
+import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
+import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
-import org.firstinspires.ftc.teamcode.subsystems.LimelightLocalization;
+
 import org.firstinspires.ftc.teamcode.subsystems.TempHood;
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
-
+import static dev.nextftc.extensions.pedro.PedroComponent.follower;
+import dev.nextftc.core.commands.Command;
+import dev.nextftc.core.commands.delays.Delay;
+import dev.nextftc.core.commands.groups.SequentialGroup;
+import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.components.SubsystemComponent;
 import dev.nextftc.extensions.pedro.PedroComponent;
+import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.ftc.Gamepads;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.ftc.components.BulkReadComponent;
+import dev.nextftc.hardware.driving.Drivetrain;
 import dev.nextftc.hardware.impl.MotorEx;
+import dev.nextftc.hardware.powerable.SetPower;
 
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOpRed")
@@ -27,7 +39,7 @@ public class TeleOpRed extends NextFTCOpMode {
     public TeleOpRed() {
         addComponents(
                 new PedroComponent(Constants::createFollower),
-                new SubsystemComponent(TempHood.INSTANCE, DriveTrain.INSTANCE, LimelightLocalization.INSTANCE/*, Intake.INSTANCE, Spindexer.INSTANCE*/),
+                new SubsystemComponent(TempHood.INSTANCE, DriveTrain.INSTANCE/*, Intake.INSTANCE, Spindexer.INSTANCE*/),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE
 

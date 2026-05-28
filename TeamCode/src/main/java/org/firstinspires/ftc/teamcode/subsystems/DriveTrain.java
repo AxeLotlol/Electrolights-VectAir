@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.INCH;
+import static org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit.DEGREES;
+
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpBlue.isBlue;
@@ -63,9 +66,82 @@ public class DriveTrain implements Subsystem {
 
     private double tx;
 
+    private boolean autolock = false;
 
     public double aimMultiplier = 0.575;
 
+    private boolean slow = false;
+    // === AprilTag/Limelight align tuning ===
+    private static final int APRILTAG_PIPELINE = 8;   // <-- set to your AprilTag pipeline index
+    private static final double YAW_KP = 0.09;      // deg -> yaw power (flip sign if turning wrong way)
+    private static final double YAW_KD = 0.01;      // <-- ADDED: D-Gain for dampening oscillation
+    private static final double YAW_MAX = 0.7;       // yaw cap
+    private static final double YAW_DEADBAND_DEG = 0.3;
+
+    // ADDED: Fields to track error over time for D term
+    private double lastError = 0;
+    private double lastTime = 0;
+
+    public double currentHoodState = 0;
+
+    public double hoodAngleDriver = 0;
+
+    private double clip(double v, double lo, double hi) {
+        return Math.max(lo, Math.min(hi, v));
+    }
+
+
+
+    private double visionYawCommand(double txDeg) {
+        if (Math.abs(txDeg) < YAW_DEADBAND_DEG) {
+            lastError = 0;
+            return 0.0;
+        }
+
+        // 1. Use System time for consistent math
+        double currentTime = System.currentTimeMillis() / 1000.0;
+        double deltaTime = currentTime - lastTime;
+        if (deltaTime <= 0) deltaTime = 0.001;
+
+        // 2. Only calculate D if the vision frame actually updated
+        // This prevents the "zero-derivative" jitter
+        double errorDerivative = 0;
+        if (txDeg != lastError) {
+            errorDerivative = (txDeg - lastError) / deltaTime;
+        }
+
+        // 3. Power Calculation
+        double pTerm = YAW_KP * txDeg;
+        double dTerm = YAW_KD * errorDerivative;
+
+        // 4. Add a small 'kS' (Static friction) to help it finish the move
+        // This allows you to lower KP and KD overall.
+        double kS = 0.05 * Math.signum(txDeg);
+
+        double power = pTerm + dTerm + kS;
+
+        lastError = txDeg;
+        lastTime = currentTime;
+
+        return aimMultiplier * clip(power, -YAW_MAX, YAW_MAX);
+    }
+
+    private void autolocktrue(){
+        autolock = true;
+    }
+
+    private void autolockfalse(){
+        autolock = false;
+    }
+
+
+    private void slowtrue(){
+        slow = true;
+    }
+
+    private void slowfalse(){
+        slow = false;
+    }
     public static final MotorEx fL = new MotorEx("frontLeft").brakeMode();
     public static final MotorEx fR = new MotorEx("frontRight").brakeMode();
     public static final MotorEx bL = new MotorEx("backLeft").brakeMode();
@@ -79,6 +155,7 @@ public class DriveTrain implements Subsystem {
 
     public int alliance;
     public boolean far;
+    public boolean bum = false;
 
     public Supplier<Double> yVCtx;
 
@@ -105,14 +182,29 @@ public class DriveTrain implements Subsystem {
     @Override
     public Command getDefaultCommand() {
 
-        if (isBlue() != true && isRed() != true) {
+        if (isBlue() != true && isRed() != true ) {
             ActiveOpMode.telemetry().addLine("No direction set");
+            bum = true;
         } else {
+            Pose check = new Pose(72, 72, Math.toRadians(90));
+            //bum = false;
             if (isBlue() == true) {
                 alliance = 1;
+                far = false;
+
+                if (startingpose == check) {
+                    startingpose = new Pose(24, 72, Math.toRadians(90));
+                    follower.setStartingPose(startingpose);
+                }
             }
             if (isRed() == true) {
                 alliance = -1;
+                far = false;
+                if (startingpose == check) {
+                    startingpose = new Pose(120, 72, Math.toRadians(90));
+                    follower.setStartingPose(startingpose);
+                }
+
             }
         }
         follower.update();
@@ -120,19 +212,64 @@ public class DriveTrain implements Subsystem {
         double robotHeading = follower.getPose().getHeading();
         Vector robotToGoalVector = new Vector(follower.getPose().distanceFrom(new Pose(goalX, goalY)), Math.atan2(goalY - currPose.getY(), goalX - currPose.getX()));
         Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity());
-        {
+
+
+        if (autolock == true) {
+
+            double finalHeadingError = results[2];
+            /*if (follower().getPose().getY() < 20 && follower().getVelocity().getMagnitude() < 10) {
+                if (alliance == -1) {
+                    follower.turnTo(Math.atan2((144 - follower().getPose().getY()), 139 - follower().getPose().getX()));
+                    return null;
+                }
+
+                if (alliance == 1) {
+                    follower.turnTo(Math.atan2((144 - follower().getPose().getY()), 6 - follower().getPose().getX()));
+                    return null;
+                }
+            } else {*/
+            yVCtx = () -> visionYawCommand(finalHeadingError);
             return new MecanumDriverControlled(
                     fL,
                     fR,
                     bL,
                     bR,
-                    Gamepads.gamepad1().leftStickX().map(it -> alliance *it),
-                    Gamepads.gamepad1().leftStickY().map(it -> alliance *it),
-                    Gamepads.gamepad1().rightStickX().map(it -> it * 0.75),
+                    Gamepads.gamepad1().leftStickX().map(it -> alliance * it),
+                    Gamepads.gamepad1().leftStickY().map(it -> alliance * it),
+                    yVCtx,
                     new FieldCentric(imu)
             );
-        }
+            //}
 
+        }
+        else// IF AUTOLOCK IS NOT ON
+        {
+            if (slow == true) {
+                return new MecanumDriverControlled(
+                        fL,
+                        fR,
+                        bL,
+                        bR,
+                        Gamepads.gamepad1().leftStickX().map(it -> alliance * it * 0.4),
+                        Gamepads.gamepad1().leftStickY().map(it -> alliance * it *0.4),
+                        Gamepads.gamepad1().rightStickX().map(it -> it * 0.4 * 0.75),
+                        new FieldCentric(imu)
+                );
+            }
+            else //IF SLOW IS OFF
+            {
+                return new MecanumDriverControlled(
+                        fL,
+                        fR,
+                        bL,
+                        bR,
+                        Gamepads.gamepad1().leftStickX().map(it -> alliance *it),
+                        Gamepads.gamepad1().leftStickY().map(it -> alliance *it),
+                        Gamepads.gamepad1().rightStickX().map(it -> it * 0.75),
+                        new FieldCentric(imu)
+                );
+            }
+        }
         //return null;
     }
 
@@ -145,39 +282,74 @@ public class DriveTrain implements Subsystem {
 
         firsttime = true;
         shooting = false;
+        autolock = false;
         follower = follower();
         if(isBlue()!=true && isRed()!=true) {
             ActiveOpMode.telemetry().addLine("No direction set");
+            bum=true;
         }
         else{
+            bum = false;
             if(isBlue()==true) {
                 alliance=1;
+                far = false;
             }
             if(isRed()==true){
                 alliance=-1;
+                far = false;
             }}
         imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
-        startingpose = Storage.currentPose;
-        if(Storage.currentPose!=new Pose(0, 0, 0)) {
-            follower.setStartingPose(startingpose);
-        }
 
         if(alliance ==-1){
+            if(far==true){
+                startingpose=new Pose (110, 9, Math.toRadians(90));
+                follower.setStartingPose(startingpose);
+
+
+            }
+            else if(far==false) {
+                startingpose = new Pose(120, 72, Math.toRadians(90));
+                follower.setStartingPose(startingpose);
+            }
+
             localize = new LambdaCommand()
                     .setStart(()->follower.setPose(new Pose(129,90,Math.toRadians(90))));
 
         }
         if(alliance ==1){
+            if(far==true){
+                startingpose=new Pose (34, 9, Math.toRadians(90));
+                follower.setStartingPose(startingpose);
+            }
+            else if(far==false) {
+                startingpose=new Pose (24, 72, Math.toRadians(90));
+                follower.setStartingPose(startingpose);
+            }
             localize = new LambdaCommand()
                     .setStart(()->follower.setPose(new Pose(15,90,Math.toRadians(90))));
 
         }
+
+
+        startingpose = Storage.currentPose;
+        follower.setStartingPose(startingpose);
+
         hoodServo1n= ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo1");
         hoodServo2n=  ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo2");
+
+
+
+
         follower.update();
+
+
+
     }
 
 
+
+    public double anglechange;
+    private MotorEx intakeMotor;
     private static MotorEx transfer1;
     private static ServoEx transfer2;
 
@@ -185,19 +357,88 @@ public class DriveTrain implements Subsystem {
     double goalX = 138;
 
     static double localizeX;
+    double localizeY;
+
+    double goalYDist = 138;
     double goalXDist = 138;
 
 
     static boolean shooting = false;
 
+    static Command shootTrue = new LambdaCommand()
+            .setStart(() -> shooting=true);
+
     static Command shootFalse = new LambdaCommand()
             .setStart(() -> shooting=false);
 
+
+    static boolean lowerangle = false;
+
+    static boolean loweranglemid = false;
+
+    static boolean didFirst = false;
+
+    //public static SequentialGroup shoot = new SequentialGroup(new SetPosition(transfer2, 0.3), new Delay(0.4), new SetPower(transfer1, -0.75), new Delay(0.75), new SetPower(transfer1, 0), new SetPosition(transfer2, 0.7));
+
+
+
+
+
     public boolean lift;
+
+    public boolean liftmid;
+
+
+    public void hood(){
+        if(lift==false){
+            lift=true;
+            lowerangle=true;
+            //ActiveOpMode.telemetry().addLine("HoodUp");
+        }
+        else if (lift==true) {
+            lift=false;
+            lowerangle=false;
+            //ActiveOpMode.telemetry().addLine("HoodDown");
+        }
+        else if (lift!=true&&lift!=false) {
+            lift=true;
+            lowerangle=true;
+            //ActiveOpMode.telemetry().addLine("HoodUp");
+        }
+
+    }
 
     public boolean decrease = false;
 
+    public static double farangle = -0.37006585;
+
+    public static void farAngle(){
+        if(farangle ==-0.54006585){
+            farangle=-0.04006585;
+        }
+        else if (farangle ==-0.04006585) {
+            farangle = -0.54006585;
+        }
+
+    }
+
+    public void hoodControl(){
+        if(decrease!=true&&hoodAngleDriver<1){
+            hoodAngleDriver = hoodAngleDriver+0.1;
+        }
+        else if (decrease==true&&hoodAngleDriver<1&&hoodAngleDriver>1) {
+            decrease=true;
+            hoodAngleDriver = 1;
+        }
+        else{
+            hoodAngleDriver=0;
+        }
+
+    }
+
     static double transferpower = -1.0;
+
+    double distance;
 
     public static Command opentransfer = new LambdaCommand()
             .setStart(()-> {
@@ -265,11 +506,18 @@ public class DriveTrain implements Subsystem {
     @Override
     public void periodic() {
         if (firsttime == true) {
+
+
+            Gamepads.gamepad1().triangle().whenBecomesTrue(() -> autolocktrue())
+                    .whenBecomesFalse(() -> autolockfalse());
             // Schedule the command stored in the localize variable
             Gamepads.gamepad1().x().whenBecomesTrue((()->Localize().schedule()));
+
+
+            Gamepads.gamepad1().cross().whenBecomesTrue(() -> hoodControl());
             //Gamepads.gamepad1().square().whenBecomesTrue(() -> farAngle());
             Gamepads.gamepad1().rightTrigger().greaterThan(0.3).whenBecomesTrue(shooter);
-            MotorEx intakeMotor = new MotorEx("intake");
+            intakeMotor = new MotorEx("intake");
             transfer1 = new MotorEx("transfer");
             transfer2 = new ServoEx("transferServo1");
             firsttime = false;
@@ -278,8 +526,12 @@ public class DriveTrain implements Subsystem {
                     new SetPosition(hoodServo2,0)
             );
             HoodPowerZero.schedule();
+
+
         }
         follower.update();
+
+        //ActiveOpMode.telemetry().addData("Lowangle:", lowerangle);
 
 
         if (isBlue() == true) {
@@ -295,10 +547,43 @@ public class DriveTrain implements Subsystem {
         Pose currPose = follower.getPose();
         double robotHeading = follower.getPose().getHeading();
         Vector robotToGoalVector = new Vector(follower.getPose().distanceFrom(new Pose(goalX, goalY)), Math.atan2(goalY - currPose.getY(), goalX - currPose.getX()));
+        //Vector v = new Vector(new Pose(138, 138));
         Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity());
         Double headingError = results[2];
+        double finalHeadingError = headingError;
+        yVCtx = () -> visionYawCommand(finalHeadingError);
         double flywheelSpeed = results[0];
-        shooter((float) flywheelSpeed);
+        if(headingError<-50||headingError>50) {
+            shooter((float) ((float) flywheelSpeed * 0.75));
+            aimMultiplier = 0.95;
+            transferpower = -1;
+        }
+        else{
+            //double offset = -8/17 * currPose.distanceFrom(new Pose( 138, 138)) + 746/17;
+            if(robotToGoalVector.getMagnitude() > 110) {
+                transferpower = -1;
+            }
+            else{
+                transferpower = -1;
+            }
+            shooter((float) ((float) flywheelSpeed));
+            if(Math.abs(follower.getVelocity().getMagnitude())<8){
+                if(headingError>-10&&headingError<10) {
+                    aimMultiplier = 0.375;
+                }
+                else {
+                    aimMultiplier = 0.385;
+                }
+            }
+            else{
+                if(headingError>-20&&headingError<20) {
+                    aimMultiplier = 0.5;
+                }
+                else {
+                    aimMultiplier = 0.9;
+                }
+            }
+        }
         double hoodAngle = results[1];
         hoodToPos(hoodAngle);
         double s1speed = 60 * flywheel.getVelocity()/28;
@@ -308,6 +593,7 @@ public class DriveTrain implements Subsystem {
         //ActiveOpMode.telemetry().addData("Motor2Speed", s2speed);
         ActiveOpMode.telemetry().addData("far", far);
         ActiveOpMode.telemetry().addData("alliance", alliance);
+        //ActiveOpMode.telemetry().addData("bum", bum);
         //ActiveOpMode.telemetry().addData("servo1pos", hoodServo1.getPosition());
         //ActiveOpMode.telemetry().addData("servo2pos", hoodServo2.getPosition());
 
@@ -320,6 +606,7 @@ public class DriveTrain implements Subsystem {
         //ActiveOpMode.telemetry().addData("frontLeftRPM", frontLeftRPM);
         //ActiveOpMode.telemetry().addData("backLeftRPM", backLeftRPM);
 
+        ActiveOpMode.telemetry().addData("aimMultipler", aimMultiplier);
         //ActiveOpMode.telemetry().addData("goalX", goalX);
         //ActiveOpMode.telemetry().addData("goalY", goalY);
         ActiveOpMode.telemetry().addData("RobotX", currPose.getX());

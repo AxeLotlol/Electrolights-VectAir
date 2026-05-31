@@ -1,5 +1,3 @@
-
-
 package org.firstinspires.ftc.teamcode.pedroPathing;
 import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.control.FilteredPIDFCoefficients;
@@ -42,12 +40,12 @@ public class Constants {
             .leftRearMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightRearMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .xVelocity(92.5617)
+            .xVelocity(97)
             .yVelocity(80);
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(4.75)
-            .strafePodX(0)
+            .forwardPodY(4.86)
+            .strafePodX(0.84)
             .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
             .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED);
 

@@ -56,6 +56,9 @@ public class DriveTrain2 implements Subsystem {
     public int alliance;
     public boolean far;
 
+    private static ServoEx turret1;
+    private static ServoEx turret2;
+
     public Supplier<Double> yVCtx;
 
     /*public static double hoodToPos(double runtime) {
@@ -115,7 +118,47 @@ public class DriveTrain2 implements Subsystem {
 
     public Command localize;
 
+    public static Command turretzero = new LambdaCommand()
+            .setStart(()-> {
+                //`5transfer2.setPosition(-0.25);
+                turret1.setPosition(0);
+                turret2.setPosition(0);
+            }).setIsDone(() -> true);
+    public static Command turrethalf = new LambdaCommand()
+            .setStart(()-> {
+                //`5transfer2.setPosition(-0.25);
+                turret1.setPosition(0.5);
+                turret2.setPosition(0.5);
+            }).setIsDone(() -> true);
 
+
+    private static final double MIN_ANGLE = -44.75;
+    private static final double MAX_ANGLE = 404.75;
+
+    // Tracks where the turret is across frames (Double, initialized to center)
+    private double currentTurretPos = 180.0;
+
+    public double getClosestValidTurretAngle(double relativeGoalDegrees) {
+        // Option 1: The raw 0-360 input from your vector calculation
+        double option1 = relativeGoalDegrees;
+
+        // Option 2: The 360-degree alternative wrap position
+        double option2 = (option1 > 180.0) ? (option1 - 360.0) : (option1 + 360.0);
+
+        boolean opt1Valid = (option1 >= MIN_ANGLE && option1 <= MAX_ANGLE);
+        boolean opt2Valid = (option2 >= MIN_ANGLE && option2 <= MAX_ANGLE);
+
+        // If both options are mechanically safe, pick the one closest to current position
+        if (opt1Valid && opt2Valid) {
+            return (Math.abs(option1 - currentTurretPos) < Math.abs(option2 - currentTurretPos)) ? option1 : option2;
+        }
+
+        if (opt1Valid) return option1;
+        if (opt2Valid) return option2;
+
+        // Safety fallback clamp
+        return Math.max(MIN_ANGLE, Math.min(MAX_ANGLE, option1));
+    }
 
     @Override
     public void initialize() {
@@ -245,11 +288,14 @@ public class DriveTrain2 implements Subsystem {
             // Schedule the command stored in the localize variable
             Gamepads.gamepad1().x().whenBecomesTrue((()->Localize().schedule()));
             //Gamepads.gamepad1().square().whenBecomesTrue(() -> farAngle());
-            //Gamepads.gamepad1().rightTrigger().greaterThan(0.3).whenBecomesTrue(shooter);
+            Gamepads.gamepad1().rightBumper().whenBecomesTrue(turretzero);
+            Gamepads.gamepad1().leftBumper().whenBecomesTrue(turrethalf);
             MotorEx intakeMotor = new MotorEx("intakeMotor");
             transfer1 = new MotorEx("transferMotor");
             //transfer2 = new ServoEx("transferServo1");
             firsttime = false;
+            turret1 = new ServoEx("turretServo1");
+            turret2 = new ServoEx("turretServo2");
             /*ParallelGroup HoodPowerZero=new ParallelGroup(
                     new SetPosition(hoodServo1,0),
                     new SetPosition(hoodServo2,0)
@@ -272,12 +318,20 @@ public class DriveTrain2 implements Subsystem {
         Pose currPose = follower.getPose();
         double robotHeading = follower.getPose().getHeading();
         Vector robotToGoalVector = new Vector(follower.getPose().distanceFrom(new Pose(goalX, goalY)), Math.atan2(goalY - currPose.getY(), goalX - currPose.getX()));
-        //Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity());
-        //Double headingError = results[2];
+        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity());
+        Double headingError = results[2];
         //double flywheelSpeed = results[0];
         //shooter((float) flywheelSpeed);
         //double hoodAngle = results[1];
         //hoodToPos(hoodAngle);
+        double targetTurretAngle = getClosestValidTurretAngle(headingError);
+        double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
+        servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
+        //turret1.setPosition(servoPositionSignal);
+        //turret2.setPosition(servoPositionSignal);
+        //currentTurretPos=servoPositionSignal;
+        currentTurretPos=((turret1.getPosition() - 0.05) / 0.90) * 449.51 - 44.75;
+
 
         //ActiveOpMode.telemetry().addData("Motor1Speed", s1speed);
         //ActiveOpMode.telemetry().addData("Motor2Speed", s2speed);

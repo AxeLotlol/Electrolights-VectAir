@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpBlue.isBlue;
 import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpRed.isRed;
+import static org.firstinspires.ftc.teamcode.subsystems.LaunchDetector.isOverlappingLaunchZone;
 import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
 //import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
 
@@ -204,6 +205,8 @@ public class DriveTrain implements Subsystem {
                 //`5transfer2.setPosition(-0.25);
                 transfer2.setPosition(0.35);
             }).setIsDone(() -> true);
+
+
     public static Command closeTransfer = new LambdaCommand()
             .setStart(() -> {
                 transfer2.setPosition(0.635);
@@ -303,6 +306,12 @@ public class DriveTrain implements Subsystem {
         hoodToPos(hoodAngle);
         double s1speed = 60 * flywheel.getVelocity()/28;
         double s2speed = 60 * flywheel2.getVelocity()/28;
+        if(isOverlappingLaunchZone(follower.getPose())){
+            ActiveOpMode.telemetry().addData("Launch?", isOverlappingLaunchZone(follower.getPose()));
+        }
+        if(isOverlappingLaunchZone(follower.getPose())){
+            ActiveOpMode.telemetry().addData("Launch in 0.2? TBD", isOverlappingLaunchZone(follower.getPose()));
+        }
 
         //ActiveOpMode.telemetry().addData("Motor1Speed", s1speed);
         //ActiveOpMode.telemetry().addData("Motor2Speed", s2speed);

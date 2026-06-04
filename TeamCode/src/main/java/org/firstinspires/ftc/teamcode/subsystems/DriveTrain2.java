@@ -132,8 +132,8 @@ public class DriveTrain2 implements Subsystem {
             }).setIsDone(() -> true);
 
 
-    private static final double MIN_ANGLE = -44.75;
-    private static final double MAX_ANGLE = 404.75;
+    private static final double MIN_ANGLE = -224.75;
+    private static final double MAX_ANGLE = 224.75;
 
     // Tracks where the turret is across frames (Double, initialized to center)
     private double currentTurretPos = 180.0;
@@ -327,9 +327,9 @@ public class DriveTrain2 implements Subsystem {
         double targetTurretAngle = getClosestValidTurretAngle(headingError);
         double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
         servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
-        //turret1.setPosition(servoPositionSignal);
-        //turret2.setPosition(servoPositionSignal);
-        //currentTurretPos=servoPositionSignal;
+        turret1.setPosition(servoPositionSignal);
+        turret2.setPosition(servoPositionSignal);
+        //currentTurretPos=Math.toDegrees(robotHeading) - headingError;
         currentTurretPos=((turret1.getPosition() - 0.05) / 0.90) * 449.51 - 44.75;
 
 

@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpBlue.isBlue;
 import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpRed2.isRed;
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
+import static org.firstinspires.ftc.teamcode.subsystems.LaunchDetector.isOverlappingLaunchZone;
 import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
 import static dev.nextftc.extensions.pedro.PedroComponent.follower;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
@@ -80,7 +81,7 @@ public class DriveTrain2 implements Subsystem {
 
 
     //Pose startingpose = Storage.currentPose;
-    Pose startingpose = new Pose(72,72, Math.toRadians(90));
+    Pose startingpose = new Pose(120,96, Math.toRadians(90));
     @Override
     public Command getDefaultCommand() {
 
@@ -116,6 +117,8 @@ public class DriveTrain2 implements Subsystem {
         //return null;
     }
 
+    public MotorEx intakeMotor;
+    public MotorEx transfer;
     public Command localize;
 
     public static Command turretzero = new LambdaCommand()
@@ -166,6 +169,8 @@ public class DriveTrain2 implements Subsystem {
         firsttime = true;
         shooting = false;
         follower = follower();
+        intakeMotor = new MotorEx("intakeMotor");
+        transfer = new MotorEx("transferMotor");
         if(isBlue()!=true && isRed()!=true) {
             ActiveOpMode.telemetry().addLine("No direction set");
         }
@@ -331,6 +336,15 @@ public class DriveTrain2 implements Subsystem {
         turret2.setPosition(servoPositionSignal);
         //currentTurretPos=Math.toDegrees(robotHeading) - headingError;
         currentTurretPos=((turret1.getPosition() - 0.05) / 0.90) * 449.51 - 44.75;
+        ActiveOpMode.telemetry().addData("launch?", isOverlappingLaunchZone(follower().getPose()));
+        if(isOverlappingLaunchZone(follower().getPose())){
+            intakeMotor.setPower(-1);
+            transfer.setPower(1);
+        }
+        else{
+            intakeMotor.setPower(0);
+            transfer.setPower(0);
+        }
 
 
         //ActiveOpMode.telemetry().addData("Motor1Speed", s1speed);

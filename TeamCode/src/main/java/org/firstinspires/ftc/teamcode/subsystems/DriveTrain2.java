@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 import static org.firstinspires.ftc.teamcode.subsystems.LaunchDetector.isOverlappingLaunchZone;
 import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
+import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeadingWithAcceleration;
 import static dev.nextftc.extensions.pedro.PedroComponent.follower;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 
@@ -326,7 +327,7 @@ public class DriveTrain2 implements Subsystem {
         Pose currPose = follower.getPose();
         double robotHeading = follower.getPose().getHeading();
         Vector robotToGoalVector = new Vector(follower.getPose().distanceFrom(new Pose(goalX, goalY)), Math.atan2(goalY - currPose.getY(), goalX - currPose.getX()));
-        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity());
+        Double[] results = calculateShotVectorandUpdateHeadingWithAcceleration(robotHeading, robotToGoalVector, follower.getVelocity(), (Math.abs(follower.getVelocity().getMagnitude()) < 8) ? follower.getAcceleration() : new Vector(0,0));
         Double headingError = results[2];
         double flywheelSpeed = results[0];
         shooter((float) flywheelSpeed);
@@ -379,6 +380,11 @@ public class DriveTrain2 implements Subsystem {
         //ActiveOpMode.telemetry().addData("headingError", headingError);
         //ActiveOpMode.telemetry().addData("distance", distance);
         //ActiveOpMode.telemetry().addData("yVCtx", visionYawCommand(headingError));
+        Vector vel = (Math.abs(follower.getVelocity().getMagnitude()) < 0.01) ? follower.getVelocity() : new Vector(0, 0);
+        Vector accel = (Math.abs(follower.getVelocity().getMagnitude()) < 8) ? follower.getAcceleration() : new Vector(0,0);
+        ActiveOpMode.telemetry().addData("Velocity", vel.getMagnitude() + ", " + Math.toDegrees(vel.getTheta()) + "deg");
+        ActiveOpMode.telemetry().addData("Accel", accel.getMagnitude() + ", " + Math.toDegrees(accel.getTheta()) + "deg");
+        ActiveOpMode.telemetry().addData("Measured Voltage", Flywheel.currentVoltage);
         ActiveOpMode.telemetry().update();
     }
 }

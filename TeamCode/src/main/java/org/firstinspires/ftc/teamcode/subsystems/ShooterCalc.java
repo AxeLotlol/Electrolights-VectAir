@@ -30,7 +30,16 @@ public class ShooterCalc implements Subsystem {
         double x = robotToGoalVector.getMagnitude()-ShooterConstants.PASS_THROUGH_POINT_RADIUS;
         double temp = x/39.37;
         //double y = -4.5745*temp*temp*temp + 25.978*temp*temp - 48.395*temp + 58.675;
-        double y = SCORE_HEIGHT;
+        double y=SCORE_HEIGHT;
+        if(x<1.8){
+            y=SCORE_HEIGHT;
+        }
+        else if(x<3&&x<1.8){
+            y=SCORE_HEIGHT-3;
+        }
+        else if(x>3){
+            y=SCORE_HEIGHT-6;
+        }
         double a = ShooterConstants.SCORE_ANGLE;
         /*if(robotToGoalVector.getMagnitude()>115){
             x = robotToGoalVector.getMagnitude()+10;

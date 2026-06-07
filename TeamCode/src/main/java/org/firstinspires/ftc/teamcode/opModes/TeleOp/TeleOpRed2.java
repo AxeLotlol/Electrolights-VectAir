@@ -8,6 +8,7 @@ import com.pedropathing.geometry.Pose;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain2;
+import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
@@ -25,7 +26,7 @@ public class TeleOpRed2 extends NextFTCOpMode {
     public TeleOpRed2() {
         addComponents(
                 new PedroComponent(Constants::createFollower),
-                new SubsystemComponent(DriveTrain2.INSTANCE),
+                new SubsystemComponent(DriveTrain2.INSTANCE, Flywheel.INSTANCE),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE
 

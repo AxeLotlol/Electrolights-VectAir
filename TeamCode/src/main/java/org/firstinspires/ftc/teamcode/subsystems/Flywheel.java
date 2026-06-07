@@ -53,7 +53,7 @@ public class Flywheel implements Subsystem {
         // Create a KineticState with current position and velocity
 
         double power = controller1.calculate(currentstate);
-        flywheel.setPower(power*(currentVoltage/12));
+        flywheel.setPower(power*(12/currentVoltage));
     }
     public static void velocityControlWithFeedforwardExample2(KineticState currentstate, float configtps) {
         // Create a velocity controller with PID and feedforward
@@ -68,7 +68,7 @@ public class Flywheel implements Subsystem {
         // Create a KineticState with current position and velocity
 
         double power = controller2.calculate(currentstate);
-        flywheel2.setPower(-1*power*(currentVoltage/12));
+        flywheel2.setPower(-1*power*(12/currentVoltage));
     }
     public static void shooter(float tps) {
         BindingManager.update();

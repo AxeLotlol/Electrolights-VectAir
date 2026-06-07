@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpBlue.isBlue;
+import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpBlue2.isBlue;
 import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpRed2.isRed;
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
@@ -82,6 +82,7 @@ public class DriveTrain2 implements Subsystem {
 
     //Pose startingpose = Storage.currentPose;
     Pose startingpose = new Pose(120,96, Math.toRadians(90));
+    //Pose startingpose = new Pose(72,72, Math.toRadians(90));
     @Override
     public Command getDefaultCommand() {
 
@@ -120,6 +121,8 @@ public class DriveTrain2 implements Subsystem {
     public MotorEx intakeMotor;
     public MotorEx transfer;
     public Command localize;
+
+    public static ServoEx hoodServo = new ServoEx("hoodServo");
 
     public static Command turretzero = new LambdaCommand()
             .setStart(()-> {
@@ -206,11 +209,11 @@ public class DriveTrain2 implements Subsystem {
     private static MotorEx transfer1;
     private static ServoEx transfer2;
 
-    double goalY = 138;
-    double goalX = 138;
+    double goalY = 144;
+    double goalX = 144;
 
     static double localizeX;
-    double goalXDist = 138;
+    double goalXDist = 144;
 
 
     static boolean shooting = false;
@@ -311,13 +314,13 @@ public class DriveTrain2 implements Subsystem {
 
 
         if (isBlue() == true) {
-            goalXDist = 6;
-            goalX = 6;
+            goalXDist = 0;
+            goalX = 0;
             localizeX = 136;
         }
         if (isRed() == true) {
-            goalXDist = 138;
-            goalX = 138;
+            goalXDist = 144;
+            goalX = 144;
             localizeX = 8;
         }
         Pose currPose = follower.getPose();
@@ -325,15 +328,17 @@ public class DriveTrain2 implements Subsystem {
         Vector robotToGoalVector = new Vector(follower.getPose().distanceFrom(new Pose(goalX, goalY)), Math.atan2(goalY - currPose.getY(), goalX - currPose.getX()));
         Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity());
         Double headingError = results[2];
-        //double flywheelSpeed = results[0];
-        //shooter((float) flywheelSpeed);
-        //double hoodAngle = results[1];
-        //hoodToPos(hoodAngle);
+        double flywheelSpeed = results[0];
+        shooter((float) flywheelSpeed);
+        double hoodAngle = results[1];
+        hoodServo.setPosition(hoodAngle);
         double targetTurretAngle = getClosestValidTurretAngle(headingError);
         double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
         servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
-        turret1.setPosition(servoPositionSignal);
-        turret2.setPosition(servoPositionSignal);
+        if(servoPositionSignal>0.2&&servoPositionSignal<0.8) {
+            turret1.setPosition(servoPositionSignal);
+            turret2.setPosition(servoPositionSignal);
+        }
         //currentTurretPos=Math.toDegrees(robotHeading) - headingError;
         currentTurretPos=((turret1.getPosition() - 0.05) / 0.90) * 449.51 - 44.75;
         ActiveOpMode.telemetry().addData("launch?", isOverlappingLaunchZone(follower().getPose()));
@@ -351,7 +356,7 @@ public class DriveTrain2 implements Subsystem {
         //ActiveOpMode.telemetry().addData("Motor2Speed", s2speed);
         ActiveOpMode.telemetry().addData("far", far);
         ActiveOpMode.telemetry().addData("alliance", alliance);
-        //ActiveOpMode.telemetry().addData("servo1pos", hoodServo1.getPosition());
+        ActiveOpMode.telemetry().addData("hoodPos", hoodServo.getPosition());
         //ActiveOpMode.telemetry().addData("servo2pos", hoodServo2.getPosition());
 
         //double frontLeftRPM = 28 / 60 * fL.getVelocity();

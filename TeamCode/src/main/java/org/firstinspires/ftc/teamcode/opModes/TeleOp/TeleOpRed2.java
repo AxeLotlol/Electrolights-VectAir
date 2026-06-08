@@ -8,7 +8,6 @@ import com.pedropathing.geometry.Pose;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain2;
-import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
@@ -26,7 +25,7 @@ public class TeleOpRed2 extends NextFTCOpMode {
     public TeleOpRed2() {
         addComponents(
                 new PedroComponent(Constants::createFollower),
-                new SubsystemComponent(DriveTrain2.INSTANCE, Flywheel.INSTANCE),
+                new SubsystemComponent(DriveTrain2.INSTANCE),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE
 
@@ -44,9 +43,9 @@ public class TeleOpRed2 extends NextFTCOpMode {
     @Override
     public void onInit() {
         red=true;
-        intakeMotor = new MotorEx("intakeMotor").reversed();
+        intakeMotor = new MotorEx("intakeMotor");
         transfer = new MotorEx("transferMotor");
-        Gamepads.gamepad1().leftTrigger().greaterThan(0.3).whenBecomesTrue(()-> intakeMotor.setPower(-1))
+        Gamepads.gamepad1().leftTrigger().greaterThan(0.3).whenBecomesTrue(()-> intakeMotor.setPower(1))
                 .whenBecomesFalse(() -> intakeMotor.setPower(0));
         Gamepads.gamepad1().leftTrigger().greaterThan(0.3).whenBecomesTrue(()-> transfer.setPower(1))
                 .whenBecomesFalse(() -> transfer.setPower(0));

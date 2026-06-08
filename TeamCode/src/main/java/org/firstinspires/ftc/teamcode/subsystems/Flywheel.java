@@ -12,8 +12,6 @@ import dev.nextftc.control.feedforward.BasicFeedforwardParameters;
 import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.hardware.impl.MotorEx;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
-
 @Configurable
 public class Flywheel implements Subsystem {
     public Flywheel() {
@@ -34,11 +32,8 @@ public class Flywheel implements Subsystem {
     public static PIDCoefficients myPidCoeff = new PIDCoefficients(0.00038, 0.005, 0.00);
     public static BasicFeedforwardParameters myFF = new BasicFeedforwardParameters(0.000405, 0, 0.0);
 
-    private VoltageSensor batteryVoltageSensor;
 
     public static double configvelocity = 1400; //far zone - ~1500. near zone - ~1200-1300
-
-    static double currentVoltage;
 
     public static void velocityControlWithFeedforwardExample(KineticState currentstate, float configtps) {
         // Create a velocity controller with PID and feedforward
@@ -53,7 +48,7 @@ public class Flywheel implements Subsystem {
         // Create a KineticState with current position and velocity
 
         double power = controller1.calculate(currentstate);
-        flywheel.setPower(power*(12/currentVoltage));
+        flywheel.setPower(power);
     }
     public static void velocityControlWithFeedforwardExample2(KineticState currentstate, float configtps) {
         // Create a velocity controller with PID and feedforward
@@ -68,7 +63,7 @@ public class Flywheel implements Subsystem {
         // Create a KineticState with current position and velocity
 
         double power = controller2.calculate(currentstate);
-        flywheel2.setPower(-1*power*(12/currentVoltage));
+        flywheel2.setPower(-1*power);
     }
     public static void shooter(float tps) {
         BindingManager.update();
@@ -80,13 +75,14 @@ public class Flywheel implements Subsystem {
         velocityControlWithFeedforwardExample(currentState, tps);
         velocityControlWithFeedforwardExample2(currentState2, tps);
         double rpm = (flywheelvelocity / 28) * 60.0;
+
     }
     @Override public void initialize() {
-        batteryVoltageSensor = ActiveOpMode.hardwareMap().voltageSensor.iterator().next();
+
     }
 
     @Override public void periodic() {
-        currentVoltage = batteryVoltageSensor.getVoltage();
+
     }
 }
 

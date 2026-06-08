@@ -49,7 +49,7 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
 
     public Red24BallSpamLinear(){
         addComponents(
-                new SubsystemComponent(Flywheel.INSTANCE),
+                new SubsystemComponent(),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE,
                 new PedroComponent(hwMap -> Constants.createFollower(hwMap))
@@ -67,7 +67,6 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
     public Pose start = new Pose(109.81,133.272, Math.toRadians(270));
 
     private MotorEx transfer1;
-    private ServoEx transfer2;
 
     public static MotorEx flywheel = new MotorEx("launchingmotor");
     public static MotorEx flywheel2 = new MotorEx("launchingmotor2");
@@ -85,7 +84,6 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
         paths = new Paths(follower);
         intakeMotor = new MotorEx("intakeMotor");
         transfer1 = new MotorEx("transferMotor");
-        transfer2 = new ServoEx("transferServo1");
         turret1 = new ServoEx("turretServo1");
         turret2 = new ServoEx("turretServo2");
 
@@ -114,66 +112,14 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
                 transfer.setPower(0);}
             );
 
-    double distance;
 
 
-    public Command opentransfer = new LambdaCommand()
-            .setStart(()-> {
-                transfer2.setPosition(0.3);
-            });
 
-    public Command closeTransfer = new LambdaCommand()
-            .setStart(() -> {
-                transfer2.setPosition(0.635); 
-            });
+    //public SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.05), intakeMotorOn, new Delay(0.3), intakeMotorOff, closeTransfer);
 
-    public SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.05), intakeMotorOn, new Delay(0.3), intakeMotorOff, closeTransfer);
-
-    public boolean spinup = true;
-    public Command spinupfalse = new LambdaCommand()
-            .setStart(()-> {
-                spinup=false;
-            });
-
-    Command spinupPLEASEEIsagiINEEDTHIS = new LambdaCommand()
-            .setStart(()->{
-                flywheel.setPower(1);
-                flywheel2.setPower(-1);
-            });
-    public Command reverseIntakeForMe = new LambdaCommand()
-            .setStart(() -> intakeMotor.setPower(0.5));
-    public Command aimAtGoal = new LambdaCommand()
-            .setStart(() -> {
-                Pose currPose = follower.getPose();
-
-                Vector robotToGoalVector = new Vector(
-                        follower.getPose().distanceFrom(new Pose(138, 141)),
-                        Math.atan2(141 - currPose.getY(), 138 - currPose.getX())
-                );
-
-                Double[] results = calculateShotVectorandUpdateHeading(
-                        currPose.getHeading(),
-                        robotToGoalVector,
-                        follower.getVelocity()
-                );
-
-                double targetHeading = results[2];
-                double flywheelSpeed = results[0];
-                double hoodAngle = results[1];
-
-                shooter((float) (flywheelSpeed + 30));
-
-                follower.turn(targetHeading);
-            });
-    public boolean lift;
-    boolean lowerangle = false;
     private Boolean preloadspinreal = false;
 
     Command preloadSpun = new LambdaCommand().setStart(() -> preloadspinreal = true);
-    Command preloadSpunReal = new LambdaCommand().setStart(() -> preloadspinreal = false);
-    public boolean intake3 = false;
-    Command shootIntake3 = new LambdaCommand()
-            .setStart(()->intake3=true);
     private double currentTurretPos = 180.0;
     public boolean intakeSpam = false;
 

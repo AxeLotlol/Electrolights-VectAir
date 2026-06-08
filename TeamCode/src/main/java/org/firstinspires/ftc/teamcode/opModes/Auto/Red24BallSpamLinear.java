@@ -16,7 +16,6 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.Vector;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -73,16 +72,6 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
     public static MotorEx flywheel = new MotorEx("launchingmotor");
     public static MotorEx flywheel2 = new MotorEx("launchingmotor2");
 
-    private Boolean preloadspin;
-    private double preloadtps;
-    private double shoottps;
-
-    private static Servo hoodServo1n;
-    private static Servo hoodServo2n;
-
-    private static ServoEx hoodServo1 = new ServoEx(() -> hoodServo1n);
-    private static ServoEx hoodServo2 = new ServoEx(() -> hoodServo2n);
-
     private static ServoEx turret1;
     private static ServoEx turret2;
 
@@ -93,12 +82,9 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
 
         IMUEx imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
 
-        Limelight3A limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.pipelineSwitch(7);
-        limelight.start();
         paths = new Paths(follower);
-        intakeMotor = new MotorEx("intake");
-        transfer1 = new MotorEx("transfer");
+        intakeMotor = new MotorEx("intakeMotor");
+        transfer1 = new MotorEx("transferMotor");
         transfer2 = new ServoEx("transferServo1");
         turret1 = new ServoEx("turretServo1");
         turret2 = new ServoEx("turretServo2");
@@ -112,31 +98,13 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
         telemetry.addLine("Follower + IMU + Odo Pods initialized successfully!");
         telemetry.addLine("Initialization complete!");
         telemetry.update();
-        hoodServo1n= ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo1");
-        hoodServo2n=  ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo2");
 
         follower.update();
     }
 
-    public static double hoodToPos(double runtime) {
-        if(Double.isNaN(runtime)!=true) {
-            ActiveOpMode.telemetry().addData("runtime", runtime);
-            ParallelGroup HoodRunUp = new ParallelGroup(
-                    new SetPosition(hoodServo1, runtime),
-                    new SetPosition(hoodServo2, -1*runtime)
-            );
-            HoodRunUp.schedule();
-            return runtime;
-        }
-        else {
-            ActiveOpMode.telemetry().addLine("NaN");
-            return 0;
-        }
-    }
-
     private Command intakeMotorOn = new LambdaCommand()
             .setStart(() ->{
-                intakeMotor.setPower(-1);
+                intakeMotor.setPower(1);
             transfer.setPower(1);}
             );
 
@@ -148,12 +116,6 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
 
     double distance;
 
-    Command transferOn = new LambdaCommand()
-            .setStart(()-> transfer1.setPower(-1));
-    Command transferOff = new LambdaCommand()
-            .setStart(() -> transfer1.setPower(0));
-    Command transferOnForIntake = new LambdaCommand()
-            .setStart(()-> transfer1.setPower(-1));
 
     public Command opentransfer = new LambdaCommand()
             .setStart(()-> {
@@ -162,10 +124,10 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
 
     public Command closeTransfer = new LambdaCommand()
             .setStart(() -> {
-                transfer2.setPosition(0.635);
+                transfer2.setPosition(0.635); 
             });
 
-    public SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.05), transferOn, new Delay(0.3), transferOff, closeTransfer);
+    public SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.05), intakeMotorOn, new Delay(0.3), intakeMotorOff, closeTransfer);
 
     public boolean spinup = true;
     public Command spinupfalse = new LambdaCommand()
@@ -200,7 +162,6 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
                 double hoodAngle = results[1];
 
                 shooter((float) (flywheelSpeed + 30));
-                hoodToPos(hoodAngle);
 
                 follower.turn(targetHeading);
             });
@@ -241,7 +202,24 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
 
     public Command Auto(){
         return new SequentialGroup(
-                new FollowPath(paths.path1)
+                new FollowPath(paths.path1,false,1.0),
+                new FollowPath(paths.path2,false,1.0),
+                new FollowPath(paths.path3,false,1.0),
+                new FollowPath(paths.path4,false,1.0),
+                new Delay(0.7),
+                new FollowPath(paths.path5,false,1.0),
+                new FollowPath(paths.path6,false,1.0),
+                new Delay(1.5),
+                new FollowPath(paths.path7,false,1.0),
+                new FollowPath(paths.path8,false,1.0),
+                new Delay(1.5),
+                new FollowPath(paths.path9,false,1.0),
+                new FollowPath(paths.path10,false,1.0),
+                new Delay(1.5),
+                new FollowPath(paths.path11,false,1.0),
+                new FollowPath(paths.path12,false,1.0),
+                new FollowPath(paths.path13,false,1.0)
+
         );
     }
 
@@ -270,6 +248,7 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
         shooter((float) flywheelSpeed);
         double hoodAngle = results[1];
         hoodServo.setPosition(hoodAngle);
+        //if this doesnt work its cuz hoodServo isnt defined here and nithin is gay asf
 
         double targetTurretAngle = getClosestValidTurretAngle(headingError);
         double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;

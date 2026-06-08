@@ -6,7 +6,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.DriveTrain2.hoodServo;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 import static org.firstinspires.ftc.teamcode.subsystems.LaunchDetector.isOverlappingLaunchZone;
 import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
-import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeadingWithAcceleration;
+
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
@@ -135,10 +135,16 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
     }
 
     private Command intakeMotorOn = new LambdaCommand()
-            .setStart(() -> intakeMotor.setPower(-1));
+            .setStart(() ->{
+                intakeMotor.setPower(-1);
+            transfer.setPower(1);}
+            );
 
     Command intakeMotorOff = new LambdaCommand()
-            .setStart(() -> intakeMotor.setPower(0));
+            .setStart(() -> {
+                intakeMotor.setPower(0);
+                transfer.setPower(0);}
+            );
 
     double distance;
 
@@ -258,7 +264,7 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
         double robotHeading = currPose.getHeading();
         Vector robotToGoalVector = new Vector(currPose.distanceFrom(new Pose(138, 141)), Math.atan2(141 - currPose.getY(), 138 - currPose.getX()));
 
-        Double[] results = calculateShotVectorandUpdateHeadingWithAcceleration(robotHeading, robotToGoalVector, follower.getVelocity(), (Math.abs(follower.getVelocity().getMagnitude()) < 8) ? follower.getAcceleration() : new Vector(0,0));
+        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity());
         Double headingError = results[2];
         double flywheelSpeed = results[0];
         shooter((float) flywheelSpeed);
@@ -276,7 +282,7 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
 
         ActiveOpMode.telemetry().addData("launch?", isOverlappingLaunchZone(currPose));
         if(isOverlappingLaunchZone(currPose)&&autoShoot){
-            intakeMotor.setPower(-1);
+            intakeMotor.setPower(1);
             transfer.setPower(1);
         }
         else{
@@ -309,6 +315,8 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
         public PathChain path11;
         public PathChain path12;
         public PathChain path13;
+
+        public PathChain path14;
 
         public Paths(Follower follower) {
             path1 = follower.pathBuilder().addPath(
@@ -405,8 +413,8 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
             path12 = follower.pathBuilder().addPath(
                             new BezierCurve(
                                     new Pose(82.000, 73.334),
-                                    new Pose(87.809, 79.238),
-                                    new Pose(119.796, 81.183)
+                                    new Pose(116.316, 68.281),
+                                    new Pose(118.097, 39.506)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(-15), Math.toRadians(30))
                     .build();
@@ -417,6 +425,14 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
                                     new Pose(94.967, 83.711)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(30), Math.toRadians(270))
+                    .build();
+            path14 = follower.pathBuilder().addPath(
+                    new BezierLine(
+                            new Pose(94.967,83.711),
+                            new Pose(84.375,63.060)
+                    )
+
+                    ).setConstantHeadingInterpolation(Math.toRadians(270))
                     .build();
         }
     }

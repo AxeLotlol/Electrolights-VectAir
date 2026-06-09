@@ -69,7 +69,7 @@ public class AutoShooterCalc implements Subsystem {
         flywheelSpeed = Math.sqrt(g * ndr * ndr / (2 * Math.pow(Math.cos(hoodAngle), 2) * (ndr * Math. tan(hoodAngle) - y)));
         flywheelSpeed = flywheelSpeed/ 39.37;
         double headingVelCompOffset = Math.atan(perpendicularComponent / ivr);
-        double headingAngle = Math.toDegrees(robotHeading - robotToGoalVector.getTheta() + headingVelCompOffset);
+        double headingAngle = Math.toDegrees(robotToGoalVector.getTheta() - robotHeading - headingVelCompOffset);
 
         requiredRPM = 1.4286* Math.pow(flywheelSpeed, 3) - 39.264*Math.pow(flywheelSpeed, 2) + 863.57*flywheelSpeed-1373.9;
         requiredTPS = (28 * requiredRPM) / 60;

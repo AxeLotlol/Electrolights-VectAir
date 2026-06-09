@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opModes.Auto;
 
+
+
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
@@ -18,11 +20,13 @@ import org.firstinspires.ftc.teamcode.subsystems.Storage;
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
 import dev.nextftc.core.commands.groups.SequentialGroup;
+import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
+import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
 
 
@@ -39,9 +43,12 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
     }
 
     private Follower follower;
+
+    private MotorEx transfer;
     private Timer opmodeTimer;
     private Paths paths;
-    public static double gateTime = 1.32;
+    public static double gateTime1 = 1;
+    public static double gateTime = 1.8;
 
     public Pose start = new Pose(110.58652658884565, 133.1659559014267, Math.toRadians(270));
 
@@ -49,12 +56,12 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
     private ServoEx turret1;
     private ServoEx turret2;
     private ServoEx hoodServo;
-
+    private MotorEx intakeMotor;
     private static final double GOAL_X = 144;
     private static final double GOAL_Y = 144;
     private static final double MIN_ANGLE = -224.75;
     private static final double MAX_ANGLE =  224.75;
-    private static final double TURRET_RANGE     =  449.51;
+    private static final double TURRET_RANGE =  449.51;
     private double currentTurretPos = 180.0;
 
     private boolean matchStarted = false;
@@ -88,7 +95,8 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
         follower.setStartingPose(start);
         paths = new Paths(follower);
         opmodeTimer = new Timer();
-
+        intakeMotor = new MotorEx("intakeMotor");
+        transfer = new MotorEx("transferMotor");
         turret1  = new ServoEx("turretServo1");
         turret2  = new ServoEx("turretServo2");
         hoodServo = new ServoEx("hoodServo");
@@ -100,32 +108,40 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
     public Command Auto() {
         return new SequentialGroup(
                 new FollowPath(paths.preLoadShoot, true, 1.0),
+                intakeMotorOn,
                 new FollowPath(paths.spike2, true, 1.0),
+                
                 new FollowPath(paths.launchSpike2, true, 1.0),
+                intakeMotorOn,
                 new FollowPath(paths.gate1, true, 1.0),
-                new Delay(gateTime),
-
+                new Delay(gateTime1),
+                
                 new FollowPath(paths.spike1, true, 1.0),
+                intakeMotorOn,
                 new FollowPath(paths.gate2Intake, true, 1.0),
                 new Delay(gateTime),
 
+                
+                new FollowPath(paths.gateShoot, true, 1.0),
+                intakeMotorOn,
+                new FollowPath(paths.gateIntake, true, 1.0),
+                new Delay(gateTime),
+
+                
+                new FollowPath(paths.gateShoot, true, 1.0),
+                intakeMotorOn,
+                new FollowPath(paths.gateIntake, true, 1.0),
+                new Delay(gateTime),
+                
 
                 new FollowPath(paths.gateShoot, true, 1.0),
+                intakeMotorOn,
                 new FollowPath(paths.gateIntake, true, 1.0),
                 new Delay(gateTime),
 
 
                 new FollowPath(paths.gateShoot, true, 1.0),
-                new FollowPath(paths.gateIntake, true, 1.0),
-                new Delay(gateTime),
-
-
-                new FollowPath(paths.gateShoot, true, 1.0),
-                new FollowPath(paths.gateIntake, true, 1.0),
-                new Delay(gateTime),
-
-
-                new FollowPath(paths.gateShoot, true, 1.0),
+                intakeMotorOff,
                 new FollowPath(paths.park, true, 1.0)
         );
     }
@@ -135,6 +151,18 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
         matchStarted = true;
         Auto().schedule();
     }
+    private Command intakeMotorOn = new LambdaCommand()
+            .setStart(() ->{
+                intakeMotor.setPower(1);
+                transfer.setPower(1);}
+            );
+    private Command intakeMotorOff = new LambdaCommand()
+            .setStart(() ->{
+                intakeMotor.setPower(0);
+                transfer.setPower(0);
+            }
+            );
+
 
     @Override
     public void onUpdate() {
@@ -252,6 +280,8 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
                     )
                     .setTValueConstraint(0.8)
                     .setConstantHeadingInterpolation(Math.toRadians(0))
+                    .addPoseCallback(new Pose(96.535,82.990),intakeMotorOn,0.98)
+
                     .addPath(
                             new BezierLine(
                                     new Pose(96.535, 82.990),
@@ -269,6 +299,7 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
                     .setTValueConstraint(0.8)
                     .setTangentHeadingInterpolation()
                     .setReversed()
+
                     .build();
 
             gate2Intake = follower.pathBuilder()

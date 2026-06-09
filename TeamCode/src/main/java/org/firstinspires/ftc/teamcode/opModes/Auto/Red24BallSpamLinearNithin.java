@@ -36,6 +36,7 @@ import dev.nextftc.hardware.impl.IMUEx;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
 
+@Deprecated
 @Autonomous
 @Configurable
 public class Red24BallSpamLinearNithin extends NextFTCOpMode {

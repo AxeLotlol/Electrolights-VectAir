@@ -56,6 +56,7 @@ public class Red24BallSpamLinearNithin extends NextFTCOpMode {
 
     private Paths paths;
     public MotorEx intakeMotor;
+    public static ServoEx hoodServo = new ServoEx("hoodServo");
 
     int tagId = 0;
 
@@ -181,7 +182,7 @@ public class Red24BallSpamLinearNithin extends NextFTCOpMode {
 
         Pose currPose = follower.getPose();
         double robotHeading = currPose.getHeading();
-        Vector robotToGoalVector = new Vector(currPose.distanceFrom(new Pose(138, 141)), Math.atan2(141 - currPose.getY(), 138 - currPose.getX()));
+        Vector robotToGoalVector = new Vector(currPose.distanceFrom(new Pose(144, 144)), Math.atan2(144 - currPose.getY(), 14 - currPose.getX()));
 
         Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity());
         Double headingError = results[2];
@@ -189,7 +190,7 @@ public class Red24BallSpamLinearNithin extends NextFTCOpMode {
         shooter((float) flywheelSpeed);
         double hoodAngle = results[1];
         hoodServo.setPosition(hoodAngle);
-        //if this doesnt work its cuz hoodServo isnt defined here and nithin is gay asf
+        //if this doesnt work its cuz hoodServo isnt defined here (its in dt2)
 
         double targetTurretAngle = getClosestValidTurretAngle(headingError);
         double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;

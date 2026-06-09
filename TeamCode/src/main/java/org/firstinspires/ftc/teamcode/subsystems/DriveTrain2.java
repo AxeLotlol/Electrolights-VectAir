@@ -143,6 +143,7 @@ public class DriveTrain2 implements Subsystem {
 
     // Tracks where the turret is across frames (Double, initialized to center)
     private double currentTurretPos = 180.0;
+    public boolean wrapping = false;
 
     public double getClosestValidTurretAngle(double relativeGoalDegrees) {
         // Option 1: The raw 0-360 input from your vector calculation
@@ -159,8 +160,13 @@ public class DriveTrain2 implements Subsystem {
             return (Math.abs(option1 - currentTurretPos) < Math.abs(option2 - currentTurretPos)) ? option1 : option2;
         }
 
-        if (opt1Valid) return option1;
-        if (opt2Valid) return option2;
+        if (opt1Valid) {
+            return option1;
+        }
+        if (opt2Valid) {
+            wrapping = true;
+            return option2;
+        }
 
         // Safety fallback clamp
         return Math.max(MIN_ANGLE, Math.min(MAX_ANGLE, option1));
@@ -252,32 +258,6 @@ public class DriveTrain2 implements Subsystem {
         }
     }*/
 
-    public boolean isInLaunchZone(double x, double y) {
-
-        // Vertices: (-8, 144), (152, 144), (72, 64)
-        // This triangle exists between y = 64 and y = 144.
-        if (y >= 64 && y <= 144) {
-            // As y increases from 64 to 144, the width of the triangle increases.
-            // The slope of the edges is (144 - 64) / (152 - 72) = 80 / 80 = 1.
-            double halfWidth = (y - 64);
-            if (x >= (72 - halfWidth) && x <= (72 + halfWidth)) {
-                return true;
-            }
-        }
-
-        // Vertices: (72, 32), (104, 0), (40, 0)
-        // This triangle exists between y = 0 and y = 32.
-        if (y >= 0 && y <= 32) {
-            // As y decreases from 32 to 0, the width increases.
-            // The slope of the edges is (32 - 0) / (72 - 40) = 32 / 32 = 1.
-            double halfWidth = (32 - y);
-            if (x >= (72 - halfWidth) && x <= (72 + halfWidth)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     //private static Servo hoodServo1n;
     //private static Servo hoodServo2n;
@@ -288,6 +268,13 @@ public class DriveTrain2 implements Subsystem {
             .setStart(()-> shoot());*/
     public Command Localize(){
         return localize;
+    }
+
+    public boolean wraptofalseexecuted = false;
+    public Command wrapfalse() {wrapping = false; wraptofalseexecuted=false; return null;}
+    public void wrapperforwrap(){
+            SequentialGroup wraptofalse = new SequentialGroup(new Delay(0.3),wrapfalse());
+            wraptofalse.schedule();
     }
 
     @Override
@@ -339,10 +326,14 @@ public class DriveTrain2 implements Subsystem {
             turret1.setPosition(servoPositionSignal);
             turret2.setPosition(servoPositionSignal);
         }
+        if(wrapping==true && wraptofalseexecuted==false){
+            wrapperforwrap();
+            wraptofalseexecuted = true;
+        }
         //currentTurretPos=Math.toDegrees(robotHeading) - headingError;
         currentTurretPos=((turret1.getPosition() - 0.05) / 0.90) * 449.51 - 44.75;
         ActiveOpMode.telemetry().addData("launch?", isOverlappingLaunchZone(follower().getPose()));
-        if(isOverlappingLaunchZone(follower().getPose())){
+        if(isOverlappingLaunchZone(follower().getPose()) && robotToGoalVector.getMagnitude()>30 && wrapping == false){
             intakeMotor.setPower(1);
             transfer.setPower(1);
         }

@@ -75,9 +75,11 @@ public class ShooterCalc implements Subsystem {
         double headingVelCompOffset = Math.atan(perpendicularComponent / ivr);
         double headingAngle = Math.toDegrees(robotToGoalVector.getTheta() - robotHeading - headingVelCompOffset);
 
-        requiredRPM = (1.4286* Math.pow(flywheelSpeed, 3) - 39.264*Math.pow(flywheelSpeed, 2) + 863.57*flywheelSpeed-1373.9 + rpmoffset);
-        requiredTPS = (28 * requiredRPM) / 60;
+        //requiredRPM = (1.4286* Math.pow(flywheelSpeed, 3) - 39.264*Math.pow(flywheelSpeed, 2) + 863.57*flywheelSpeed-1373.9 + rpmoffset);
+        //requiredTPS = (28 * requiredRPM) / 60;
+        //requiredTPS = 12.79084*Math.pow(flywheelSpeed, 2)-69.40057*flywheelSpeed+849.93005;
 
+        requiredTPS = -16.19*Math.pow(flywheelSpeed, 2)+ 449.11*flywheelSpeed- 964.9;
         double what = Math.toDegrees(hoodAngle);
 
         //double c1 = (double) -13 /376;
@@ -88,6 +90,8 @@ public class ShooterCalc implements Subsystem {
 
         double hoodTime = (0.01625 * what) - 0.6;
         ActiveOpMode.telemetry().addData("hoodAngle", what);
+        ActiveOpMode.telemetry().addData("ballVelocity", flywheelSpeed);
+        ActiveOpMode.telemetry().addData("flywheelSpeed", requiredTPS);
 
         Double[] returnvalue = {requiredTPS, hoodTime, headingAngle};
         return returnvalue;

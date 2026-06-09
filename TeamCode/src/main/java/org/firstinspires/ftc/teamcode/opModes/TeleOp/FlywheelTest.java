@@ -26,10 +26,14 @@ public class FlywheelTest extends NextFTCOpMode {
     }
     public static float flywheelspeed = 800;
 
-    public static double servopos = 0;
-    public static MotorEx flywheel = new MotorEx("launchingmotor");
-    public static MotorEx flywheel2 = new MotorEx("launchingmotor2");
-    public static ServoEx hoodServo = new ServoEx("hoodServo");
+    public static double servopos = 0.6;
+    public static double servopos2 = 0.6;
+    public MotorEx flywheel = new MotorEx("launchingmotor");
+    public MotorEx flywheel2 = new MotorEx("launchingmotor2");
+    public MotorEx intake = new MotorEx("intakeMotor");
+    public MotorEx transfer = new MotorEx("transferMotor");
+    public ServoEx hoodServo = new ServoEx("hoodServo");
+    public ServoEx stopperServo = new ServoEx("stopperServo");
     @Override
     public void onInit() {
 
@@ -43,14 +47,17 @@ public class FlywheelTest extends NextFTCOpMode {
 
     @Override
     public void onUpdate() {
-        //shooter(flywheelspeed);
-        flywheel.setPower(1);
-        flywheel2.setPower(-1);
+        shooter(flywheelspeed);
+        //flywheel.setPower(1);
+        //flywheel2.setPower(-1);
         double ticksPerSecond = flywheel.getVelocity();
         double rpm = (ticksPerSecond / 28) * 60.0;
         PanelsTelemetry.INSTANCE.getTelemetry().addData("Motor RPM", rpm);
         PanelsTelemetry.INSTANCE.getTelemetry().update(telemetry);
         hoodServo.setPosition(servopos);
+        stopperServo.setPosition(servopos2);
+        intake.setPower(1);
+        transfer.setPower(1);
 
     }
 

@@ -280,12 +280,12 @@ public class DriveTrain2 implements Subsystem {
         return localize;
     }
 
-    public boolean wraptofalseexecuted = false;
+    /*public boolean wraptofalseexecuted = false;
     public Command wrapfalse() {wrapping = false; wraptofalseexecuted=false; return null;}
     public void wrapperforwrap(){
             SequentialGroup wraptofalse = new SequentialGroup(new Delay(0.3),wrapfalse());
             wraptofalse.schedule();
-    }
+    }*/
 
     @Override
     public void periodic() {
@@ -332,18 +332,17 @@ public class DriveTrain2 implements Subsystem {
         double targetTurretAngle = getClosestValidTurretAngle(headingError);
         double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
         servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
-        if(servoPositionSignal>0.2&&servoPositionSignal<0.8) {
             turret1.setPosition(servoPositionSignal);
             turret2.setPosition(servoPositionSignal);
-        }
-        if(wrapping==true && wraptofalseexecuted==false){
+        /*if(wrapping==true && wraptofalseexecuted==false){
             wrapperforwrap();
             wraptofalseexecuted = true;
-        }
+        }*/
         //currentTurretPos=Math.toDegrees(robotHeading) - headingError;
         currentTurretPos=((turret1.getPosition() - 0.05) / 0.90) * 449.51 - 44.75;
         ActiveOpMode.telemetry().addData("launch?", isOverlappingLaunchZone(follower().getPose()));
-        if(isOverlappingLaunchZone(follower().getPose()) && robotToGoalVector.getMagnitude()>30 && wrapping == false){
+        //if(isOverlappingLaunchZone(follower().getPose()) && robotToGoalVector.getMagnitude()>30 && wrapping == false){
+        if(isOverlappingLaunchZone(follower().getPose()) && robotToGoalVector.getMagnitude()>30){
             intakeMotor.setPower(1);
             transfer.setPower(1);
             openStopper.schedule();

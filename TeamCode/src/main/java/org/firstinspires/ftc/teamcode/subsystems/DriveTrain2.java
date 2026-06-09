@@ -35,6 +35,7 @@ import dev.nextftc.hardware.impl.IMUEx;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
 import dev.nextftc.hardware.positionable.SetPosition;
+import dev.nextftc.hardware.powerable.SetPower;
 
 
 @Configurable
@@ -118,8 +119,8 @@ public class DriveTrain2 implements Subsystem {
         //return null;
     }
 
-    public MotorEx intakeMotor;
-    public MotorEx transfer;
+    public static MotorEx intakeMotor;
+    public static MotorEx transfer;
     public Command localize;
 
     public static ServoEx hoodServo = new ServoEx("hoodServo");
@@ -279,6 +280,8 @@ public class DriveTrain2 implements Subsystem {
     public Command Localize(){
         return localize;
     }
+    Command shooter = new LambdaCommand()
+            .setStart(()-> shoot());
 
     /*public boolean wraptofalseexecuted = false;
     public Command wrapfalse() {wrapping = false; wraptofalseexecuted=false; return null;}
@@ -286,12 +289,20 @@ public class DriveTrain2 implements Subsystem {
             SequentialGroup wraptofalse = new SequentialGroup(new Delay(0.3),wrapfalse());
             wraptofalse.schedule();
     }*/
+    public static void shoot(){
+        if(shooting==false){
+            shooting = true;
+            SequentialGroup shoot = new SequentialGroup(openStopper, new SetPower(intakeMotor, 1), new SetPower(transfer, 1), new Delay(0.3), closeStopper, new SetPower(intakeMotor, 0), new SetPower(transfer, 0), shootFalse);
+            shoot.schedule();
+        }
+    }
 
     @Override
     public void periodic() {
         if (firsttime == true) {
             // Schedule the command stored in the localize variable
             Gamepads.gamepad1().x().whenBecomesTrue((()->Localize().schedule()));
+            Gamepads.gamepad1().rightTrigger().greaterThan(0.3).whenBecomesTrue(shooter);
             //Gamepads.gamepad1().square().whenBecomesTrue(() -> farAngle());
             Gamepads.gamepad1().rightBumper().whenBecomesTrue(turretzero);
             Gamepads.gamepad1().leftBumper().whenBecomesTrue(turrethalf);
@@ -342,7 +353,7 @@ public class DriveTrain2 implements Subsystem {
         currentTurretPos=((turret1.getPosition() - 0.05) / 0.90) * 449.51 - 44.75;
         ActiveOpMode.telemetry().addData("launch?", isOverlappingLaunchZone(follower().getPose()));
         //if(isOverlappingLaunchZone(follower().getPose()) && robotToGoalVector.getMagnitude()>30 && wrapping == false){
-        if(isOverlappingLaunchZone(follower().getPose()) && robotToGoalVector.getMagnitude()>30){
+        /*if(isOverlappingLaunchZone(follower().getPose()) && robotToGoalVector.getMagnitude()>30){
             intakeMotor.setPower(1);
             transfer.setPower(1);
             openStopper.schedule();
@@ -351,7 +362,7 @@ public class DriveTrain2 implements Subsystem {
             intakeMotor.setPower(0);
             transfer.setPower(0);
             closeStopper.schedule();
-        }
+        }*/
 
 
         //ActiveOpMode.telemetry().addData("Motor1Speed", s1speed);

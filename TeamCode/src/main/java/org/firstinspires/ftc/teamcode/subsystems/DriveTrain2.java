@@ -144,6 +144,7 @@ public class DriveTrain2 implements Subsystem {
     // Tracks where the turret is across frames (Double, initialized to center)
     private double currentTurretPos = 180.0;
     public boolean wrapping = false;
+    public static ServoEx stopperServo = new ServoEx("stopperServo");
 
     public double getClosestValidTurretAngle(double relativeGoalDegrees) {
         // Option 1: The raw 0-360 input from your vector calculation
@@ -171,6 +172,14 @@ public class DriveTrain2 implements Subsystem {
         // Safety fallback clamp
         return Math.max(MIN_ANGLE, Math.min(MAX_ANGLE, option1));
     }
+    public static Command closeStopper = new LambdaCommand()
+            .setStart(() -> {
+                stopperServo.setPosition(0.02);
+            }).setIsDone(() -> true);
+    public static Command openStopper = new LambdaCommand()
+            .setStart(() -> {
+                stopperServo.setPosition(0.16);
+            }).setIsDone(() -> true);
 
     @Override
     public void initialize() {
@@ -180,6 +189,7 @@ public class DriveTrain2 implements Subsystem {
         follower = follower();
         intakeMotor = new MotorEx("intakeMotor");
         transfer = new MotorEx("transferMotor");
+        closeStopper.schedule();
         if(isBlue()!=true && isRed()!=true) {
             ActiveOpMode.telemetry().addLine("No direction set");
         }
@@ -336,10 +346,12 @@ public class DriveTrain2 implements Subsystem {
         if(isOverlappingLaunchZone(follower().getPose()) && robotToGoalVector.getMagnitude()>30 && wrapping == false){
             intakeMotor.setPower(1);
             transfer.setPower(1);
+            openStopper.schedule();
         }
         else{
             intakeMotor.setPower(0);
             transfer.setPower(0);
+            closeStopper.schedule();
         }
 
 

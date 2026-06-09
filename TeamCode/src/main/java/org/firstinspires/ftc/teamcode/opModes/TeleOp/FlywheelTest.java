@@ -26,8 +26,8 @@ public class FlywheelTest extends NextFTCOpMode {
     }
     public static float flywheelspeed = 800;
 
-    public static double servopos = 0.6;
-    public static double servopos2 = 0.6;
+    public static double servopos = 0;
+    public static double servopos2 = 0.16;
     public MotorEx flywheel = new MotorEx("launchingmotor");
     public MotorEx flywheel2 = new MotorEx("launchingmotor2");
     public MotorEx intake = new MotorEx("intakeMotor");

@@ -64,6 +64,9 @@ public class DriveTrain2 implements Subsystem {
     public static double turretOffset = 0;
     public static double turretOffsetStep = -5;
 
+    public static double openStopperPos = 0.5;
+    public static double closeStopperPos = 0.42;
+
     public Supplier<Double> yVCtx;
 
     /*public static double hoodToPos(double runtime) {
@@ -178,11 +181,11 @@ public class DriveTrain2 implements Subsystem {
     }
     public static Command closeStopper = new LambdaCommand()
             .setStart(() -> {
-                stopperServo.setPosition(0.23);
+                stopperServo.setPosition(closeStopperPos); // close
             }).setIsDone(() -> true);
     public static Command openStopper = new LambdaCommand()
             .setStart(() -> {
-                stopperServo.setPosition(0.31);
+                stopperServo.setPosition(openStopperPos); // open
             }).setIsDone(() -> true);
 
     @Override

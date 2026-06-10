@@ -53,8 +53,8 @@ public class TeleOpRed2 extends NextFTCOpMode {
         Gamepads.gamepad1().x().whenBecomesTrue(()->follower.setPose(new Pose(79.967,9.271,Math.toRadians(90))));
 
         // Backup Controls
-        Gamepads.gamepad2().leftTrigger().greaterThan(0.5).whenTrue(() -> DriveTrain2.turretOffset -= DriveTrain2.turretOffsetStep);
-        Gamepads.gamepad2().rightTrigger().greaterThan(0.5).whenTrue(() -> DriveTrain2.turretOffset += DriveTrain2.turretOffsetStep);
+        Gamepads.gamepad2().leftTrigger().greaterThan(0.5).whenBecomesTrue(() -> DriveTrain2.turretOffset -= DriveTrain2.turretOffsetStep);
+        Gamepads.gamepad2().rightTrigger().greaterThan(0.5).whenBecomesTrue(() -> DriveTrain2.turretOffset += DriveTrain2.turretOffsetStep);
         Gamepads.gamepad2().a().whenBecomesTrue(() -> DriveTrain2.turretOffset = 0);
         Gamepads.gamepad2().dpadUp().whenBecomesTrue(() -> ShooterCalc.verticalShift += ShooterCalc.verticalShiftStep);
         Gamepads.gamepad2().dpadDown().whenBecomesTrue(() -> ShooterCalc.verticalShift -= ShooterCalc.verticalShiftStep);

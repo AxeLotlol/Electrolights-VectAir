@@ -61,6 +61,9 @@ public class DriveTrain2 implements Subsystem {
     private static ServoEx turret1;
     private static ServoEx turret2;
 
+    public static double turretOffset = 0;
+    public static double turretOffsetStep = 0.5;
+
     public Supplier<Double> yVCtx;
 
     /*public static double hoodToPos(double runtime) {
@@ -341,7 +344,7 @@ public class DriveTrain2 implements Subsystem {
         shooter((float) flywheelSpeed);
         double hoodAngle = results[1];
         hoodServo.setPosition(hoodAngle);
-        double targetTurretAngle = getClosestValidTurretAngle(headingError);
+        double targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset);
         double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
         servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
             turret1.setPosition(servoPositionSignal);

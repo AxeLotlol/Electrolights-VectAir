@@ -10,7 +10,7 @@ import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.ftc.ActiveOpMode;
 
 @Configurable
-public class AutoShooterCalc implements Subsystem {
+public class ShooterCalcOldDoNotUse implements Subsystem {
 
     public static boolean lowangle = false;
 

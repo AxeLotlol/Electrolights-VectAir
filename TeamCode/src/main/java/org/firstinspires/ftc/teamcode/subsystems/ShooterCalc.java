@@ -25,6 +25,9 @@ public class ShooterCalc implements Subsystem {
     public static double rpmoffset = 200;
     public static double requiredTPS = (28*requiredRPM)/60;
 
+    public static double verticalShift = 0;
+    public static double verticalShiftStep = 50;
+
     public static Double[] calculateShotVectorandUpdateHeading(double robotHeading, Vector robotToGoalVector, Vector robotVel){
         double g = 32.174*12;
         double x = robotToGoalVector.getMagnitude()-ShooterConstants.PASS_THROUGH_POINT_RADIUS;
@@ -79,7 +82,7 @@ public class ShooterCalc implements Subsystem {
         //requiredTPS = (28 * requiredRPM) / 60;
         //requiredTPS = 12.79084*Math.pow(flywheelSpeed, 2)-69.40057*flywheelSpeed+849.93005;
 
-        requiredTPS = -16.19*Math.pow(flywheelSpeed, 2)+ 449.11*flywheelSpeed- 964.9;
+        requiredTPS = (-16.19*Math.pow(flywheelSpeed, 2)+ 449.11*flywheelSpeed- 964.9) + verticalShift;
         double what = Math.toDegrees(hoodAngle);
 
         //double c1 = (double) -13 /376;

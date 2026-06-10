@@ -58,7 +58,6 @@ public class FlywheelTest extends NextFTCOpMode {
         stopperServo.setPosition(servopos2);
         intake.setPower(1);
         transfer.setPower(1);
-
     }
 
 

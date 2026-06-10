@@ -62,7 +62,7 @@ public class DriveTrain2 implements Subsystem {
     private static ServoEx turret2;
 
     public static double turretOffset = 0;
-    public static double turretOffsetStep = 0.5;
+    public static double turretOffsetStep = -5;
 
     public Supplier<Double> yVCtx;
 

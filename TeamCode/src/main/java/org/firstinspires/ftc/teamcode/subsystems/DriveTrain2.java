@@ -88,7 +88,7 @@ public class DriveTrain2 implements Subsystem {
 
 
     //Pose startingpose = Storage.currentPose;
-    Pose startingpose = new Pose(120,96, Math.toRadians(90));
+    Pose startingpose = new Pose(72,72, Math.toRadians(90));
     //Pose startingpose = new Pose(72,72, Math.toRadians(90));
     @Override
     public Command getDefaultCommand() {

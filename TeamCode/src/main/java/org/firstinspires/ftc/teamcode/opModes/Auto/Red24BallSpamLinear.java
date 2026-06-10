@@ -80,12 +80,12 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
             );
     public Command servoOpen = new LambdaCommand()
             .setStart(() ->{
-                        servoStopper.setPosition(0.31);
+                        servoStopper.setPosition(0.5);
                     }
             );
     public Command servoClose = new LambdaCommand()
             .setStart(() ->{
-                        servoStopper.setPosition(0.23);
+                        servoStopper.setPosition(0.42);
                     }
             );
 

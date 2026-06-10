@@ -86,7 +86,7 @@ public class Blue24BallSpamLinear extends NextFTCOpMode {
             );
     public Command servoClose = new LambdaCommand()
             .setStart(() ->{
-                        servoStopper.setPosition(0.16);
+                        servoStopper.setPosition(0.02);
                     }
             );
 

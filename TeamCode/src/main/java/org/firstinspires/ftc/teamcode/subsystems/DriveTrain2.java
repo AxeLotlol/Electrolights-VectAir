@@ -312,6 +312,7 @@ public class DriveTrain2 implements Subsystem {
             firsttime = false;
             turret1 = new ServoEx("turretServo1");
             turret2 = new ServoEx("turretServo2");
+
             /*ParallelGroup HoodPowerZero=new ParallelGroup(
                     new SetPosition(hoodServo1,0),
                     new SetPosition(hoodServo2,0)

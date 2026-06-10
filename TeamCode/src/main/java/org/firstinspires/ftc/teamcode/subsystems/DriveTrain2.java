@@ -178,7 +178,7 @@ public class DriveTrain2 implements Subsystem {
     }
     public static Command closeStopper = new LambdaCommand()
             .setStart(() -> {
-                stopperServo.setPosition(0.2);
+                stopperServo.setPosition(0.23);
             }).setIsDone(() -> true);
     public static Command openStopper = new LambdaCommand()
             .setStart(() -> {

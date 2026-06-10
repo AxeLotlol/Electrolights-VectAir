@@ -396,6 +396,10 @@ public class DriveTrain2 implements Subsystem {
         //ActiveOpMode.telemetry().addData("headingError", headingError);
         //ActiveOpMode.telemetry().addData("distance", distance);
         //ActiveOpMode.telemetry().addData("yVCtx", visionYawCommand(headingError));
+
+        ActiveOpMode.telemetry().addLine("==== BACKUP CONSTANTS ====");
+        ActiveOpMode.telemetry().addData("Turret Offset", turretOffset);
+        ActiveOpMode.telemetry().addData("RPM Vertical Shift", ShooterCalc.verticalShift);
         ActiveOpMode.telemetry().update();
     }
 }

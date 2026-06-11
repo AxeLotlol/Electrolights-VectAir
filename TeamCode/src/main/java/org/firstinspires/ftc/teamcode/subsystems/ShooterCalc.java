@@ -24,7 +24,6 @@ public class ShooterCalc implements Subsystem {
 
     public static double rpmoffset = 200;
     public static double requiredTPS = (28*requiredRPM)/60;
-
     public static double verticalShift = 0;
     public static double verticalShiftStep = 50;
 
@@ -69,7 +68,6 @@ public class ShooterCalc implements Subsystem {
         if(isNaN(hoodAngle)){
             hoodAngle=Math.toRadians(60);
         }
-
         double newtemp = (ndr+5)/39.37;
 
         //y = /*SCORE_HEIGHT*/ -4.5745*newtemp*newtemp*newtemp + 25.978*newtemp*newtemp - 48.395*newtemp + 58.675; // -0.7135x2 + 0.8315x + 33.532

@@ -72,14 +72,11 @@ public class DriveTrain2 implements Subsystem {
 
     public static double openStopperPos = 0.5;
     public static double closeStopperPos = 0.42;
-    Command driveToGate = new LambdaCommand()
+    public Command driveToGate = new LambdaCommand()
             .setStart(() -> dToGate = true);
     public static boolean dToGate = false;
     public Pose currPose;
 
-    public class pathD {
-        public PathChain dGate;
-    }
 
     public Supplier<Double> yVCtx;
 
@@ -424,39 +421,55 @@ public class DriveTrain2 implements Subsystem {
         ActiveOpMode.telemetry().addData("RPM Vertical Shift", ShooterCalc.verticalShift);
         ActiveOpMode.telemetry().update();
         Gamepads.gamepad1().rightTrigger().greaterThan(0.3).whenBecomesTrue(shooter);
-        Gamepads.gamepad1().rightStickButton().whenBecomesTrue(driveToGate)
+        Gamepads.gamepad1().dpadUp().whenBecomesTrue(getDriveToGateCommand())
                 .whenBecomesFalse(dToGateFalse);
-        if (dToGate) {
-
-           
-
-            follower.update();
 
 
+
+
+
+
+        if (firsttime == true) {
+            // Correct binding: Runs the path once per press, and automatically clears out when done
+            Gamepads.gamepad1().rightStickButton().whenBecomesTrue(getDriveToGateCommand());
+
+            firsttime = false; // Prevents re-binding buttons every loop
         }
 
     }
 
-    public class pathsD {
-        public PathChain dGate;
-        public class PathsD {
-            public PathChain dGate;
 
+    // Fixed constructor name to match class name exactly
+    public Command getDriveToGateCommand() {
+        return new LambdaCommand()
+                .setStart(() -> {
+                    // 1. Build the path dynamically from your current position
+                    PathChain dGatePath = follower.pathBuilder()
+                            .addPath(
+                                    new BezierCurve(
+                                            follower.getPose(),
+                                            new Pose(115.158, 61.289),
+                                            new Pose(133, 55.5)
+                                    )
+                            )
+                            .setLinearHeadingInterpolation(follower.getPose().getHeading(), Math.toRadians(32))
+                            .setVelocityConstraint(1.0)
+                            .setTValueConstraint(0.8)
 
-            // Fixed constructor name to match class name exactly
-            public PathsD(Follower follower) {
-                this.dGate = follower.pathBuilder().addPath(
-                                new BezierCurve(
-                                        currPose,
-                                        new Pose(115.158, 61.289),
-                                        new Pose(133, 55.5)
-                                )
-                        ).setLinearHeadingInterpolation(Math.toRadians(follower.getHeading()), Math.toRadians(32))
-                        .setVelocityConstraint(1.0)
-                        .setTValueConstraint(0.8)
-                        .build();
-            }
-        }
+                            // 2. FIXED: Loosen the arrival tolerances directly on this specific path segment
+                            // This allows Pedro to mark the path complete without infinitely trying to correct micro-inches
+                            .setTranslationalConstraint(1.5) // Allow 1.5 inches of margin at destination
+                            .setHeadingConstraint(Math.toRadians(3.0)) // Allow 3 degrees of heading margin
+                            .build();
+
+                    // 3. Command Pedro to run the path
+                    follower.followPath(dGatePath, false);
+                })
+                // 4. End the command when Pedro stops driving
+                .setIsDone(() -> !follower.isBusy())
+                .setStop((Boolean interrupted) -> {
+                    follower.breakFollowing(); // Safely hand control back to the joysticks
+                })
+                .requires(this); // Lock out your TeleOp joysticks while this is executing
     }
-
-}
+    }

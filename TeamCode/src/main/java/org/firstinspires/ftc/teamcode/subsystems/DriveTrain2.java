@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+
 import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpBlue2.isBlue;
 import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpRed2.isRed;
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
@@ -76,6 +77,7 @@ public class DriveTrain2 implements Subsystem {
             .setStart(() -> dToGate = true);
     public static boolean dToGate = false;
     public Pose currPose;
+    public boolean firsttime2 = true;
 
 
     public Supplier<Double> yVCtx;
@@ -447,11 +449,8 @@ public class DriveTrain2 implements Subsystem {
 
 
 
-        if (firsttime == true) {
-            // Correct binding: Runs the path once per press, and automatically clears out when done
+        if (isRed()) {
             Gamepads.gamepad1().dpadUp().whenBecomesTrue(getDriveToGateCommand());
-
-            firsttime = false; // Prevents re-binding buttons every loop
         }
 
     }
@@ -459,35 +458,32 @@ public class DriveTrain2 implements Subsystem {
 
     // Fixed constructor name to match class name exactly
     public Command getDriveToGateCommand() {
-        return new LambdaCommand()
+        Command followCommand = new LambdaCommand()
                 .setStart(() -> {
-                    // 1. Build the path dynamically from your current position
                     PathChain dGatePath = follower.pathBuilder()
                             .addPath(
                                     new BezierCurve(
                                             follower.getPose(),
+                                            new Pose(106.0, 72.0),
                                             new Pose(115.158, 61.289),
                                             new Pose(133, 55.5)
                                     )
                             )
                             .setLinearHeadingInterpolation(follower.getPose().getHeading(), Math.toRadians(32))
                             .setVelocityConstraint(1.0)
-                            .setTValueConstraint(0.8)
-
-                            // 2. FIXED: Loosen the arrival tolerances directly on this specific path segment
-                            // This allows Pedro to mark the path complete without infinitely trying to correct micro-inches
-                            .setTranslationalConstraint(0.5) // Allow 1.5 inches of margin at destination
-                            .setHeadingConstraint(Math.toRadians(2.0)) // Allow 3 degrees of heading margin
                             .build();
 
-                    // 3. Command Pedro to run the path
-                    follower.followPath(dGatePath, false);
+                    follower.followPath(dGatePath, true);
                 })
-                // 4. End the command when Pedro stops driving
                 .setIsDone(() -> !follower.isBusy())
                 .setStop((Boolean interrupted) -> {
-                    follower.breakFollowing(); // Safely hand control back to the joysticks
+                    // This shuts off Pedro's PID hold-points instantly
+                    follower.breakFollowing();
                 })
-                .requires(this); // Lock out your TeleOp joysticks while this is executing
+                // CRITICAL: Change "this" to whatever your Drivetrain subsystem instance is called
+                // e.g., MecanumDrive.INSTANCE or drivetrain
+                .requires(this);
+
+        return followCommand.raceWith(new Delay(1.0));
     }
     }

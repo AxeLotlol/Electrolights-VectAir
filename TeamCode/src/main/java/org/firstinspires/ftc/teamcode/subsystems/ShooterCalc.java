@@ -28,6 +28,8 @@ public class ShooterCalc implements Subsystem {
     public static double verticalShift = 0;
     public static double verticalShiftStep = 50;
 
+    public static double accelScalar = 0.02; // Set to 0 to disable
+
     public static Double[] calculateShotVectorandUpdateHeading(double robotHeading, Vector robotToGoalVector, Vector robotVel, Vector robotAccel){
         double g = 32.174*12;
         double x = robotToGoalVector.getMagnitude()-ShooterConstants.PASS_THROUGH_POINT_RADIUS;
@@ -50,11 +52,12 @@ public class ShooterCalc implements Subsystem {
             hoodAngle=Math.toRadians(63);
         }
         double flywheelSpeed = Math.sqrt(g * x * x / (2 * Math.pow(Math.cos(hoodAngle), 2) * (x * Math. tan(hoodAngle) - y)));
+
         Vector robotVelocity = robotVel;
-        //if(robotAccel.getMagnitude()>11){
-            //robotVelocity = robotVel.plus(robotAccel.times(0.1));
-        //}
-        //robotVelocity = robotVelocity.times(1.2);
+        if(robotAccel.getMagnitude() > 11) {
+            robotVelocity.setMagnitude(robotVelocity.getMagnitude() + (robotAccel.getMagnitude() * accelScalar));
+        }
+        robotVelocity = robotVelocity.times(1.2);
 
         double coordinateTheta = robotVelocity.getTheta() - robotToGoalVector.getTheta();
 

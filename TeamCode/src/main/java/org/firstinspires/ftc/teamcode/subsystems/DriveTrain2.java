@@ -67,7 +67,7 @@ public class DriveTrain2 implements Subsystem {
     private static ServoEx turret1;
     private static ServoEx turret2;
 
-    public static double turretOffset = 0;
+    public static double turretOffset = -3;
     public static double turretOffsetStep = -5;
 
     public static double openStopperPos = 0.5;
@@ -363,17 +363,36 @@ public class DriveTrain2 implements Subsystem {
         shooter((float) flywheelSpeed);
         double hoodAngle = results[1];
         hoodServo.setPosition(hoodAngle);
-        double targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset);
-        double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
-        servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
-        turret1.setPosition(servoPositionSignal);
-        turret2.setPosition(servoPositionSignal);
+        double robotAngularVelocityRads = follower.getAngularVelocity();
+        double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
+
+        // Calculate the feedforward offset (Velocity * Time)
+        double feedforwardOffset = robotAngularVelocityDegs * 0.225;
+
+
+        //if(follower.getAngularVelocity()>5){
+            double targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset - feedforwardOffset);
+            double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
+            servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
+            turret1.setPosition(servoPositionSignal);
+            turret2.setPosition(servoPositionSignal);
+            //currentTurretPos = ((servoPositionSignal - 0.05) / 0.90) * 449.51 - 44.75;
+        //}
+        //else{
+            double targetTurretAngle2 = getClosestValidTurretAngle(headingError + turretOffset);
+            double servoPositionSignal2 = 0.05 + ((targetTurretAngle2 - MIN_ANGLE) / 449.51) * 0.90;
+            servoPositionSignal2 = Math.max(0.05, Math.min(0.95, servoPositionSignal2));
+            //turret1.setPosition(servoPositionSignal2);
+            //turret2.setPosition(servoPositionSignal2);
+            currentTurretPos = ((servoPositionSignal2 - 0.05) / 0.90) * 449.51 - 44.75;
+        //}
+
         /*if(wrapping==true && wraptofalseexecuted==false){
             wrapperforwrap();
             wraptofalseexecuted = true;
         }*/
-        //currentTurretPos=Math.toDegrees(robotHeading) - headingError;
-        currentTurretPos = ((turret1.getPosition() - 0.05) / 0.90) * 449.51 - 44.75;
+        //currentTurretPos=targetTurretAngle;
+
         ActiveOpMode.telemetry().addData("launch?", isOverlappingLaunchZone(follower().getPose()));
         //if(isOverlappingLaunchZone(follower().getPose()) && robotToGoalVector.getMagnitude()>30 && wrapping == false){
         /*if(isOverlappingLaunchZone(follower().getPose()) && robotToGoalVector.getMagnitude()>30){

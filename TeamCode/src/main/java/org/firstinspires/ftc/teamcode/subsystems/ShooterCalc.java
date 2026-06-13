@@ -57,7 +57,7 @@ public class ShooterCalc implements Subsystem {
         double perpendicularComponent = Math.sin(coordinateTheta) * robotVelocity.getMagnitude();
 
         double vz = flywheelSpeed * Math.sin(hoodAngle);
-        double time = (x / (flywheelSpeed * Math.cos(hoodAngle)));
+        double time = 1.2*(x / (flywheelSpeed * Math.cos(hoodAngle))); //maybe try 1.25
         double ivr = x / time + parallelComponent;
         double nvr = Math.sqrt(ivr * ivr + perpendicularComponent * perpendicularComponent);
         double ndr = nvr * time;

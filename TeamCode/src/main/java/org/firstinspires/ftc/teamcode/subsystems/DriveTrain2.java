@@ -440,8 +440,7 @@ public class DriveTrain2 implements Subsystem {
         ActiveOpMode.telemetry().addData("RPM Vertical Shift", ShooterCalc.verticalShift);
         ActiveOpMode.telemetry().update();
         Gamepads.gamepad1().rightTrigger().greaterThan(0.3).whenBecomesTrue(shooter);
-        Gamepads.gamepad1().dpadUp().whenBecomesTrue(getDriveToGateCommand())
-                .whenBecomesFalse(dToGateFalse);
+
 
 
 

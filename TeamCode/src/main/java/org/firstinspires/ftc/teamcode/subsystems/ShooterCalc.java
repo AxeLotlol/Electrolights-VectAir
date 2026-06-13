@@ -52,7 +52,7 @@ public class ShooterCalc implements Subsystem {
         double flywheelSpeed = Math.sqrt(g * x * x / (2 * Math.pow(Math.cos(hoodAngle), 2) * (x * Math. tan(hoodAngle) - y)));
         Vector robotVelocity = robotVel;
         if(robotAccel.getMagnitude()>11){
-            robotVelocity = robotVel.plus(robotAccel.times(0.1));
+            robotVelocity = robotVel.plus(robotAccel.times(0.02));
         }
         //robotVelocity = robotVelocity.times(1.2);
 

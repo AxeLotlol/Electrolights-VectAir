@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opModes.Auto;
 
+import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 import static org.firstinspires.ftc.teamcode.subsystems.Airsort.transfer;
 import static org.firstinspires.ftc.teamcode.subsystems.DriveTrain2.hoodServo;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
@@ -196,13 +197,13 @@ public class Red24BallSpamLinearOld extends NextFTCOpMode {
         double robotHeading = currPose.getHeading();
         Vector robotToGoalVector = new Vector(currPose.distanceFrom(new Pose(138, 141)), Math.atan2(141 - currPose.getY(), 138 - currPose.getX()));
 
-        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity());
+        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity(), follower.getAcceleration());
         Double headingError = results[2];
         double flywheelSpeed = results[0];
         shooter((float) flywheelSpeed);
         double hoodAngle = results[1];
         hoodServo.setPosition(hoodAngle);
-        //if this doesnt work its cuz hoodServo isnt defined here and nithin is gay asf
+        //if this doesnt work its cuz hoodServo isnt defined here and moksh is gay asf
 
         double targetTurretAngle = getClosestValidTurretAngle(headingError);
         double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;

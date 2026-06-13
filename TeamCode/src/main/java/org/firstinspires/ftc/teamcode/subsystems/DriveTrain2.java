@@ -434,14 +434,13 @@ public class DriveTrain2 implements Subsystem {
         //ActiveOpMode.telemetry().addData("headingError", headingError);
         //ActiveOpMode.telemetry().addData("distance", distance);
         //ActiveOpMode.telemetry().addData("yVCtx", visionYawCommand(headingError));
-
+        ActiveOpMode.telemetry().addData("Robot Heading: ",follower.getHeading());
         ActiveOpMode.telemetry().addLine("==== BACKUP CONSTANTS ====");
         ActiveOpMode.telemetry().addData("Turret Offset", turretOffset);
         ActiveOpMode.telemetry().addData("RPM Vertical Shift", ShooterCalc.verticalShift);
         ActiveOpMode.telemetry().update();
         Gamepads.gamepad1().rightTrigger().greaterThan(0.3).whenBecomesTrue(shooter);
-        Gamepads.gamepad1().dpadUp().whenBecomesTrue(getDriveToGateCommand())
-                .whenBecomesFalse(dToGateFalse);
+
 
 
 
@@ -450,7 +449,7 @@ public class DriveTrain2 implements Subsystem {
 
         if (firsttime == true) {
             // Correct binding: Runs the path once per press, and automatically clears out when done
-            Gamepads.gamepad1().rightStickButton().whenBecomesTrue(getDriveToGateCommand());
+            Gamepads.gamepad1().dpadUp().whenBecomesTrue(getDriveToGateCommand());
 
             firsttime = false; // Prevents re-binding buttons every loop
         }

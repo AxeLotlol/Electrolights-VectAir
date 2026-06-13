@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opModes.Auto;
 
+import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 import static org.firstinspires.ftc.teamcode.subsystems.Airsort.transfer;
 import static org.firstinspires.ftc.teamcode.subsystems.DriveTrain2.hoodServo;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
@@ -185,7 +186,7 @@ public class Red24BallSpamLinearNithin extends NextFTCOpMode {
         double robotHeading = currPose.getHeading();
         Vector robotToGoalVector = new Vector(currPose.distanceFrom(new Pose(144, 144)), Math.atan2(144 - currPose.getY(), 14 - currPose.getX()));
 
-        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity());
+        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity(), follower.getAcceleration());
         Double headingError = results[2];
         double flywheelSpeed = results[0];
         shooter((float) flywheelSpeed);

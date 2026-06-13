@@ -477,8 +477,8 @@ public class DriveTrain2 implements Subsystem {
 
                             // 2. FIXED: Loosen the arrival tolerances directly on this specific path segment
                             // This allows Pedro to mark the path complete without infinitely trying to correct micro-inches
-                            .setTranslationalConstraint(1.5) // Allow 1.5 inches of margin at destination
-                            .setHeadingConstraint(Math.toRadians(3.0)) // Allow 3 degrees of heading margin
+                            .setTranslationalConstraint(0.5) // Allow 1.5 inches of margin at destination
+                            .setHeadingConstraint(Math.toRadians(2.0)) // Allow 3 degrees of heading margin
                             .build();
 
                     // 3. Command Pedro to run the path

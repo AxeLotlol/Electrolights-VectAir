@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opModes.Auto;
 
+import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
 
@@ -237,11 +238,9 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
                 );
 
                 // 2. Get the required heading and flywheel/hood specs from your utility
-                Double[] results = calculateShotVectorandUpdateHeading(
-                        currPose.getHeading(),
-                        robotToGoalVector,
-                        follower.getVelocity()
-                );
+               double robotHeading= currPose.getHeading();
+                Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity(), follower.getAcceleration());        Double headingError = results[2];
+
 
                 double targetHeading = results[2]; // Assuming index 2 is the target heading from your calc
                 double flywheelSpeed = results[0];
@@ -379,8 +378,7 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
         double robotHeading = follower.getPose().getHeading();
         Vector robotToGoalVector = new Vector(follower.getPose().distanceFrom(new Pose(138, 141)), Math.atan2(141 - currPose.getY(), 138 - currPose.getX()));
         //Vector v = new Vector(new Pose(138, 138));
-        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity());
-        double flywheelSpeed = results[0];
+        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity(), follower.getAcceleration());        double flywheelSpeed = results[0];
         shooter((float) (flywheelSpeed+30));
         double hoodAngle = results[1];
         hoodToPos(hoodAngle);

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opModes.Auto;
 
+import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
 
@@ -220,8 +221,7 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
         Pose currPose = follower.getPose();
         double robotHeading = follower.getPose().getHeading();
         Vector robotToGoalVector = new Vector(follower.getPose().distanceFrom(new Pose(goalX, goalY)), Math.atan2(goalY - currPose.getY(), goalX - currPose.getX()));
-        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity());
-
+        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity(), follower.getAcceleration());
         double flywheelSpeed = results[0];
         shooter((float) flywheelSpeed);
         double hoodAngle = results[1];

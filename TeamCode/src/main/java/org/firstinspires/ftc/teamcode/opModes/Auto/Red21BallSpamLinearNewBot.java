@@ -58,7 +58,7 @@ public class Red21BallSpamLinearNewBot extends NextFTCOpMode {
 
     int tagId = 0;
 
-    public Pose start = new Pose(112.158,135.289, Math.toRadians(90));
+        public Pose start = new Pose(109.810, 132.272, Math.toRadians(270));
 
 
     private MotorEx transferMotor;
@@ -341,11 +341,11 @@ public class Red21BallSpamLinearNewBot extends NextFTCOpMode {
         public Paths(Follower follower) {
             preloadLaunch = follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(112.158,135.289),
+                                    new Pose(109.810, 132.272),
                                     new Pose(110.000, 110.500),
                                     new Pose(100.000, 100.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(90),Math.toRadians(46))
+                    ).setLinearHeadingInterpolation(Math.toRadians(270),Math.toRadians(46))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
 

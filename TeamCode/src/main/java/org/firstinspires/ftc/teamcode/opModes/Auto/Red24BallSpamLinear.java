@@ -49,7 +49,6 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
     private Timer opmodeTimer;
     private Paths paths;
 
-    public boolean gay = false;
 
     public Pose start = new Pose(109.810, 133.272, Math.toRadians(270));
 
@@ -96,21 +95,11 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
             intakeMotorOn,
             new Delay(0.3),
             servoClose
-
     );
-
-    private Command turretControler = new LambdaCommand()
-            .setStart(() ->{
-                        gay=!gay;
-                    }
-
-
-            );
 
 
 
     public double getClosestValidTurretAngle(double relativeGoalDegrees) {
-
         // Option 1: The raw 0-360 input from your vector calculation
         double option1 = relativeGoalDegrees;
 
@@ -152,62 +141,47 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
     public Command Auto() {
         return new SequentialGroup(
 
-                turretControler,
                 new FollowPath(paths.Path1,false,1.0),
-                turretControler,
+
                 intakeMotorOn,
                 new FollowPath(paths.Path2,false,1.0),
                 intakeMotorOff,
                 new FollowPath(paths.Path3,false,1.0),
-                turretControler,
                 shoot,
-                turretControler,
                 intakeMotorOn,
                 new FollowPath(paths.Path4,false,1.0),
                 new Delay(0.7),
                 intakeMotorOff,
                 new FollowPath(paths.Path5,false,1.0),
-                turretControler,
                 shoot,
-                turretControler,
                 intakeMotorOn,
                 new FollowPath(paths.Path6,false,1.0),
                 new Delay(1.5),
                 intakeMotorOff,
                 new FollowPath(paths.Path7,false,1.0),
-                turretControler,
                 shoot,
-                turretControler,
                 intakeMotorOn,
                 new FollowPath(paths.Path8,false,1.0),
                 new Delay(1.5),
                 intakeMotorOff,
                 new FollowPath(paths.Path9,false,1.0),
-                turretControler,
                 shoot,
-                turretControler,
                 intakeMotorOn,
                 new FollowPath(paths.Path10,false,1.0),
                 new Delay(1.5),
                 new FollowPath(paths.Path11,false,1.0),
-                turretControler,
                 shoot,
                 intakeMotorOn,
-                turretControler,
                 new FollowPath(paths.Path12,false,1.0),
                 new Delay(1.5),
                 intakeMotorOff,
                 new FollowPath(paths.Path13,false,1.0),
-                turretControler,
                 shoot,
-                turretControler,
                 intakeMotorOn,
                 new FollowPath(paths.Path14,false,1.0),
                 intakeMotorOff,
                 new FollowPath(paths.Path15,false,1.0),
-                turretControler,
                 shoot,
-                turretControler,
                 new FollowPath(paths.Path16,false,1.0)
 
 
@@ -241,12 +215,9 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
         double targetTurretAngle = getClosestValidTurretAngle(headingError);
         double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
         servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
-
-        if(gay) {
-            turret1.setPosition(servoPositionSignal);
-            turret2.setPosition(servoPositionSignal);
-            currentTurretPos = ((turret1.getPosition() - 0.05) / 0.90) * 449.51 - 44.75;
-        }
+        turret1.setPosition(servoPositionSignal);
+        turret2.setPosition(servoPositionSignal);
+        currentTurretPos=((turret1.getPosition() - 0.05) / 0.90) * 449.51 - 44.75;
 
 
     }
@@ -259,7 +230,7 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
     }
 
 
-    
+
     public class Paths {
 
         public PathChain Path1;

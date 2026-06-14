@@ -336,7 +336,9 @@ public class DriveTrain2 implements Subsystem {
             firsttime = false;
             turret1 = new ServoEx("turretServo1");
             turret2 = new ServoEx("turretServo2");
-
+            if(isRed()) {
+                Gamepads.gamepad1().dpadUp().whenBecomesTrue(getDriveToGateCommand());
+            }
             /*ParallelGroup HoodPowerZero=new ParallelGroup(
                     new SetPosition(hoodServo1,0),
                     new SetPosition(hoodServo2,0)
@@ -373,20 +375,20 @@ public class DriveTrain2 implements Subsystem {
 
 
         //if(follower.getAngularVelocity()>5){
-            double targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset - feedforwardOffset);
-            double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
-            servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
-            turret1.setPosition(servoPositionSignal);
-            turret2.setPosition(servoPositionSignal);
-            //currentTurretPos = ((servoPositionSignal - 0.05) / 0.90) * 449.51 - 44.75;
+        double targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset - feedforwardOffset);
+        double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
+        servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
+        turret1.setPosition(servoPositionSignal);
+        turret2.setPosition(servoPositionSignal);
+        //currentTurretPos = ((servoPositionSignal - 0.05) / 0.90) * 449.51 - 44.75;
         //}
         //else{
-            double targetTurretAngle2 = getClosestValidTurretAngle(headingError + turretOffset);
-            double servoPositionSignal2 = 0.05 + ((targetTurretAngle2 - MIN_ANGLE) / 449.51) * 0.90;
-            servoPositionSignal2 = Math.max(0.05, Math.min(0.95, servoPositionSignal2));
-            //turret1.setPosition(servoPositionSignal2);
-            //turret2.setPosition(servoPositionSignal2);
-            currentTurretPos = ((servoPositionSignal2 - 0.05) / 0.90) * 449.51 - 44.75;
+        double targetTurretAngle2 = getClosestValidTurretAngle(headingError + turretOffset);
+        double servoPositionSignal2 = 0.05 + ((targetTurretAngle2 - MIN_ANGLE) / 449.51) * 0.90;
+        servoPositionSignal2 = Math.max(0.05, Math.min(0.95, servoPositionSignal2));
+        //turret1.setPosition(servoPositionSignal2);
+        //turret2.setPosition(servoPositionSignal2);
+        currentTurretPos = ((servoPositionSignal2 - 0.05) / 0.90) * 449.51 - 44.75;
         //}
 
         /*if(wrapping==true && wraptofalseexecuted==false){
@@ -436,22 +438,13 @@ public class DriveTrain2 implements Subsystem {
         //ActiveOpMode.telemetry().addData("headingError", headingError);
         //ActiveOpMode.telemetry().addData("distance", distance);
         //ActiveOpMode.telemetry().addData("yVCtx", visionYawCommand(headingError));
-        ActiveOpMode.telemetry().addData("Robot Heading: ",follower.getHeading());
+        ActiveOpMode.telemetry().addData("Robot Heading: ", follower.getHeading());
         ActiveOpMode.telemetry().addLine("==== BACKUP CONSTANTS ====");
         ActiveOpMode.telemetry().addData("Turret Offset", turretOffset);
         ActiveOpMode.telemetry().addData("RPM Vertical Shift", ShooterCalc.verticalShift);
         ActiveOpMode.telemetry().update();
         Gamepads.gamepad1().rightTrigger().greaterThan(0.3).whenBecomesTrue(shooter);
 
-
-
-
-
-
-
-        if (isRed()) {
-            Gamepads.gamepad1().dpadUp().whenBecomesTrue(getDriveToGateCommand());
-        }
 
     }
 
@@ -473,17 +466,22 @@ public class DriveTrain2 implements Subsystem {
                             .setVelocityConstraint(1.0)
                             .build();
 
-                    follower.followPath(dGatePath, true);
+                    // FIXED: Changed to false so the robot drives naturally nose-forward
+                    follower.followPath(dGatePath, false);
                 })
                 .setIsDone(() -> !follower.isBusy())
                 .setStop((Boolean interrupted) -> {
-                    // This shuts off Pedro's PID hold-points instantly
-                    follower.breakFollowing();
+                    follower.breakFollowing(); // Instantly cuts off Pedro PID loops
+                    follower.setPose(follower.getPose()); // Wipes velocity caches
+
+                    // Force drive motor powers to absolute 0 to stop post-path drift
+                    fL.setPower(0);
+                    fR.setPower(0);
+                    bL.setPower(0);
+                    bR.setPower(0);
                 })
-                // CRITICAL: Change "this" to whatever your Drivetrain subsystem instance is called
-                // e.g., MecanumDrive.INSTANCE or drivetrain
-                .requires(this);
+                .requires(DriveTrain2.INSTANCE);
 
         return followCommand.raceWith(new Delay(1.0));
     }
-    }
+}

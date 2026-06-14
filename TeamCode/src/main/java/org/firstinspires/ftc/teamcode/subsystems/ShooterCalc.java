@@ -28,7 +28,7 @@ public class ShooterCalc implements Subsystem {
     public static double verticalShift = 0;
     public static double verticalShiftStep = 50;
 
-    public static double accelScalar = 0.015; // Set to 0 to disable
+    public static double accelScalar = 0.02; // Set to 0 to disable
 
     public static Double[] calculateShotVectorandUpdateHeading(double robotHeading, Vector robotToGoalVector, Vector robotVel, Vector robotAccel){
         double g = 32.174*12;

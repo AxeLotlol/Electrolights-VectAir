@@ -79,12 +79,12 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
 
     public Command servoOpen = new LambdaCommand()
             .setStart(() -> {
-                servoStopper.setPosition(0.5);
+                servoStopper.setPosition(0.9);
             });
 
     public Command servoClose = new LambdaCommand()
             .setStart(() -> {
-                servoStopper.setPosition(0.42);
+                servoStopper.setPosition(0.8);
             });
 
     public SequentialGroup shoot = new SequentialGroup(
@@ -148,7 +148,7 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
 
     public Command Auto() {
         return new SequentialGroup(
-                setTurretHeading(220),
+                setTurretHeading(160),
                 new FollowPath(paths.Path1, false, 1.0),
 
                 intakeMotorOn,
@@ -156,11 +156,11 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
                 intakeMotorOff,
 
                 // Example of overriding the turret to 80 degrees relative angle before a path
-                setTurretHeading(95),
+                setTurretHeading(45),
 
                 new FollowPath(paths.Path3, false, 1.0),
                 shoot,
-                setTurretHeading(110),
+                setTurretHeading(58),
 
                 // Example of turning automatic tracking back on when needed
 
@@ -195,7 +195,7 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
                 new FollowPath(paths.Path13, false, 1.0),
                 shoot,
                 intakeMotorOn,
-                setTurretHeading(90),
+                setTurretHeading(75),
                 new FollowPath(paths.Path14, false, 1.0),
                 intakeMotorOff,
                 new FollowPath(paths.Path15, false, 1.0),
@@ -280,8 +280,8 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
             Path2 = follower.pathBuilder()
                     .addPath(new BezierCurve(
                             new Pose(95.005, 94.650),
-                            new Pose(84.764, 63),
-                            new Pose(108.822, 59),
+                            new Pose(84.764, 64),
+                            new Pose(108.822, 61),
                             new Pose(125.790, 58.117)))
                     .setLinearHeadingInterpolation(Math.toRadians(240), Math.toRadians(30))
                     .build();
@@ -296,13 +296,13 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
             Path4 = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(80.854, 69.703),
-                            new Pose(132.5, 54.2)))
+                            new Pose(132.5, 55)))
                     .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(28))
                     .build();
 
             Path5 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(132.5, 54.2),
+                            new Pose(132.5, 55),
                             new Pose(82.058, 73.32)))
                     .setLinearHeadingInterpolation(Math.toRadians(28), Math.toRadians(-15))
                     .build();
@@ -310,13 +310,13 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
             Path6 = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(82.058, 73.328),
-                            new Pose(132.5, 54.2)))
+                            new Pose(132.5, 54.759)))
                     .setLinearHeadingInterpolation(Math.toRadians(-15), Math.toRadians(28))
                     .build();
 
             Path7 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(132.5, 54.2),
+                            new Pose(132.5, 54.759),
                             new Pose(82.100, 73.328)))
                     .setLinearHeadingInterpolation(Math.toRadians(28), Math.toRadians(-15))
                     .build();
@@ -324,13 +324,13 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
             Path8 = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(82.100, 73.328),
-                            new Pose(132.5, 54.2)))
+                            new Pose(132.5, 54.759)))
                     .setLinearHeadingInterpolation(Math.toRadians(-15), Math.toRadians(28))
                     .build();
 
             Path9 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(132.5, 54.2),
+                            new Pose(132.5, 54.759),
                             new Pose(82.100, 73.328)))
                     .setLinearHeadingInterpolation(Math.toRadians(28), Math.toRadians(-15))
                     .build();
@@ -338,13 +338,13 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
             Path10 = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(82.100, 73.328),
-                            new Pose(132.5, 54.2)))
+                            new Pose(132.5, 54.759)))
                     .setLinearHeadingInterpolation(Math.toRadians(-15), Math.toRadians(28))
                     .build();
 
             Path11 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(132.5, 54.2),
+                            new Pose(132.5, 54.759),
                             new Pose(82.000, 73.328)))
                     .setLinearHeadingInterpolation(Math.toRadians(28), Math.toRadians(-15))
                     .build();
@@ -352,13 +352,13 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
             Path12 = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(82.000, 73.328),
-                            new Pose(132.5,54.2)))
+                            new Pose(132.5,54.759)))
                     .setLinearHeadingInterpolation(Math.toRadians(-15), Math.toRadians(28))
                     .build();
 
             Path13 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(132.5,54.2),
+                            new Pose(132.5,54.759),
                             new Pose(82, 73.328)))
                     .setLinearHeadingInterpolation(Math.toRadians(28), Math.toRadians(-15))
                     .build();

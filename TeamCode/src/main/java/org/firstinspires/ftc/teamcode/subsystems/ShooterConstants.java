@@ -11,7 +11,7 @@ public class ShooterConstants {
 
     public static double SCORE_ANGLE = Math.toRadians(-40);
 
-    public static double PASS_THROUGH_POINT_RADIUS = 6; //inches
+    public static double PASS_THROUGH_POINT_RADIUS = 4; //inches
 
     public static double RAISE_TIME = 0.15;
 

@@ -67,7 +67,7 @@ public class DriveTrain2 implements Subsystem {
     private static ServoEx turret1;
     private static ServoEx turret2;
 
-    public static double turretOffset = -3;
+    public static double turretOffset = 0;
     public static double turretOffsetStep = -5;
 
     public static double openStopperPos = 0.9;
@@ -312,11 +312,18 @@ public class DriveTrain2 implements Subsystem {
             wraptofalse.schedule();
     }*/
     public static void shoot() {
-        if (shooting == false) {
-            shooting = true;
-            SequentialGroup shoot = new SequentialGroup(openStopper, new SetPower(intakeMotor, 1), new SetPower(transfer, 1), new Delay(0.3), closeStopper, new SetPower(intakeMotor, 0), new SetPower(transfer, 0), shootFalse);
-            shoot.schedule();
-        }
+        //if (shooting == false) {
+        //    shooting = true;
+            //SequentialGroup shoot = new SequentialGroup(new Delay(0.3), shootFalse);
+        //    shoot.schedule();
+        //}
+        shooting = true;
+        new Delay(0.3);
+        shootFalse.schedule();
+    }
+
+    public static void shootreal(){
+        //shoot = true;
     }
 
     @Override
@@ -384,18 +391,18 @@ public class DriveTrain2 implements Subsystem {
             servoPositionSignal2 = Math.max(0.05, Math.min(0.95, servoPositionSignal2));
             //turret1.setPosition(servoPositionSignal2);
             //turret2.setPosition(servoPositionSignal2);
-            currentTurretPos = ((servoPositionSignal2 - 0.05) / 0.90) * 449.51 - 44.75;
+            //currentTurretPos = ((servoPositionSignal2 - 0.05) / 0.90) * 449.51 - 44.75;
         //}
 
         /*if(wrapping==true && wraptofalseexecuted==false){
             wrapperforwrap();
             wraptofalseexecuted = true;
         }*/
-        //currentTurretPos=targetTurretAngle;
+        currentTurretPos=targetTurretAngle;
 
         ActiveOpMode.telemetry().addData("launch?", isOverlappingLaunchZone(follower().getPose()));
         //if(isOverlappingLaunchZone(follower().getPose()) && robotToGoalVector.getMagnitude()>30 && wrapping == false){
-        /*if(isOverlappingLaunchZone(follower().getPose()) && robotToGoalVector.getMagnitude()>30){
+        if((isOverlappingLaunchZone(follower().getPose()) && robotToGoalVector.getMagnitude()>60)|| shooting ==true){
             intakeMotor.setPower(1);
             transfer.setPower(1);
             openStopper.schedule();
@@ -404,7 +411,7 @@ public class DriveTrain2 implements Subsystem {
             intakeMotor.setPower(0);
             transfer.setPower(0);
             closeStopper.schedule();
-        }*/
+        }
 
 
         //ActiveOpMode.telemetry().addData("Motor1Speed", s1speed);

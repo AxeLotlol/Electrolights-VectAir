@@ -59,16 +59,16 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
     private MotorEx intakeMotor;
     double goalY = 144;
     double goalX = 144;
-    public static double gateX = 132;
+    public static double gateX = 132.1;
     public static double gateY = 54.85;
 
     public static double gateHeading = 30;
 
-    public static double gateX1 = 131.4;
+    public static double gateX1 = 131.5;
     public static double gateY1 = 56;
-    public static double turretHeading1=60;
-    public static double turretHeading2=55;
-    public static double turretHeading3=75;
+    public static double turretHeading1=57;
+    public static double turretHeading2=60;
+    public static double turretHeading3=63;
     public static double gateHeading1 = 30;
     private static final double MIN_ANGLE = -224.75;
     private static final double MAX_ANGLE =  224.75;
@@ -261,7 +261,7 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
         turret2.setPosition(servoPositionSignal);
 
         currentTurretPos = ((turret1.getPosition() - 0.05) / 0.90) * 449.51 - 44.75;
-        if(isOverlappingLaunchZone(PedroComponent.follower().getPose()) && robotToGoalVector.getMagnitude()>60){
+        if(isOverlappingLaunchZone(PedroComponent.follower().getPose()) && robotToGoalVector.getMagnitude()>60&&autoShoot){
             intakeMotor.setPower(1);
             transfer.setPower(1);
             openStopper.schedule();

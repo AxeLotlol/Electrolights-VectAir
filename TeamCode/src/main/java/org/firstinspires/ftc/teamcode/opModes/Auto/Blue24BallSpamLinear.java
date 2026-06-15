@@ -250,7 +250,7 @@ public class Blue24BallSpamLinear extends NextFTCOpMode {
         turret2.setPosition(servoPositionSignal);
 
         currentTurretPos = ((turret1.getPosition() - 0.05) / 0.90) * 449.51 - 44.75;
-        if(isOverlappingLaunchZone(PedroComponent.follower().getPose()) && robotToGoalVector.getMagnitude()>60){
+        if(isOverlappingLaunchZone(PedroComponent.follower().getPose()) && robotToGoalVector.getMagnitude()>60&&autoShoot){
             intakeMotor.setPower(1);
             transfer.setPower(1);
             openStopper.schedule();

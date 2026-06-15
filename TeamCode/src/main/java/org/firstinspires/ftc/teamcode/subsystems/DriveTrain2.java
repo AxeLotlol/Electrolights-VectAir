@@ -70,8 +70,8 @@ public class DriveTrain2 implements Subsystem {
     public static double turretOffset = 0;
     public static double turretOffsetStep = -5;
 
-    public static double openStopperPos = 0.9;
-    public static double closeStopperPos = 0.8;
+    public static double openStopperPos = 0.95;
+    public static double closeStopperPos = 0.86;
     public Command driveToGate = new LambdaCommand()
             .setStart(() -> dToGate = true);
     public static boolean dToGate = false;
@@ -96,11 +96,6 @@ public class DriveTrain2 implements Subsystem {
         }
     }*/
 
-
-    //Pose startingpose = Storage.currentPose;
-    Pose startingpose = new Pose(72, 72, Math.toRadians(90));
-
-    //Pose startingpose = new Pose(72,72, Math.toRadians(90));
     @Override
     public Command getDefaultCommand() {
 
@@ -220,10 +215,12 @@ public class DriveTrain2 implements Subsystem {
             }
         }
         imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
-        //startingpose = Storage.currentPose;
-        //if(Storage.currentPose!=new Pose(0, 0, 0)) {
+        Pose startingpose = new Pose(72, 72, Math.toRadians(90));
+        if(Storage.setPose){
+            startingpose = Storage.currentPose;
+            Storage.setPose=false;
+        }
         follower.setStartingPose(startingpose);
-        //}
 
         if (alliance == -1) {
             localize = new LambdaCommand()

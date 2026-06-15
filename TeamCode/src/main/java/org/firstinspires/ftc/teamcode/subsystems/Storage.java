@@ -11,4 +11,5 @@ public class Storage {
     public static double currentHeading = 90;
 
     public static Pose currentPose = new Pose(currentX, currentY, currentHeading);
+    public static boolean setPose=false;
 }

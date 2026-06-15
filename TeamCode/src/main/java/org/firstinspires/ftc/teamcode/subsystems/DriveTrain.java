@@ -227,32 +227,6 @@ public class DriveTrain implements Subsystem {
         }
     }
 
-    public boolean isInLaunchZone(double x, double y) {
-
-        // Vertices: (-8, 144), (152, 144), (72, 64)
-        // This triangle exists between y = 64 and y = 144.
-        if (y >= 64 && y <= 144) {
-            // As y increases from 64 to 144, the width of the triangle increases.
-            // The slope of the edges is (144 - 64) / (152 - 72) = 80 / 80 = 1.
-            double halfWidth = (y - 64);
-            if (x >= (72 - halfWidth) && x <= (72 + halfWidth)) {
-                return true;
-            }
-        }
-
-        // Vertices: (72, 32), (104, 0), (40, 0)
-        // This triangle exists between y = 0 and y = 32.
-        if (y >= 0 && y <= 32) {
-            // As y decreases from 32 to 0, the width increases.
-            // The slope of the edges is (32 - 0) / (72 - 40) = 32 / 32 = 1.
-            double halfWidth = (32 - y);
-            if (x >= (72 - halfWidth) && x <= (72 + halfWidth)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     private static Servo hoodServo1n;
     private static Servo hoodServo2n;

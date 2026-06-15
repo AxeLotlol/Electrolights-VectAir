@@ -242,6 +242,8 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
         turret2.setPosition(servoPositionSignal);
 
         currentTurretPos = ((turret1.getPosition() - 0.05) / 0.90) * 449.51 - 44.75;
+        Storage.currentPose = follower.getPose();
+        Storage.setPose = true;
     }
 
     @Override

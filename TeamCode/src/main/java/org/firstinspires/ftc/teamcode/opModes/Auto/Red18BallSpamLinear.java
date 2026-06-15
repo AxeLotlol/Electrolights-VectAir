@@ -351,6 +351,7 @@
                 double hoodAngle = results[1];
                 hoodToPos(hoodAngle);
                 Storage.currentPose = follower.getPose();
+                Storage.setPose = true;
 
             }
 

@@ -59,16 +59,16 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
     private MotorEx intakeMotor;
     double goalY = 144;
     double goalX = 144;
-    public static double gateX = 132.1;
-    public static double gateY = 54.85;
+    public static double gateX = 131;
+    public static double gateY = 55.35;
 
     public static double gateHeading = 30;
 
-    public static double gateX1 = 131.5;
+    public static double gateX1 = 131.4;
     public static double gateY1 = 56;
-    public static double turretHeading1=57;
-    public static double turretHeading2=60;
-    public static double turretHeading3=63;
+    public static double turretHeading1=60;
+    public static double turretHeading2=55;
+    public static double turretHeading3=75;
     public static double gateHeading1 = 30;
     private static final double MIN_ANGLE = -224.75;
     private static final double MAX_ANGLE =  224.75;
@@ -107,9 +107,9 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
             });
 
     //public SequentialGroup shoot = new SequentialGroup(
-            //servoOpen,
-            //new Delay(0.3)
-            //servoClose
+    //servoOpen,
+    //new Delay(0.3)
+    //servoClose
     //);
 
     double targetTurretAngle;
@@ -130,19 +130,28 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
     }
 
     public double getClosestValidTurretAngle(double relativeGoalDegrees) {
+        // Option 1: The raw 0-360 input from your vector calculation
         double option1 = relativeGoalDegrees;
+
+        // Option 2: The 360-degree alternative wrap position
         double option2 = (option1 > 180.0) ? (option1 - 360.0) : (option1 + 360.0);
 
         boolean opt1Valid = (option1 >= MIN_ANGLE && option1 <= MAX_ANGLE);
         boolean opt2Valid = (option2 >= MIN_ANGLE && option2 <= MAX_ANGLE);
 
+        // If both options are mechanically safe, pick the one closest to current position
         if (opt1Valid && opt2Valid) {
             return (Math.abs(option1 - currentTurretPos) < Math.abs(option2 - currentTurretPos)) ? option1 : option2;
         }
 
-        if (opt1Valid) return option1;
-        if (opt2Valid) return option2;
+        if (opt1Valid) {
+            return option1;
+        }
+        if (opt2Valid) {
+            return option2;
+        }
 
+        // Safety fallback clamp
         return Math.max(MIN_ANGLE, Math.min(MAX_ANGLE, option1));
     }
 
@@ -222,6 +231,7 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
                 new FollowPath(paths.Path16, false, 1.0)
         );
     }
+    public double turretOffset=0;
 
     public void onStartButtonPressed() {
         opmodeTimer.resetTimer();
@@ -240,7 +250,7 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
         Pose currPose = follower.getPose();
         double robotHeading = follower.getPose().getHeading();
         Vector robotToGoalVector = new Vector(follower.getPose().distanceFrom(new Pose(goalX, goalY)), Math.atan2(goalY - currPose.getY(), goalX - currPose.getX()));
-        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity(), follower.getAcceleration());
+        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity().times(1.7), follower.getAcceleration());
         double flywheelSpeed = results[0];
         shooter((float) flywheelSpeed);
         double hoodAngle = results[1];
@@ -248,20 +258,20 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
 
         // Only update targetTurretAngle from vector calculations if auto goal tracking is allowed.
         // If a command forced a static heading, onUpdate leaves 'targetTurretAngle' completely alone.
-        if (useAutoGoalTracking) {
-            double headingError = results[2];
-            targetTurretAngle = headingError;
-        }
-
-        // --- Hardware Execution Loop ---
-        // This blocks runs every frame, applying whatever position is inside 'targetTurretAngle'
+        //if (useAutoGoalTracking) {
+        double headingError = results[2];
+        targetTurretAngle = headingError;
+        //}
+        double robotAngularVelocityRads = follower.getAngularVelocity();
+        double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
+        double feedforwardOffset = robotAngularVelocityDegs * 0.225;
+        double targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset - feedforwardOffset);
         double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
         servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
         turret1.setPosition(servoPositionSignal);
         turret2.setPosition(servoPositionSignal);
-
-        currentTurretPos = ((turret1.getPosition() - 0.05) / 0.90) * 449.51 - 44.75;
-        if(isOverlappingLaunchZone(PedroComponent.follower().getPose()) && robotToGoalVector.getMagnitude()>60&&autoShoot){
+        currentTurretPos=targetTurretAngle;
+        if(isOverlappingLaunchZone(PedroComponent.follower().getPose()) && robotToGoalVector.getMagnitude()>60){
             intakeMotor.setPower(1);
             transfer.setPower(1);
             openStopper.schedule();
@@ -331,7 +341,7 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
 
             Path5 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(gateX1, gateY1),
+                            new Pose(gateX, gateY),
                             new Pose(82.058, 73.32)))
                     .setLinearHeadingInterpolation(Math.toRadians(gateHeading1), Math.toRadians(-15))
                     .build();

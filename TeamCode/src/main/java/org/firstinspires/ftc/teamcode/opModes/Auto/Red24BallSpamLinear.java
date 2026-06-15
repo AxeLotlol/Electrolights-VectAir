@@ -178,14 +178,14 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
                 new FollowPath(paths.Path3, false, 1.0),
 
                 //shoot,
-                //setTurretHeading(turretHeading2),
-                enableGoalTracking(),
+                setTurretHeading(turretHeading2),
+
 
 
 
 
                 new FollowPath(paths.Path4, true, 1.0),
-                new Delay(1.0),
+                new Delay(1.2),
                 new FollowPath(paths.Path5, false, 1.0),
                 //shoot,
 
@@ -208,7 +208,7 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
                 new Delay(1.8),
                 new FollowPath(paths.Path13, false, 1.0),
                 //shoot,
-                //setTurretHeading(turretHeading3),
+                setTurretHeading(turretHeading3),
 
                 new FollowPath(paths.Path14, false, 1.0),
                 intakeMotorOff,

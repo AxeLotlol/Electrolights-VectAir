@@ -70,8 +70,8 @@ public class DriveTrain2 implements Subsystem {
     public static double turretOffset = 0;
     public static double turretOffsetStep = -5;
 
-    public static double openStopperPos = 0.95;
-    public static double closeStopperPos = 0.86;
+    public static double openStopperPos = 0.7;
+    public static double closeStopperPos = 0.634;
     public Command driveToGate = new LambdaCommand()
             .setStart(() -> dToGate = true);
     public static boolean dToGate = false;

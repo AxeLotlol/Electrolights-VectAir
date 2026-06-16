@@ -5,7 +5,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.DriveTrain2.closeStopper
 import static org.firstinspires.ftc.teamcode.subsystems.DriveTrain2.openStopperPos;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 import static org.firstinspires.ftc.teamcode.subsystems.LaunchDetector.isOverlappingLaunchZone;
-import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
+import static org.firstinspires.ftc.teamcode.subsystems.AutoShooterCalc.calculateShotVectorandUpdateHeading;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
@@ -49,7 +49,7 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
     private Timer opmodeTimer;
     private Paths paths;
 
-    public Pose start = new Pose(109.810, 132.272, Math.toRadians(270));
+    public Pose start = new Pose(111.2, 134, Math.toRadians(270));
 
     // --- Turret tracking ---
     private ServoEx turret1;
@@ -59,17 +59,18 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
     private MotorEx intakeMotor;
     double goalY = 144;
     double goalX = 144;
-    public static double gateX = 131;
-    public static double gateY = 55.35;
+    public static double gateX = 133
+            ;
+    public static double gateY = 58.75;
 
-    public static double gateHeading = 30;
+    public static double gateHeading = 41.25;
 
-    public static double gateX1 = 131.4;
-    public static double gateY1 = 56;
+    public static double gateX1 = 133;
+    public static double gateY1 = 58.75;
     public static double turretHeading1=60;
     public static double turretHeading2=55;
     public static double turretHeading3=75;
-    public static double gateHeading1 = 30;
+    public static double gateHeading1 = 41.25;
     private static final double MIN_ANGLE = -224.75;
     private static final double MAX_ANGLE =  224.75;
     private static final double TURRET_RANGE =  449.51;
@@ -138,7 +139,25 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
         // Safety fallback clamp
         return Math.max(MIN_ANGLE, Math.min(MAX_ANGLE, option1));
     }
+    public boolean manualTPS = true;
 
+
+    public void autoShootEnable(){
+        autoShoot = true;
+
+    }
+    public Command turnOffManualtps(){
+        return new LambdaCommand()
+                .setStart(()->manualTPS=false);
+    }
+    public Command turnOffPreload(){
+        return new LambdaCommand()
+                .setStart(()->preload=false);
+    }
+
+    public static MotorEx flywheel = new MotorEx("launchingmotor");
+
+    public static MotorEx flywheel2 = new MotorEx("launchingmotor2");
 
     // ----------------------
 
@@ -171,38 +190,38 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
 
                 intakeMotorOn,
                 new FollowPath(paths.Path2, false, 1.0),
+                turnOffPreload(),
+                turnOffManualtps(),
+
                 new FollowPath(paths.Path3, false, 1.0),
 
-
-
-
-
-
                 new FollowPath(paths.Path4, true, 1.0),
-                new Delay(1.2),
+                new Delay(1.25),
+
                 new FollowPath(paths.Path5, false, 1.0),
                 //shoot,
 
                 new FollowPath(paths.Path6, true, 1.0),
-                new Delay(1.8),
+                new Delay(2.15),
 
                 new FollowPath(paths.Path7, false, 1.0),
                 //shoot,
 
                 new FollowPath(paths.Path8, true, 1.0),
-                new Delay(1.8),
+                new Delay(2.15),
 
                 new FollowPath(paths.Path9, false, 1.0),
                 new FollowPath(paths.Path14, false, 1.0),
                 intakeMotorOff,
                 new FollowPath(paths.Path15, false, 1.0),
                 //shoot,
+                intakeMotorOn,
                 new FollowPath(paths.Path10, true, 1.0),
-                new Delay(1.8),
+                new Delay(1.25),
                 new FollowPath(paths.Path11, false, 1.0),
                 //shoot,
                 new FollowPath(paths.Path12, true, 1.0),
-                new Delay(1.8),
+                new Delay(2.1),
                 new FollowPath(paths.Path13, false, 1.0),
 
 
@@ -215,8 +234,12 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
     public void onStartButtonPressed() {
         opmodeTimer.resetTimer();
         matchStarted = true;
+        flywheel.setPower(1);
+        flywheel2.setPower(-1);
         Auto().schedule();
     }
+    private boolean preload = true;
+    private double flywheelSpeed;
 
     @Override
     public void onUpdate() {
@@ -229,9 +252,20 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
         Pose currPose = follower.getPose();
         double robotHeading = follower.getPose().getHeading();
         Vector robotToGoalVector = new Vector(follower.getPose().distanceFrom(new Pose(goalX, goalY)), Math.atan2(goalY - currPose.getY(), goalX - currPose.getX()));
-        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity().times(1), 1);
-        double flywheelSpeed = results[0];
-        shooter((float) flywheelSpeed - 45);
+        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity().times(1), follower.getAcceleration());
+
+            flywheelSpeed = results[0];
+
+        if(preload==true){
+            flywheel.setPower(1);
+            flywheel2.setPower(-1);
+            //hoodServo.setPosition(0.5);
+        }
+        if(preload==false){
+
+            shooter((float) flywheelSpeed - 38);
+
+        }
         double hoodAngle = results[1];
         hoodServo.setPosition(hoodAngle);
 
@@ -239,16 +273,16 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
         targetTurretAngle = headingError;
         double robotAngularVelocityRads = follower.getAngularVelocity();
         double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
-        double feedforwardOffset = robotAngularVelocityDegs * 0.225;
+        double feedforwardOffset = robotAngularVelocityDegs * 0.2;
         double targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset - feedforwardOffset);
         double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
         servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
         turret1.setPosition(servoPositionSignal);
         turret2.setPosition(servoPositionSignal);
         currentTurretPos=targetTurretAngle;
-        Pose futurepose = new Pose(follower.getPose().getX()+follower.getVelocity().getXComponent()*0.4, follower.getPose().getY()+follower.getVelocity().getYComponent()*0.4, follower.getHeading());
+        Pose futurepose = new Pose(follower.getPose().getX()+follower.getVelocity().getXComponent()*0.5, follower.getPose().getY()+follower.getVelocity().getYComponent()*0.5, follower.getHeading());
         //if((isOverlappingLaunchZone(PedroComponent.follower().getPose())||isOverlappingLaunchZone(futurepose)) && robotToGoalVector.getMagnitude()>40){
-        if(isOverlappingLaunchZone(futurepose) && robotToGoalVector.getMagnitude()>40){
+        if(isOverlappingLaunchZone(futurepose) && robotToGoalVector.getMagnitude()>50){
             intakeMotor.setPower(1);
             transfer.setPower(1);
             openStopper.schedule();
@@ -296,17 +330,16 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
             Path2 = follower.pathBuilder()
                     .addPath(new BezierCurve(
                             new Pose(95.005, 94.650),
-                            new Pose(84.764, 64),
-                            new Pose(108.822, 61),
-                            new Pose(125.790, 58.117)))
-                    .setLinearHeadingInterpolation(Math.toRadians(240), Math.toRadians(30))
+                            new Pose(93.48, 59.7),
+                            new Pose(125.5, 59.5)))
+                    .setLinearHeadingInterpolation(Math.toRadians(240), Math.toRadians(20))
                     .build();
 
             Path3 = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(125.790, 58.117),
                             new Pose(80.854, 69.703)))
-                    .setLinearHeadingInterpolation(Math.toRadians(30),Math.toRadians(0))
+                    .setLinearHeadingInterpolation(Math.toRadians(20),Math.toRadians(0))
                     .build();
 
             Path4 = follower.pathBuilder()
@@ -326,13 +359,13 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
             Path6 = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(82.058, 73.328),
-                            new Pose(gateX + 0.05, gateY)))
+                            new Pose(gateX, gateY)))
                     .setLinearHeadingInterpolation(Math.toRadians(-15), Math.toRadians(gateHeading))
                     .build();
 
             Path7 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(gateX + 0.05, gateY),
+                            new Pose(gateX, gateY),
                             new Pose(82.100, 73.328)))
                     .setLinearHeadingInterpolation(Math.toRadians(gateHeading), Math.toRadians(-15))
                     .build();
@@ -340,27 +373,28 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
             Path8 = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(82.100, 73.328),
-                            new Pose(gateX + 0.1, gateY)))
+                            new Pose(gateX, gateY)))
                     .setLinearHeadingInterpolation(Math.toRadians(-15), Math.toRadians(gateHeading))
                     .build();
 
             Path9 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(gateX + 0.1, gateY),
+                            new Pose(gateX, gateY),
                             new Pose(82.100, 73.328)))
                     .setLinearHeadingInterpolation(Math.toRadians(gateHeading), Math.toRadians(-15))
                     .build();
 
             Path10 = follower.pathBuilder()
-                    .addPath(new BezierLine(
+                    .addPath(new BezierCurve(
                             new Pose(94.96695962391377, 83.71111297536585),
-                            new Pose(gateX + 0.18, gateY)))
-                    .setLinearHeadingInterpolation(Math.toRadians(-15), Math.toRadians(gateHeading))
+                            new Pose(103.019,63.28),
+                            new Pose(gateX, gateY)))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(gateHeading))
                     .build();
 
             Path11 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(gateX + 0.18, gateY),
+                            new Pose(gateX, gateY),
                             new Pose(82.000, 73.328)))
                     .setLinearHeadingInterpolation(Math.toRadians(gateHeading), Math.toRadians(-15))
                     .build();
@@ -368,13 +402,13 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
             Path12 = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(82.000, 73.328),
-                            new Pose(gateX + 0.22,gateY)))
+                            new Pose(gateX,gateY)))
                     .setLinearHeadingInterpolation(Math.toRadians(-15), Math.toRadians(gateHeading))
                     .build();
 
             Path13 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(gateX + 0.22,gateY),
+                            new Pose(gateX,gateY),
                             new Pose(82, 73.328)))
                     .setLinearHeadingInterpolation(Math.toRadians(gateHeading), Math.toRadians(-15))
                     .build();

@@ -29,41 +29,28 @@ public class Flywheel implements Subsystem {
 
     public static MotorEx flywheel2 = new MotorEx("launchingmotor2");
 
-    public static PIDCoefficients myPidCoeff = new PIDCoefficients(0.01, 0.05, 0.00);
-    public static BasicFeedforwardParameters myFF = new BasicFeedforwardParameters(0.0005, 0, 0.1);
-
+    public static double kS = 0.1;
+    public static double kF = 0.01;
+    public static double kP = 0.01;
 
     public static double configvelocity = 1400; //far zone - ~1500. near zone - ~1200-1300
 
     public static void velocityControlWithFeedforwardExample(KineticState currentstate, float configtps) {
-        // Create a velocity controller with PID and feedforward
         ControlSystem controller1 = ControlSystem.builder()
-                .velPid(myPidCoeff) // Velocity PID with kP=0.1, kI=0.01, kD=0.05
-                .basicFF(myFF) // Basic feedforward with kV=0.02, kA=0.0, kS=0.01 //pid tuning
+                .velPid(new PIDCoefficients(kP, 0, 0))
+                .basicFF(new BasicFeedforwardParameters(0, 0, kS))
                 .build();
-
         controller1.setGoal(new KineticState(0.0, configtps, 0.0));
-
-        // In a loop (simulated here), you would:
-        // Create a KineticState with current position and velocity
-
-        double power = controller1.calculate(currentstate);
-        flywheel.setPower(power);
+        flywheel.setPower(controller1.calculate(currentstate) + kF * configtps);
     }
+
     public static void velocityControlWithFeedforwardExample2(KineticState currentstate, float configtps) {
-        // Create a velocity controller with PID and feedforward
         ControlSystem controller2 = ControlSystem.builder()
-                .velPid(myPidCoeff) // Velocity PID with kP=0.1, kI=0.01, kD=0.05
-                .basicFF(myFF) // Basic feedforward with kV=0.02, kA=0.0, kS=0.01 //pid tuning
+                .velPid(new PIDCoefficients(kP, 0, 0))
+                .basicFF(new BasicFeedforwardParameters(0, 0, kS))
                 .build();
-
         controller2.setGoal(new KineticState(0.0, configtps, 0.0));
-
-        // In a loop (simulated here), you would:
-        // Create a KineticState with current position and velocity
-
-        double power = controller2.calculate(currentstate);
-        flywheel2.setPower(-1*power);
+        flywheel2.setPower(-1 * (controller2.calculate(currentstate) + kF * configtps));
     }
     public static void shooter(float tps) {
         BindingManager.update();
@@ -74,7 +61,6 @@ public class Flywheel implements Subsystem {
         //if(tps-(-1*flywheelvelocity)<7 && tps-(-1*flywheelvelocity)>-7){
         velocityControlWithFeedforwardExample(currentState, tps);
         velocityControlWithFeedforwardExample2(currentState2, tps);
-        double rpm = (flywheelvelocity / 28) * 60.0;
 
     }
     @Override public void initialize() {

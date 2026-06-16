@@ -55,12 +55,12 @@ public class ShooterCalc implements Subsystem {
 
         double coordinateTheta = robotVelocity.getTheta() - robotToGoalVector.getTheta();
 
-        double parallelComponent = -Math.cos(coordinateTheta) * robotVelocity.getMagnitude();
+        double parallelComponent = Math.cos(coordinateTheta) * robotVelocity.getMagnitude();
         double perpendicularComponent = Math.sin(coordinateTheta) * robotVelocity.getMagnitude();
 
         double vz = flywheelSpeed * Math.sin(hoodAngle);
         double time = (x / (flywheelSpeed * Math.cos(hoodAngle))); //maybe try 1.25 SIDENOTE revert back to 1.2 if accel change does NOT work, then multiply the speed itself by 1.2
-        double ivr = x / time + parallelComponent;
+        double ivr = x / time - parallelComponent;
         double nvr = Math.sqrt(ivr * ivr + perpendicularComponent * perpendicularComponent);
         double ndr = nvr * time;
 

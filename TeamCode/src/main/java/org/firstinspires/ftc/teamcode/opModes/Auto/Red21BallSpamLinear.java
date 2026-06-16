@@ -239,7 +239,7 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
 
                 // 2. Get the required heading and flywheel/hood specs from your utility
                double robotHeading= currPose.getHeading();
-                Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity(), follower.getAcceleration());        Double headingError = results[2];
+                Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity(), 1.3);        Double headingError = results[2];
 
 
                 double targetHeading = results[2]; // Assuming index 2 is the target heading from your calc
@@ -378,7 +378,7 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
         double robotHeading = follower.getPose().getHeading();
         Vector robotToGoalVector = new Vector(follower.getPose().distanceFrom(new Pose(138, 141)), Math.atan2(141 - currPose.getY(), 138 - currPose.getX()));
         //Vector v = new Vector(new Pose(138, 138));
-        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity(), follower.getAcceleration());        double flywheelSpeed = results[0];
+        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity(), 1.3);        double flywheelSpeed = results[0];
         shooter((float) (flywheelSpeed+30));
         double hoodAngle = results[1];
         hoodToPos(hoodAngle);

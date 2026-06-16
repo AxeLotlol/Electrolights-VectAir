@@ -351,7 +351,7 @@ public class Blue21BallSpamLinear extends NextFTCOpMode {
         double robotHeading = follower.getPose().getHeading();
         Vector robotToGoalVector = new Vector(follower.getPose().distanceFrom(new Pose(4, 141)), Math.atan2(141 - currPose.getY(), 4 - currPose.getX()));
         //Vector v = new Vector(new Pose(138, 138));
-        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity(), follower.getAcceleration());
+        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity(), 1.3);
         double flywheelSpeed = results[0];
         shooter((float) (flywheelSpeed+30));
         double hoodAngle = results[1];

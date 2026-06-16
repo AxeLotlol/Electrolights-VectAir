@@ -30,7 +30,7 @@ public class ShooterCalc implements Subsystem {
 
     public static double accelScalar = 0.015; // Set to 0 to disable
 
-    public static Double[] calculateShotVectorandUpdateHeading(double robotHeading, Vector robotToGoalVector, Vector robotVel, Vector robotAccel){
+    public static Double[] calculateShotVectorandUpdateHeading(double robotHeading, Vector robotToGoalVector, Vector robotVel, double sotmFactor){
         double g = 32.174*12;
         double x = robotToGoalVector.getMagnitude()-ShooterConstants.PASS_THROUGH_POINT_RADIUS;
         double temp = x/39.37;
@@ -77,7 +77,7 @@ public class ShooterCalc implements Subsystem {
         flywheelSpeed = Math.sqrt(g * ndr * ndr / (2 * Math.pow(Math.cos(hoodAngle), 2) * (ndr * Math. tan(hoodAngle) - y)));
         flywheelSpeed = flywheelSpeed/ 39.37;
 
-        double headingVelCompOffset = 1.5*Math.atan(perpendicularComponent / ivr);
+        double headingVelCompOffset = sotmFactor*Math.atan(perpendicularComponent / ivr);
         double headingAngle = Math.toDegrees(robotToGoalVector.getTheta() - robotHeading - headingVelCompOffset);
 
         //requiredRPM = (1.4286* Math.pow(flywheelSpeed, 3) - 39.264*Math.pow(flywheelSpeed, 2) + 863.57*flywheelSpeed-1373.9 + rpmoffset);

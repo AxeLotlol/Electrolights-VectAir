@@ -345,7 +345,7 @@
                 double robotHeading = follower.getPose().getHeading();
                 Vector robotToGoalVector = new Vector(follower.getPose().distanceFrom(new Pose(138, 141)), Math.atan2(141 - currPose.getY(), 138 - currPose.getX()));
                 //Vector v = new Vector(new Pose(138, 138));
-                Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity(), follower.getAcceleration());        Double headingError = results[2];
+                Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity(), 1.3);        Double headingError = results[2];
                 double flywheelSpeed = results[0];
                 shooter((float) (flywheelSpeed+10));
                 double hoodAngle = results[1];

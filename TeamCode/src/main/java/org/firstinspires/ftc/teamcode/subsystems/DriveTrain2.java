@@ -123,7 +123,7 @@ public class DriveTrain2 implements Subsystem {
                     bR,
                     Gamepads.gamepad1().leftStickX().map(it -> alliance * it),
                     Gamepads.gamepad1().leftStickY().map(it -> alliance * it),
-                    Gamepads.gamepad1().rightStickX().map(it -> it),
+                    Gamepads.gamepad1().rightStickX().map(it -> 0.8*it),
                     new FieldCentric(() -> e)
             );
         }
@@ -236,7 +236,17 @@ public class DriveTrain2 implements Subsystem {
         //hoodServo2n=  ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo2");
         follower.update();
     }
+    private boolean autoShoot = true;
 
+    public Command toggleAutoShoot = new LambdaCommand()
+            .setStart(()->{
+                if(autoShoot){
+                    autoShoot = false;
+                }
+                else{
+                    autoShoot = true;
+                }
+            });
 
     private static MotorEx transfer1;
     private static ServoEx transfer2;
@@ -327,6 +337,9 @@ public class DriveTrain2 implements Subsystem {
     public void periodic() {
         if (firsttime == true) {
             // Schedule the command stored in the localize variable
+            Gamepads.gamepad1().rightBumper().whenBecomesTrue(()->openStopper.schedule())
+                            .whenBecomesFalse(()->closeStopper.schedule());
+            Gamepads.gamepad1().leftBumper().whenBecomesTrue(toggleAutoShoot);
             Gamepads.gamepad1().x().whenBecomesTrue((() -> Localize().schedule()));
             Gamepads.gamepad1().rightTrigger().greaterThan(0.3).whenBecomesTrue(shooter);
             //Gamepads.gamepad1().square().whenBecomesTrue(() -> farAngle());
@@ -371,7 +384,7 @@ public class DriveTrain2 implements Subsystem {
         double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
 
         // Calculate the feedforward offset (Velocity * Time)
-        double feedforwardOffset = robotAngularVelocityDegs * 0.225;
+        double feedforwardOffset = robotAngularVelocityDegs * 0.15;
 
 
         //if(follower.getAngularVelocity()>5){
@@ -399,7 +412,7 @@ public class DriveTrain2 implements Subsystem {
 
         ActiveOpMode.telemetry().addData("launch?", isOverlappingLaunchZone(follower().getPose()));
         //if(isOverlappingLaunchZone(follower().getPose()) && robotToGoalVector.getMagnitude()>30 && wrapping == false){
-        Pose futurepose = new Pose(follower.getPose().getX()+follower.getVelocity().getXComponent()*0.5, follower.getPose().getY()+follower.getVelocity().getYComponent()*0.5, follower.getHeading());
+        Pose futurepose = new Pose(follower.getPose().getX()+follower.getVelocity().getXComponent()*0.3, follower.getPose().getY()+follower.getVelocity().getYComponent()*0.3, follower.getHeading());
         //if((isOverlappingLaunchZone(PedroComponent.follower().getPose())||isOverlappingLaunchZone(futurepose)) && robotToGoalVector.getMagnitude()>40){
         if(((isOverlappingLaunchZone(follower.getPose())||isOverlappingLaunchZone(futurepose)) && robotToGoalVector.getMagnitude()>50)|| shooting ==true){
             intakeMotor.setPower(1);

@@ -29,7 +29,7 @@ public class Flywheel implements Subsystem {
 
     public static MotorEx flywheel2 = new MotorEx("launchingmotor2");
 
-    public static PIDCoefficients myPidCoeff = new PIDCoefficients(0.01, 0.05, 0.00);
+    public static PIDCoefficients myPidCoeff = new PIDCoefficients(0.01, 0.0, 0.00);
     public static BasicFeedforwardParameters myFF = new BasicFeedforwardParameters(0.0005, 0, 0.1);
 
 

@@ -374,7 +374,7 @@ public class DriveTrain2 implements Subsystem {
         Pose currPose = follower.getPose();
         double robotHeading = follower.getPose().getHeading();
         Vector robotToGoalVector = new Vector(follower.getPose().distanceFrom(new Pose(goalX, goalY)), Math.atan2(goalY - currPose.getY(), goalX - currPose.getX()));
-        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity(), 1.0);
+        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity(), 1.2);
         Double headingError = results[2];
         double flywheelSpeed = results[0];
         shooter((float) flywheelSpeed);
@@ -384,7 +384,7 @@ public class DriveTrain2 implements Subsystem {
         double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
 
         // Calculate the feedforward offset (Velocity * Time)
-        double feedforwardOffset = robotAngularVelocityDegs * 0.15;
+        double feedforwardOffset = robotAngularVelocityDegs * 0.175;
 
 
         //if(follower.getAngularVelocity()>5){

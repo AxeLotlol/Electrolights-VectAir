@@ -43,7 +43,7 @@ public class AutoShooterCalc implements Subsystem {
             a=Math.toRadians(-45);
             y=SCORE_HEIGHT + 4;
         }
-        Vector robotVelocity = robotVel;
+        Vector robotVelocity = new Vector(robotVel.getMagnitude(), robotVel.getTheta());
         if(robotAccel.getMagnitude() > 10) {
             robotVelocity.setMagnitude(robotVelocity.getMagnitude() + (robotAccel.getMagnitude() * accelScalar));
         }

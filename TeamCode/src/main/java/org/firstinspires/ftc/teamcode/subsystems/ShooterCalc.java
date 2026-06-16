@@ -48,11 +48,10 @@ public class ShooterCalc implements Subsystem {
             a=Math.toRadians(-45);
             y=SCORE_HEIGHT + 2;
         }
-        Vector robotVelocity = robotVel;
-        /*if(robotAccel.getMagnitude() > 10) {
-            robotVelocity.setMagnitude(robotVelocity.getMagnitude() + (robotAccel.getMagnitude() * accelScalar));
-        }*/
-        //robotVelocity = robotVelocity;
+        Vector robotVelocity = new Vector(robotVel.getMagnitude(), robotVel.getTheta());
+        if (robotVelocity.getMagnitude() < 5.0) {
+            robotVelocity = new Vector(0, 0);
+        }
 
         double coordinateTheta = robotVelocity.getTheta() - robotToGoalVector.getTheta();
 
@@ -77,7 +76,8 @@ public class ShooterCalc implements Subsystem {
         flywheelSpeed = Math.sqrt(g * ndr * ndr / (2 * Math.pow(Math.cos(hoodAngle), 2) * (ndr * Math. tan(hoodAngle) - y)));
         flywheelSpeed = flywheelSpeed/ 39.37;
 
-        double headingVelCompOffset = sotmFactor*Math.atan(perpendicularComponent / ivr);
+        double safeIvr = Math.max(ivr, 50.0);
+        double headingVelCompOffset = sotmFactor * Math.atan(perpendicularComponent / safeIvr);
         double headingAngle = Math.toDegrees(robotToGoalVector.getTheta() - robotHeading - headingVelCompOffset);
 
         //requiredRPM = (1.4286* Math.pow(flywheelSpeed, 3) - 39.264*Math.pow(flywheelSpeed, 2) + 863.57*flywheelSpeed-1373.9 + rpmoffset);
@@ -85,9 +85,6 @@ public class ShooterCalc implements Subsystem {
         //requiredTPS = 12.79084*Math.pow(flywheelSpeed, 2)-69.40057*flywheelSpeed+849.93005;
 
         requiredTPS = (-16.19*Math.pow(flywheelSpeed, 2)+ 449.11*flywheelSpeed- 964.9) + verticalShift;
-        if(robotVel.getMagnitude()>20){
-            requiredTPS=requiredTPS+50;
-        }
         double what = Math.toDegrees(hoodAngle);
 
         //double c1 = (double) -13 /376;

@@ -282,7 +282,7 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
         currentTurretPos=targetTurretAngle;
         Pose futurepose = new Pose(follower.getPose().getX()+follower.getVelocity().getXComponent()*0.5, follower.getPose().getY()+follower.getVelocity().getYComponent()*0.5, follower.getHeading());
         //if((isOverlappingLaunchZone(PedroComponent.follower().getPose())||isOverlappingLaunchZone(futurepose)) && robotToGoalVector.getMagnitude()>40){
-        if(isOverlappingLaunchZone(futurepose) && robotToGoalVector.getMagnitude()>50){
+        if(isOverlappingLaunchZone(futurepose) && robotToGoalVector.getMagnitude()>40){
             intakeMotor.setPower(1);
             transfer.setPower(1);
             openStopper.schedule();

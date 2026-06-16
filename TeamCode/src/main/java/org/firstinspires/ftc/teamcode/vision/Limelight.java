@@ -14,7 +14,7 @@ public class Limelight implements Subsystem {
     private final Limelight3A limelight;
     private final int pipeline;
     private LLResult result;
-    private double lastDistance;
+    double lastDistance;
     private boolean canSeeTarget;
 
     private static final double LL_HEIGHT_INCHES = 12.8;
@@ -27,7 +27,7 @@ public class Limelight implements Subsystem {
         limelight.setPollRateHz(60);
 
         //1 = red, -1 = blue, 0 = error
-        int alliance = 0;
+        int alliance;
         if (isRed()) {
             alliance = 1;
         } else if (isBlue()) {
@@ -76,10 +76,10 @@ public class Limelight implements Subsystem {
     public Pose getPose(double heading) {
         limelight.updateRobotOrientation(heading);
         if (canSeeTarget) {
-            org.firstinspires.ftc.robotcore.external.navigation.Pose3D botpose = result.getBotpose();
-            if (botpose != null) {
-                double y = -(botpose.getPosition().x) * METER_TO_INCH + 70.5;
-                double x = (botpose.getPosition().y) * METER_TO_INCH + 70.5;
+            org.firstinspires.ftc.robotcore.external.navigation.Pose3D botPose = result.getBotpose();
+            if (botPose != null) {
+                double y = -(botPose.getPosition().x) * METER_TO_INCH + 70.5;
+                double x = (botPose.getPosition().y) * METER_TO_INCH + 70.5;
                 return new Pose(x, y);
             }
         }

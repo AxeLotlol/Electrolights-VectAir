@@ -49,24 +49,28 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
     private Timer opmodeTimer;
     private Paths paths;
 
-    public Pose start = new Pose(111.2, 134, Math.toRadians(270));
+    public Pose start = new Pose(startX, startY, Math.toRadians(270));
 
     // --- Turret tracking ---
     private ServoEx turret1;
     private ServoEx servoStopper;
     private ServoEx turret2;
     private ServoEx hoodServo;
+    public static double startX = 111;
+    public static double startY = 135;
+
     private MotorEx intakeMotor;
+
     double goalY = 144;
     double goalX = 144;
     public static double gateX = 133
             ;
-    public static double gateY = 58.75;
+    public static double gateY = 58.5;
 
     public static double gateHeading = 41.25;
 
     public static double gateX1 = 133;
-    public static double gateY1 = 58.75;
+    public static double gateY1 = 58.5;
     public static double turretHeading1=60;
     public static double turretHeading2=55;
     public static double turretHeading3=75;
@@ -142,9 +146,9 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
     public boolean manualTPS = true;
 
 
-    public void autoShootEnable(){
-        autoShoot = true;
-
+    public Command autoShootEnable(){
+        return new LambdaCommand()
+                .setStart(()->autoShoot = true);
     }
     public Command turnOffManualtps(){
         return new LambdaCommand()
@@ -175,6 +179,8 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
         telemetry.addLine("Initialized");
         telemetry.update();
     }
+    private boolean manualShooting = true;
+
     public Command closeStopper = new LambdaCommand()
             .setStart(() -> {
                 servoStopper.setPosition(closeStopperPos); // close
@@ -229,7 +235,7 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
                 new FollowPath(paths.Path16, false, 1.0)
         );
     }
-    public double turretOffset=0;
+    public static double turretOffset=-50;
 
     public void onStartButtonPressed() {
         opmodeTimer.resetTimer();
@@ -321,7 +327,7 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
         public Paths(Follower follower) {
             Path1 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(109.810, 132.272),
+                            new Pose(startX, startY),
                             new Pose(95.005, 94.650)))
                     .setLinearHeadingInterpolation(Math.toRadians(270), Math.toRadians(240))
                     //.addPoseCallback(new Pose(96.892,99.572), autoShootEnable(),0.9 )

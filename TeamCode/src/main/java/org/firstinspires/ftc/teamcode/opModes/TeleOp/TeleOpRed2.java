@@ -67,7 +67,7 @@ public class TeleOpRed2 extends NextFTCOpMode {
         limelight.initialize();
         kalmanFilter = new KalmanFilter(follower.getPose(), 0.05, 0.3);
 
-        Gamepads.gamepad1().dpadDown().whenBecomesTrue(() -> {
+        Gamepads.gamepad1().dpadLeft().whenBecomesTrue(() -> {
             limelightEnabled = !limelightEnabled;
             if (limelightEnabled) {
                 limelight.start();

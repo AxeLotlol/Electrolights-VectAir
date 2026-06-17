@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpBlue2.isBlue;
 import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpRed2.isRed;
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
+import com.qualcomm.robotcore.hardware.PwmControl;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 import static org.firstinspires.ftc.teamcode.subsystems.LaunchDetector.isOverlappingLaunchZone;
 import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
@@ -17,7 +18,10 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.Vector;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ServoImpl;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Tuning;
 
@@ -64,8 +68,8 @@ public class DriveTrain2 implements Subsystem {
     public int alliance;
     public boolean far;
 
-    private static ServoEx turret1;
-    private static ServoEx turret2;
+    private ServoImplEx turret1;
+    private ServoImplEx turret2;
 
     public static double turretOffset = 0;
     public static double turretOffsetStep = -5;
@@ -133,17 +137,19 @@ public class DriveTrain2 implements Subsystem {
 
     public static MotorEx intakeMotor;
     public static MotorEx transfer;
+
+
     public Command localize;
 
     public static ServoEx hoodServo = new ServoEx("hoodServo");
 
-    public static Command turretzero = new LambdaCommand()
+    public Command turretzero = new LambdaCommand()
             .setStart(() -> {
                 //`5transfer2.setPosition(-0.25);
                 turret1.setPosition(0);
                 turret2.setPosition(0);
             }).setIsDone(() -> true);
-    public static Command turrethalf = new LambdaCommand()
+    public Command turrethalf = new LambdaCommand()
             .setStart(() -> {
                 //`5transfer2.setPosition(-0.25);
                 turret1.setPosition(0.5);
@@ -155,7 +161,7 @@ public class DriveTrain2 implements Subsystem {
     private static final double MAX_ANGLE = 224.75;
 
     // Tracks where the turret is across frames (Double, initialized to center)
-    private double currentTurretPos = 180.0;
+    private double currentTurretPos = 0;
     public boolean wrapping = false;
     public static ServoEx stopperServo = new ServoEx("stopperServo");
 
@@ -232,8 +238,10 @@ public class DriveTrain2 implements Subsystem {
                     .setStart(() -> follower.setPose(new Pose(15, 90, Math.toRadians(90))));
 
         }
-        //hoodServo1n= ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo1");
-        //hoodServo2n=  ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo2");
+        turret1 = ActiveOpMode.hardwareMap().get(ServoImplEx.class, "turretServo1");
+        turret2 = ActiveOpMode.hardwareMap().get(ServoImplEx.class,"turretServo2");
+        turret1.setPwmRange(new PwmControl.PwmRange(500, 2500));
+        turret2.setPwmRange(new PwmControl.PwmRange(500, 2500));
         follower.update();
     }
     private boolean autoShoot = true;
@@ -349,8 +357,7 @@ public class DriveTrain2 implements Subsystem {
             transfer1 = new MotorEx("transferMotor");
             //transfer2 = new ServoEx("transferServo1");
             firsttime = false;
-            turret1 = new ServoEx("turretServo1");
-            turret2 = new ServoEx("turretServo2");
+
 
             /*ParallelGroup HoodPowerZero=new ParallelGroup(
                     new SetPosition(hoodServo1,0),
@@ -374,7 +381,7 @@ public class DriveTrain2 implements Subsystem {
         Pose currPose = follower.getPose();
         double robotHeading = follower.getPose().getHeading();
         Vector robotToGoalVector = new Vector(follower.getPose().distanceFrom(new Pose(goalX, goalY)), Math.atan2(goalY - currPose.getY(), goalX - currPose.getX()));
-        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity(), 1.2);
+        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity(), 1.7);
         Double headingError = results[2];
         double flywheelSpeed = results[0];
         shooter((float) flywheelSpeed);
@@ -382,35 +389,16 @@ public class DriveTrain2 implements Subsystem {
         hoodServo.setPosition(hoodAngle);
         double robotAngularVelocityRads = follower.getAngularVelocity();
         double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
-
-        // Calculate the feedforward offset (Velocity * Time)
-        double feedforwardOffset = robotAngularVelocityDegs * 0.175;
-
-
-        //if(follower.getAngularVelocity()>5){
-            double targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset - feedforwardOffset);
+        double feedforwardOffset = robotAngularVelocityDegs * 0.225;
+            double targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset);
             double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
             servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
             turret1.setPosition(servoPositionSignal);
             turret2.setPosition(servoPositionSignal);
-            //currentTurretPos = ((servoPositionSignal - 0.05) / 0.90) * 449.51 - 44.75;
-        //}
-        //else{
-            double targetTurretAngle2 = getClosestValidTurretAngle(headingError + turretOffset);
-            double servoPositionSignal2 = 0.05 + ((targetTurretAngle2 - MIN_ANGLE) / 449.51) * 0.90;
-            servoPositionSignal2 = Math.max(0.05, Math.min(0.95, servoPositionSignal2));
-            //turret1.setPosition(servoPositionSignal2);
-            //turret2.setPosition(servoPositionSignal2);
-            //currentTurretPos = ((servoPositionSignal2 - 0.05) / 0.90) * 449.51 - 44.75;
-        //}
-
-        /*if(wrapping==true && wraptofalseexecuted==false){
-            wrapperforwrap();
-            wraptofalseexecuted = true;
-        }*/
         currentTurretPos=targetTurretAngle;
 
         ActiveOpMode.telemetry().addData("launch?", isOverlappingLaunchZone(follower().getPose()));
+        ActiveOpMode.telemetry().addData("turret", servoPositionSignal);
         //if(isOverlappingLaunchZone(follower().getPose()) && robotToGoalVector.getMagnitude()>30 && wrapping == false){
         Pose futurepose = new Pose(follower.getPose().getX()+follower.getVelocity().getXComponent()*0.3, follower.getPose().getY()+follower.getVelocity().getYComponent()*0.3, follower.getHeading());
         //if((isOverlappingLaunchZone(PedroComponent.follower().getPose())||isOverlappingLaunchZone(futurepose)) && robotToGoalVector.getMagnitude()>40){

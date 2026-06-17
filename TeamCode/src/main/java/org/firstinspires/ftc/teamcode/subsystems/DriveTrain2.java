@@ -3,11 +3,9 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpBlue2.isBlue;
 import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpRed2.isRed;
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
-import com.qualcomm.robotcore.hardware.PwmControl;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 import static org.firstinspires.ftc.teamcode.subsystems.LaunchDetector.isOverlappingLaunchZone;
 import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
-import static dev.nextftc.extensions.pedro.PedroComponent.follower;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
@@ -35,6 +33,7 @@ import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.core.units.Angle;
 import dev.nextftc.extensions.pedro.FollowPath;
+import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.ftc.Gamepads;
 import dev.nextftc.hardware.driving.FieldCentric;
@@ -71,8 +70,11 @@ public class DriveTrain2 implements Subsystem {
     private ServoImplEx turret1;
     private ServoImplEx turret2;
 
-    public static double turretOffset = 0;
+    public static double turretOffset = 6;
     public static double turretOffsetStep = -5;
+    // Inches from the Pinpoint/Pedro robot pose origin to the turret pivot.
+    public static double turretForwardOffset = -0.52588;
+    public static double turretStrafeOffset = 0;
 
     public static double openStopperPos = 0.7;
     public static double closeStopperPos = 0.634;
@@ -103,22 +105,9 @@ public class DriveTrain2 implements Subsystem {
     @Override
     public Command getDefaultCommand() {
 
-        if (isBlue() != true && isRed() != true) {
-            ActiveOpMode.telemetry().addLine("No direction set");
-        } else {
-            if (isBlue() == true) {
-                alliance = 1;
-            }
-            if (isRed() == true) {
-                alliance = -1;
-            }
-        }
+        configureAllianceTarget();
         follower.update();
         currPose = follower.getPose();
-        double robotHeading = follower.getPose().getHeading();
-        Vector robotToGoalVector = new Vector(follower.getPose().distanceFrom(new Pose(goalX, goalY)), Math.atan2(goalY - currPose.getY(), goalX - currPose.getX()));
-        //Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity());
-        Angle e = Angle.fromRad(follower.getHeading() - Math.PI / 2);
         {
             return new MecanumDriverControlled(
                     fL,
@@ -128,7 +117,7 @@ public class DriveTrain2 implements Subsystem {
                     Gamepads.gamepad1().leftStickX().map(it -> alliance * it),
                     Gamepads.gamepad1().leftStickY().map(it -> alliance * it),
                     Gamepads.gamepad1().rightStickX().map(it -> 0.8*it),
-                    new FieldCentric(() -> e)
+                    new FieldCentric(() -> Angle.fromRad(follower.getHeading() - Math.PI / 2))
             );
         }
 
@@ -166,30 +155,54 @@ public class DriveTrain2 implements Subsystem {
     public static ServoEx stopperServo = new ServoEx("stopperServo");
 
     public double getClosestValidTurretAngle(double relativeGoalDegrees) {
-        // Option 1: The raw 0-360 input from your vector calculation
-        double option1 = relativeGoalDegrees;
-
-        // Option 2: The 360-degree alternative wrap position
-        double option2 = (option1 > 180.0) ? (option1 - 360.0) : (option1 + 360.0);
-
-        boolean opt1Valid = (option1 >= MIN_ANGLE && option1 <= MAX_ANGLE);
-        boolean opt2Valid = (option2 >= MIN_ANGLE && option2 <= MAX_ANGLE);
-
-        // If both options are mechanically safe, pick the one closest to current position
-        if (opt1Valid && opt2Valid) {
-            return (Math.abs(option1 - currentTurretPos) < Math.abs(option2 - currentTurretPos)) ? option1 : option2;
-        }
-
-        if (opt1Valid) {
-            return option1;
-        }
-        if (opt2Valid) {
-            wrapping = true;
-            return option2;
-        }
-
-        // Safety fallback clamp
+        double option1 = normalizeDegrees(relativeGoalDegrees);
+        wrapping = false;
         return Math.max(MIN_ANGLE, Math.min(MAX_ANGLE, option1));
+    }
+
+    private double normalizeDegrees(double degrees) {
+        while (degrees > 180.0) {
+            degrees -= 360.0;
+        }
+        while (degrees <= -180.0) {
+            degrees += 360.0;
+        }
+        return degrees;
+    }
+
+    private Pose getTurretPose(Pose robotPose) {
+        double heading = robotPose.getHeading();
+        double turretX = robotPose.getX()
+                + turretForwardOffset * Math.cos(heading)
+                - turretStrafeOffset * Math.sin(heading);
+        double turretY = robotPose.getY()
+                + turretForwardOffset * Math.sin(heading)
+                + turretStrafeOffset * Math.cos(heading);
+
+        return new Pose(turretX, turretY, heading);
+    }
+
+    private Vector getTurretToGoalVector(Pose turretPose) {
+        return new Vector(
+                turretPose.distanceFrom(new Pose(goalX, goalY)),
+                Math.atan2(goalY - turretPose.getY(), goalX - turretPose.getX())
+        );
+    }
+
+    private void configureAllianceTarget() {
+        if (isRed()) {
+            alliance = -1;
+            goalXDist = 144;
+            goalX = 144;
+            localizeX = 8;
+        } else if (isBlue()) {
+            alliance = 1;
+            goalXDist = 0;
+            goalX = 0;
+            localizeX = 136;
+        } else {
+            ActiveOpMode.telemetry().addLine("No direction set");
+        }
     }
 
     public static Command closeStopper = new LambdaCommand()
@@ -206,20 +219,11 @@ public class DriveTrain2 implements Subsystem {
 
         firsttime = true;
         shooting = false;
-        follower = follower();
+        follower = PedroComponent.follower();
         intakeMotor = new MotorEx("intakeMotor");
         transfer = new MotorEx("transferMotor");
         closeStopper.schedule();
-        if (isBlue() != true && isRed() != true) {
-            ActiveOpMode.telemetry().addLine("No direction set");
-        } else {
-            if (isBlue() == true) {
-                alliance = 1;
-            }
-            if (isRed() == true) {
-                alliance = -1;
-            }
-        }
+        configureAllianceTarget();
         imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
         Pose startingpose = new Pose(72, 72, Math.toRadians(90));
         if(Storage.setPose){
@@ -329,7 +333,7 @@ public class DriveTrain2 implements Subsystem {
     public static void shoot() {
         //if (shooting == false) {
         //    shooting = true;
-            //SequentialGroup shoot = new SequentialGroup(new Delay(0.3), shootFalse);
+        //SequentialGroup shoot = new SequentialGroup(new Delay(0.3), shootFalse);
         //    shoot.schedule();
         //}
         shooting = true;
@@ -346,9 +350,8 @@ public class DriveTrain2 implements Subsystem {
         if (firsttime == true) {
             // Schedule the command stored in the localize variable
             Gamepads.gamepad1().rightBumper().whenBecomesTrue(()->openStopper.schedule())
-                            .whenBecomesFalse(()->closeStopper.schedule());
+                    .whenBecomesFalse(()->closeStopper.schedule());
             Gamepads.gamepad1().leftBumper().whenBecomesTrue(toggleAutoShoot);
-            Gamepads.gamepad1().x().whenBecomesTrue((() -> Localize().schedule()));
             Gamepads.gamepad1().rightTrigger().greaterThan(0.3).whenBecomesTrue(shooter);
             //Gamepads.gamepad1().square().whenBecomesTrue(() -> farAngle());
             Gamepads.gamepad1().rightBumper().whenBecomesTrue(turretzero);
@@ -368,19 +371,10 @@ public class DriveTrain2 implements Subsystem {
         follower.update();
 
 
-        if (isBlue() == true) {
-            goalXDist = 0;
-            goalX = 0;
-            localizeX = 136;
-        }
-        if (isRed() == true) {
-            goalXDist = 144;
-            goalX = 144;
-            localizeX = 8;
-        }
         Pose currPose = follower.getPose();
-        double robotHeading = follower.getPose().getHeading();
-        Vector robotToGoalVector = new Vector(follower.getPose().distanceFrom(new Pose(goalX, goalY)), Math.atan2(goalY - currPose.getY(), goalX - currPose.getX()));
+        Pose turretPose = getTurretPose(currPose);
+        double robotHeading = currPose.getHeading();
+        Vector robotToGoalVector = getTurretToGoalVector(turretPose);
         Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity(), 1.7);
         Double headingError = results[2];
         double flywheelSpeed = results[0];
@@ -390,16 +384,15 @@ public class DriveTrain2 implements Subsystem {
         double robotAngularVelocityRads = follower.getAngularVelocity();
         double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
         double feedforwardOffset = robotAngularVelocityDegs * 0.225;
-            double targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset);
-            double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
-            servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
-            turret1.setPosition(servoPositionSignal);
-            turret2.setPosition(servoPositionSignal);
-        currentTurretPos=targetTurretAngle;
+        double targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset - feedforwardOffset);
+        double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
+        servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
+        turret1.setPosition(servoPositionSignal);
+        turret2.setPosition(servoPositionSignal);
+        currentTurretPos = targetTurretAngle;
 
-        ActiveOpMode.telemetry().addData("launch?", isOverlappingLaunchZone(follower().getPose()));
+        ActiveOpMode.telemetry().addData("launch?", isOverlappingLaunchZone(follower.getPose()));
         ActiveOpMode.telemetry().addData("turret", servoPositionSignal);
-        //if(isOverlappingLaunchZone(follower().getPose()) && robotToGoalVector.getMagnitude()>30 && wrapping == false){
         Pose futurepose = new Pose(follower.getPose().getX()+follower.getVelocity().getXComponent()*0.3, follower.getPose().getY()+follower.getVelocity().getYComponent()*0.3, follower.getHeading());
         //if((isOverlappingLaunchZone(PedroComponent.follower().getPose())||isOverlappingLaunchZone(futurepose)) && robotToGoalVector.getMagnitude()>40){
         if(((isOverlappingLaunchZone(follower.getPose())||isOverlappingLaunchZone(futurepose)) && robotToGoalVector.getMagnitude()>50)|| shooting ==true){
@@ -430,20 +423,25 @@ public class DriveTrain2 implements Subsystem {
         //ActiveOpMode.telemetry().addData("frontLeftRPM", frontLeftRPM);
         //ActiveOpMode.telemetry().addData("backLeftRPM", backLeftRPM);
 
-        //ActiveOpMode.telemetry().addData("goalX", goalX);
-        //ActiveOpMode.telemetry().addData("goalY", goalY);
+        ActiveOpMode.telemetry().addData("goalX", goalX);
+        ActiveOpMode.telemetry().addData("goalY", goalY);
         ActiveOpMode.telemetry().addData("RobotX", currPose.getX());
         ActiveOpMode.telemetry().addData("RobotY", currPose.getY());
+        ActiveOpMode.telemetry().addData("TurretX", turretPose.getX());
+        ActiveOpMode.telemetry().addData("TurretY", turretPose.getY());
         //ActiveOpMode.telemetry().addData("goalXDist", goalXDist);
         //ActiveOpMode.telemetry().addData("goalYDist", goalYDist);
         //ActiveOpMode.telemetry().addData("robotHeading", Math.toDegrees(robotHeading));
         ActiveOpMode.telemetry().addData("velocity", follower.getVelocity());
-        //ActiveOpMode.telemetry().addData("headingError", headingError);
+        ActiveOpMode.telemetry().addData("headingError", headingError);
+        ActiveOpMode.telemetry().addData("angularFF", feedforwardOffset);
         //ActiveOpMode.telemetry().addData("distance", distance);
         //ActiveOpMode.telemetry().addData("yVCtx", visionYawCommand(headingError));
         ActiveOpMode.telemetry().addData("Robot Heading: ",follower.getHeading());
         ActiveOpMode.telemetry().addLine("==== BACKUP CONSTANTS ====");
         ActiveOpMode.telemetry().addData("Turret Offset", turretOffset);
+        ActiveOpMode.telemetry().addData("Turret Forward Offset", turretForwardOffset);
+        ActiveOpMode.telemetry().addData("Turret Strafe Offset", turretStrafeOffset);
         ActiveOpMode.telemetry().addData("RPM Vertical Shift", ShooterCalc.verticalShift);
         ActiveOpMode.telemetry().update();
         Gamepads.gamepad1().rightTrigger().greaterThan(0.3).whenBecomesTrue(shooter);
@@ -497,4 +495,4 @@ public class DriveTrain2 implements Subsystem {
                 })
                 .requires(this); // Lock out your TeleOp joysticks while this is executing
     }
-    }
+}

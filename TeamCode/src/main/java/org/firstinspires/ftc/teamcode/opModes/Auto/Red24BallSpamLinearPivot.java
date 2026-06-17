@@ -1,11 +1,10 @@
 package org.firstinspires.ftc.teamcode.opModes.Auto;
 
-import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
+import static org.firstinspires.ftc.teamcode.subsystems.AutoShooterCalc.calculateShotVectorandUpdateHeading;
 import static org.firstinspires.ftc.teamcode.subsystems.DriveTrain2.closeStopperPos;
 import static org.firstinspires.ftc.teamcode.subsystems.DriveTrain2.openStopperPos;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 import static org.firstinspires.ftc.teamcode.subsystems.LaunchDetector.isOverlappingLaunchZone;
-import static org.firstinspires.ftc.teamcode.subsystems.AutoShooterCalc.calculateShotVectorandUpdateHeading;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
@@ -40,9 +39,9 @@ import dev.nextftc.hardware.impl.ServoEx;
 
 @Autonomous
 @Configurable
-public class Red24BallSpamLinear extends NextFTCOpMode {
+public class Red24BallSpamLinearPivot extends NextFTCOpMode {
 
-    public Red24BallSpamLinear() {
+    public Red24BallSpamLinearPivot() {
         addComponents(
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE,
@@ -204,6 +203,12 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
         telemetry.addLine("Initialized");
         telemetry.update();
     }
+    public Command turnTo(Pose targetPose, double timeoutSeconds) {
+        return new LambdaCommand("Turn to " + targetPose.getHeading())
+                .setStart(() -> follower.holdPoint(targetPose))
+                .setIsDone(() -> false)
+                .raceWith(new Delay(timeoutSeconds));
+    }
     private boolean manualShooting = true;
 
     public Command closeStopper = new LambdaCommand()
@@ -226,6 +231,7 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
 
                 new FollowPath(paths.Path3, false, 1.0),
                 new FollowPath(paths.Path4, true, 1.0),
+                turnTo(new Pose(132.23,63),0.4),
                 new Delay(1.25),
 
                 new FollowPath(paths.Path5, false, 1.0),
@@ -377,13 +383,14 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
             Path4 = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(80.854, 69.703),
-                            new Pose(gateX1, gateY1)))
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(gateHeading1))
+                            new Pose(131.5, 61.15)))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(5))
+                    //.addPoseCallback(new Pose(124.792,61.580),turnTo(new Pose(132.23,63),0.4),0.8)
                     .build();
 
             Path5 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(gateX, gateY),
+                            new Pose(131.5, 61.15),
                             new Pose(82.058, 73.32)))
                     .setLinearHeadingInterpolation(Math.toRadians(gateHeading1), Math.toRadians(-15))
                     .build();

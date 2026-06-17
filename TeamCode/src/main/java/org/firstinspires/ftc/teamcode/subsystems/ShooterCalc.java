@@ -36,6 +36,8 @@ public class ShooterCalc implements Subsystem {
         public double flywheelSpeed;
         public double hoodTime;
         public double headingAngle;
+        public double hoodDegrees;
+        public double ballVelocity;
     }
 
     public static void calculateShotVectorandUpdateHeading(double robotHeading, Vector robotToGoalVector, Vector robotVel, double sotmFactor, ShotVectorResult result){
@@ -50,6 +52,10 @@ public class ShooterCalc implements Subsystem {
     }
 
     public static void calculateShotVectorandUpdateHeading(double robotHeading, double robotToGoalMagnitude, double robotToGoalTheta, Vector robotVel, double sotmFactor, ShotVectorResult result){
+        calculateShotVectorandUpdateHeading(robotHeading, robotToGoalMagnitude, robotToGoalTheta, robotVel, sotmFactor, result, true);
+    }
+
+    public static void calculateShotVectorandUpdateHeading(double robotHeading, double robotToGoalMagnitude, double robotToGoalTheta, Vector robotVel, double sotmFactor, ShotVectorResult result, boolean addTelemetry){
         double x = robotToGoalMagnitude-ShooterConstants.PASS_THROUGH_POINT_RADIUS;
         //double y = -4.5745*temp*temp*temp + 25.978*temp*temp - 48.395*temp + 58.675;
         double y = SCORE_HEIGHT;
@@ -115,13 +121,17 @@ public class ShooterCalc implements Subsystem {
         //double when = (double) 475 /188;
 
         double hoodTime = (0.01625 * what) - 0.6;
-        ActiveOpMode.telemetry().addData("hoodAngle", what);
-        ActiveOpMode.telemetry().addData("ballVelocity", flywheelSpeed);
-        ActiveOpMode.telemetry().addData("flywheelSpeed", requiredTPS);
+        if (addTelemetry) {
+            ActiveOpMode.telemetry().addData("hoodAngle", what);
+            ActiveOpMode.telemetry().addData("ballVelocity", flywheelSpeed);
+            ActiveOpMode.telemetry().addData("flywheelSpeed", requiredTPS);
+        }
 
         result.flywheelSpeed = requiredTPS;
         result.hoodTime = hoodTime;
         result.headingAngle = headingAngle;
+        result.hoodDegrees = what;
+        result.ballVelocity = flywheelSpeed;
     }
 
     public static Double[] calculateShotVectorandUpdateHeading(double robotHeading, Vector robotToGoalVector, Vector robotVel, double sotmFactor){

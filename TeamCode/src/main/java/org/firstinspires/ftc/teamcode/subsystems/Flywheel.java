@@ -86,8 +86,13 @@ public class Flywheel implements Subsystem {
         controller2.setGoal(new KineticState(0.0, configtps, 0.0));
         setFlywheel2Power(-1 * (controller2.calculate(currentstate) + kF * configtps));
     }
+
     public static void shooter(float tps) {
         BindingManager.update();
+        shooterWithoutBindingUpdate(tps);
+    }
+
+    public static void shooterWithoutBindingUpdate(float tps) {
         flywheelvelocity = flywheel.getVelocity();
         flywheelvelocity2 = flywheel2.getVelocity();
         KineticState currentState = new KineticState(0, flywheelvelocity, 0.0);

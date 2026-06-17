@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpBlue2.isBlue;
 import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpRed2.isRed;
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
-import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
+import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooterWithoutBindingUpdate;
 import static org.firstinspires.ftc.teamcode.subsystems.LaunchDetector.isOverlappingLaunchZone;
 import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
 
@@ -15,6 +15,7 @@ import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.Vector;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -24,6 +25,7 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.pedroPathing.Tuning;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 import dev.nextftc.core.commands.Command;
@@ -89,10 +91,16 @@ public class DriveTrain2 implements Subsystem {
     private static final double POWER_EPSILON = 0.0001;
     private static final double SERVO_EPSILON = 0.0001;
     private static double lastStopperPosition = Double.NaN;
+    private static final long TELEMETRY_INTERVAL_NANOS = 100_000_000L;
     private double lastIntakePower = Double.NaN;
     private double lastTransferPower = Double.NaN;
     private double lastHoodPosition = Double.NaN;
     private double lastTurretPosition = Double.NaN;
+    private long lastTelemetryTime = 0;
+    private double telemetryLoopTimeSumMs = 0;
+    private double telemetryLoopTimeMaxMs = 0;
+    private int telemetryLoopCount = 0;
+    private List<LynxModule> allHubs;
     private final ShooterCalc.ShotVectorResult shotVectorResult = new ShooterCalc.ShotVectorResult();
 
 
@@ -270,6 +278,14 @@ public class DriveTrain2 implements Subsystem {
         lastHoodPosition = Double.NaN;
         lastTurretPosition = Double.NaN;
         lastStopperPosition = Double.NaN;
+        lastTelemetryTime = 0;
+        telemetryLoopTimeSumMs = 0;
+        telemetryLoopTimeMaxMs = 0;
+        telemetryLoopCount = 0;
+        allHubs = ActiveOpMode.hardwareMap().getAll(LynxModule.class);
+        for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
         Flywheel.resetPowerCache();
         follower = PedroComponent.follower();
         intakeMotor = new MotorEx("intakeMotor");
@@ -400,8 +416,15 @@ public class DriveTrain2 implements Subsystem {
     @Override
     public void periodic() {
         long currentTime = System.nanoTime();
+        for (LynxModule hub : allHubs) {
+            hub.clearBulkCache();
+        }
+
         if (lastLoopTime != 0) {
             loopTimeMs = (currentTime - lastLoopTime) / 1_000_000.0;
+            telemetryLoopTimeSumMs += loopTimeMs;
+            telemetryLoopTimeMaxMs = Math.max(telemetryLoopTimeMaxMs, loopTimeMs);
+            telemetryLoopCount++;
         }
         lastLoopTime = currentTime;
 
@@ -438,10 +461,11 @@ public class DriveTrain2 implements Subsystem {
         double goalDeltaY = goalY - turretPose.getY();
         double robotToGoalDistance = Math.hypot(goalDeltaX, goalDeltaY);
         double robotToGoalTheta = Math.atan2(goalDeltaY, goalDeltaX);
-        calculateShotVectorandUpdateHeading(robotHeading, robotToGoalDistance, robotToGoalTheta, robotVelocity, 1.7, shotVectorResult);
+        boolean shouldUpdateTelemetry = currentTime - lastTelemetryTime >= TELEMETRY_INTERVAL_NANOS;
+        calculateShotVectorandUpdateHeading(robotHeading, robotToGoalDistance, robotToGoalTheta, robotVelocity, 1.7, shotVectorResult, false);
         double headingError = shotVectorResult.headingAngle;
         double flywheelSpeed = shotVectorResult.flywheelSpeed;
-        shooter((float) flywheelSpeed);
+        shooterWithoutBindingUpdate((float) flywheelSpeed);
         double hoodAngle = shotVectorResult.hoodTime;
         setHoodPositionCached(hoodAngle);
         double robotAngularVelocityRads = follower.getAngularVelocity();
@@ -454,8 +478,6 @@ public class DriveTrain2 implements Subsystem {
         currentTurretPos = targetTurretAngle;
 
         boolean launchZone = isOverlappingLaunchZone(currPose);
-        telemetry.addData("launch?", launchZone);
-        telemetry.addData("turret", servoPositionSignal);
         Pose futurepose = new Pose(currPose.getX()+robotVelocity.getXComponent()*0.3, currPose.getY()+robotVelocity.getYComponent()*0.3, robotHeading);
         boolean futureLaunchZone = isOverlappingLaunchZone(futurepose);
         //if((isOverlappingLaunchZone(PedroComponent.follower().getPose())||isOverlappingLaunchZone(futurepose)) && robotToGoalVector.getMagnitude()>40){
@@ -470,44 +492,57 @@ public class DriveTrain2 implements Subsystem {
             setStopperPositionCached(closeStopperPos);
         }
 
-        telemetry.addData("Loop Time (ms)", loopTimeMs);
-        //ActiveOpMode.telemetry().addData("Motor1Speed", s1speed);
-        //ActiveOpMode.telemetry().addData("Motor2Speed", s2speed);
-        telemetry.addData("far", far);
-        telemetry.addData("alliance", alliance);
-        telemetry.addData("hoodPos", hoodAngle);
-        //ActiveOpMode.telemetry().addData("servo2pos", hoodServo2.getPosition());
+        if (shouldUpdateTelemetry) {
+            lastTelemetryTime = currentTime;
+            telemetry.addData("hoodAngle", shotVectorResult.hoodDegrees);
+            telemetry.addData("ballVelocity", shotVectorResult.ballVelocity);
+            telemetry.addData("flywheelSpeed", shotVectorResult.flywheelSpeed);
+            telemetry.addData("launch?", launchZone);
+            telemetry.addData("turret", servoPositionSignal);
+            telemetry.addData("Loop Time (ms)", loopTimeMs);
+            telemetry.addData("Avg Loop Time (ms)", telemetryLoopCount == 0 ? 0 : telemetryLoopTimeSumMs / telemetryLoopCount);
+            telemetry.addData("Max Loop Time (ms)", telemetryLoopTimeMaxMs);
+            //ActiveOpMode.telemetry().addData("Motor1Speed", s1speed);
+            //ActiveOpMode.telemetry().addData("Motor2Speed", s2speed);
+            telemetry.addData("far", far);
+            telemetry.addData("alliance", alliance);
+            telemetry.addData("hoodPos", hoodAngle);
+            //ActiveOpMode.telemetry().addData("servo2pos", hoodServo2.getPosition());
 
-        //double frontLeftRPM = 28 / 60 * fL.getVelocity();
-        //double frontRightRPM = 28 / 60 * fR.getVelocity();
-        //double backLeftRPM = 28 / 60 * bL.getVelocity();
-        //double backRightRPM = 28 / 60 * bR.getVelocity();
-        //ActiveOpMode.telemetry().addData("frontRightRPM", frontRightRPM);
-        //ActiveOpMode.telemetry().addData("backRightRPM", backRightRPM);
-        //ActiveOpMode.telemetry().addData("frontLeftRPM", frontLeftRPM);
-        //ActiveOpMode.telemetry().addData("backLeftRPM", backLeftRPM);
+            //double frontLeftRPM = 28 / 60 * fL.getVelocity();
+            //double frontRightRPM = 28 / 60 * fR.getVelocity();
+            //double backLeftRPM = 28 / 60 * bL.getVelocity();
+            //double backRightRPM = 28 / 60 * bR.getVelocity();
+            //ActiveOpMode.telemetry().addData("frontRightRPM", frontRightRPM);
+            //ActiveOpMode.telemetry().addData("backRightRPM", backRightRPM);
+            //ActiveOpMode.telemetry().addData("frontLeftRPM", frontLeftRPM);
+            //ActiveOpMode.telemetry().addData("backLeftRPM", backLeftRPM);
 
-        telemetry.addData("goalX", goalX);
-        telemetry.addData("goalY", goalY);
-        telemetry.addData("RobotX", currPose.getX());
-        telemetry.addData("RobotY", currPose.getY());
-        telemetry.addData("TurretX", turretPose.getX());
-        telemetry.addData("TurretY", turretPose.getY());
-        //ActiveOpMode.telemetry().addData("goalXDist", goalXDist);
-        //ActiveOpMode.telemetry().addData("goalYDist", goalYDist);
-        //ActiveOpMode.telemetry().addData("robotHeading", Math.toDegrees(robotHeading));
-        telemetry.addData("velocity", robotVelocity);
-        telemetry.addData("headingError", headingError);
-        telemetry.addData("angularFF", feedforwardOffset);
-        //ActiveOpMode.telemetry().addData("distance", distance);
-        //ActiveOpMode.telemetry().addData("yVCtx", visionYawCommand(headingError));
-        telemetry.addData("Robot Heading: ",robotHeading);
-        telemetry.addLine("==== BACKUP CONSTANTS ====");
-        telemetry.addData("Turret Offset", turretOffset);
-        telemetry.addData("Turret Forward Offset", turretForwardOffset);
-        telemetry.addData("Turret Strafe Offset", turretStrafeOffset);
-        telemetry.addData("RPM Vertical Shift", ShooterCalc.verticalShift);
-        telemetry.update();
+            telemetry.addData("goalX", goalX);
+            telemetry.addData("goalY", goalY);
+            telemetry.addData("RobotX", currPose.getX());
+            telemetry.addData("RobotY", currPose.getY());
+            telemetry.addData("TurretX", turretPose.getX());
+            telemetry.addData("TurretY", turretPose.getY());
+            //ActiveOpMode.telemetry().addData("goalXDist", goalXDist);
+            //ActiveOpMode.telemetry().addData("goalYDist", goalYDist);
+            //ActiveOpMode.telemetry().addData("robotHeading", Math.toDegrees(robotHeading));
+            telemetry.addData("velocity", robotVelocity);
+            telemetry.addData("headingError", headingError);
+            telemetry.addData("angularFF", feedforwardOffset);
+            //ActiveOpMode.telemetry().addData("distance", distance);
+            //ActiveOpMode.telemetry().addData("yVCtx", visionYawCommand(headingError));
+            telemetry.addData("Robot Heading: ",robotHeading);
+            telemetry.addLine("==== BACKUP CONSTANTS ====");
+            telemetry.addData("Turret Offset", turretOffset);
+            telemetry.addData("Turret Forward Offset", turretForwardOffset);
+            telemetry.addData("Turret Strafe Offset", turretStrafeOffset);
+            telemetry.addData("RPM Vertical Shift", ShooterCalc.verticalShift);
+            telemetry.update();
+            telemetryLoopTimeSumMs = 0;
+            telemetryLoopTimeMaxMs = 0;
+            telemetryLoopCount = 0;
+        }
 
 
 

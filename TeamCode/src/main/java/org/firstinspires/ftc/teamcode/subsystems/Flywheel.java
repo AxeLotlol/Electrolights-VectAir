@@ -22,13 +22,8 @@ public class Flywheel implements Subsystem {
     public static double flywheelvelocity;
 
     public static double flywheelvelocity2;
-    private static ControlSystem controller1;
-    private static ControlSystem controller2;
-    private static double controllerKP = Double.NaN;
-    private static double controllerKS = Double.NaN;
-    private static double lastFlywheelPower = Double.NaN;
-    private static double lastFlywheel2Power = Double.NaN;
-    private static final double POWER_EPSILON = 0.0001;
+    private ControlSystem controller1;
+    private ControlSystem controller2;
 
     public static MotorEx flywheel = new MotorEx("launchingmotor");
 
@@ -40,51 +35,22 @@ public class Flywheel implements Subsystem {
 
     public static double configvelocity = 1400; //far zone - ~1500. near zone - ~1200-1300
 
-    private static ControlSystem buildController() {
-        return ControlSystem.builder()
+    public static void velocityControlWithFeedforwardExample(KineticState currentstate, float configtps) {
+        ControlSystem controller1 = ControlSystem.builder()
                 .velPid(new PIDCoefficients(kP, 0, 0))
                 .basicFF(new BasicFeedforwardParameters(0, 0, kS))
                 .build();
-    }
-
-    private static void updateControllersIfNeeded() {
-        if (controller1 == null || controller2 == null || controllerKP != kP || controllerKS != kS) {
-            controller1 = buildController();
-            controller2 = buildController();
-            controllerKP = kP;
-            controllerKS = kS;
-        }
-    }
-
-    private static void setFlywheelPower(double power) {
-        if (Double.isNaN(lastFlywheelPower) || Math.abs(power - lastFlywheelPower) > POWER_EPSILON) {
-            flywheel.setPower(power);
-            lastFlywheelPower = power;
-        }
-    }
-
-    private static void setFlywheel2Power(double power) {
-        if (Double.isNaN(lastFlywheel2Power) || Math.abs(power - lastFlywheel2Power) > POWER_EPSILON) {
-            flywheel2.setPower(power);
-            lastFlywheel2Power = power;
-        }
-    }
-
-    public static void resetPowerCache() {
-        lastFlywheelPower = Double.NaN;
-        lastFlywheel2Power = Double.NaN;
-    }
-
-    public static void velocityControlWithFeedforwardExample(KineticState currentstate, float configtps) {
-        updateControllersIfNeeded();
         controller1.setGoal(new KineticState(0.0, configtps, 0.0));
-        setFlywheelPower(controller1.calculate(currentstate) + kF * configtps);
+        flywheel.setPower(controller1.calculate(currentstate) + kF * configtps);
     }
 
     public static void velocityControlWithFeedforwardExample2(KineticState currentstate, float configtps) {
-        updateControllersIfNeeded();
+        ControlSystem controller2 = ControlSystem.builder()
+                .velPid(new PIDCoefficients(kP, 0, 0))
+                .basicFF(new BasicFeedforwardParameters(0, 0, kS))
+                .build();
         controller2.setGoal(new KineticState(0.0, configtps, 0.0));
-        setFlywheel2Power(-1 * (controller2.calculate(currentstate) + kF * configtps));
+        flywheel2.setPower(-1 * (controller2.calculate(currentstate) + kF * configtps));
     }
     public static void shooter(float tps) {
         BindingManager.update();
@@ -105,3 +71,4 @@ public class Flywheel implements Subsystem {
 
     }
 }
+

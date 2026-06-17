@@ -46,20 +46,10 @@ public class TeleOpRed2 extends NextFTCOpMode {
         red=true;
         intakeMotor = new MotorEx("intakeMotor");
         transfer = new MotorEx("transferMotor");
-        Gamepads.gamepad1().leftTrigger().greaterThan(0.3).whenBecomesTrue(()-> {
-            intakeMotor.setPower(1);
-            DriveTrain2.INSTANCE.invalidateIntakeTransferPowerCache();
-        }).whenBecomesFalse(() -> {
-            intakeMotor.setPower(0);
-            DriveTrain2.INSTANCE.invalidateIntakeTransferPowerCache();
-        });
-        Gamepads.gamepad1().leftTrigger().greaterThan(0.3).whenBecomesTrue(()-> {
-            transfer.setPower(1);
-            DriveTrain2.INSTANCE.invalidateIntakeTransferPowerCache();
-        }).whenBecomesFalse(() -> {
-            transfer.setPower(0);
-            DriveTrain2.INSTANCE.invalidateIntakeTransferPowerCache();
-        });
+        Gamepads.gamepad1().leftTrigger().greaterThan(0.3).whenBecomesTrue(()-> intakeMotor.setPower(1))
+                .whenBecomesFalse(() -> intakeMotor.setPower(0));
+        Gamepads.gamepad1().leftTrigger().greaterThan(0.3).whenBecomesTrue(()-> transfer.setPower(1))
+                .whenBecomesFalse(() -> transfer.setPower(0));
         Gamepads.gamepad1().x().whenBecomesTrue(()->follower.setPose(new Pose(79.967,9.271,Math.toRadians(90))));
 
         // Backup Controls

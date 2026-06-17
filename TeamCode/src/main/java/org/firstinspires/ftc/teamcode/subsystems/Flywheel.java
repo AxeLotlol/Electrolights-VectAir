@@ -28,7 +28,7 @@ public class Flywheel implements Subsystem {
     private static double controllerKS = Double.NaN;
     private static double lastFlywheelPower = Double.NaN;
     private static double lastFlywheel2Power = Double.NaN;
-    private static final double POWER_EPSILON = 0.0001;
+    private static final double POWER_EPSILON = 0.005;
 
     public static MotorEx flywheel = new MotorEx("launchingmotor");
 

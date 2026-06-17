@@ -88,8 +88,8 @@ public class DriveTrain2 implements Subsystem {
     private long lastLoopTime = 0;
     private double loopTimeMs = 0;
     public Pose currPose;
-    private static final double POWER_EPSILON = 0.0001;
-    private static final double SERVO_EPSILON = 0.0001;
+    private static final double POWER_EPSILON = 0.005;
+    private static final double SERVO_EPSILON = 0.001;
     private static double lastStopperPosition = Double.NaN;
     private static final long TELEMETRY_INTERVAL_NANOS = 100_000_000L;
     private double lastIntakePower = Double.NaN;
@@ -100,6 +100,9 @@ public class DriveTrain2 implements Subsystem {
     private double telemetryLoopTimeSumMs = 0;
     private double telemetryLoopTimeMaxMs = 0;
     private int telemetryLoopCount = 0;
+    private double bulkClearMaxMs = 0;
+    private double followerUpdateMaxMs = 0;
+    private double shooterUpdateMaxMs = 0;
     private List<LynxModule> allHubs;
     private final ShooterCalc.ShotVectorResult shotVectorResult = new ShooterCalc.ShotVectorResult();
 
@@ -124,22 +127,17 @@ public class DriveTrain2 implements Subsystem {
 
     @Override
     public Command getDefaultCommand() {
-
         configureAllianceTarget();
-        follower.update();
-        currPose = follower.getPose();
-        {
-            return new MecanumDriverControlled(
-                    fL,
-                    fR,
-                    bL,
-                    bR,
-                    Gamepads.gamepad1().leftStickX().map(it -> alliance * it),
-                    Gamepads.gamepad1().leftStickY().map(it -> alliance * it),
-                    Gamepads.gamepad1().rightStickX().map(it -> 0.8*it),
-                    new FieldCentric(() -> Angle.fromRad(follower.getHeading() - Math.PI / 2))
-            );
-        }
+        return new MecanumDriverControlled(
+                fL,
+                fR,
+                bL,
+                bR,
+                Gamepads.gamepad1().leftStickX().map(it -> alliance * it),
+                Gamepads.gamepad1().leftStickY().map(it -> alliance * it),
+                Gamepads.gamepad1().rightStickX().map(it -> 0.8*it),
+                new FieldCentric(() -> Angle.fromRad(follower.getHeading() - Math.PI / 2))
+        );
 
         //return null;
     }
@@ -268,6 +266,9 @@ public class DriveTrain2 implements Subsystem {
         telemetryLoopTimeSumMs = 0;
         telemetryLoopTimeMaxMs = 0;
         telemetryLoopCount = 0;
+        bulkClearMaxMs = 0;
+        followerUpdateMaxMs = 0;
+        shooterUpdateMaxMs = 0;
         allHubs = ActiveOpMode.hardwareMap().getAll(LynxModule.class);
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
@@ -300,6 +301,16 @@ public class DriveTrain2 implements Subsystem {
         turret2 = ActiveOpMode.hardwareMap().get(ServoImplEx.class,"turretServo2");
         turret1.setPwmRange(new PwmControl.PwmRange(500, 2500));
         turret2.setPwmRange(new PwmControl.PwmRange(500, 2500));
+        Gamepads.gamepad1().rightBumper().whenBecomesTrue(()->openStopper.schedule())
+                .whenBecomesFalse(()->closeStopper.schedule());
+        Gamepads.gamepad1().leftBumper().whenBecomesTrue(toggleAutoShoot);
+        Gamepads.gamepad1().rightTrigger().greaterThan(0.3).whenBecomesTrue(shooter);
+        //Gamepads.gamepad1().square().whenBecomesTrue(() -> farAngle());
+        Gamepads.gamepad1().rightBumper().whenBecomesTrue(turretzero);
+        Gamepads.gamepad1().leftBumper().whenBecomesTrue(turrethalf);
+        transfer1 = new MotorEx("transferMotor");
+        //transfer2 = new ServoEx("transferServo1");
+        firsttime = false;
         follower.update();
     }
     private boolean autoShoot = true;
@@ -402,9 +413,11 @@ public class DriveTrain2 implements Subsystem {
     @Override
     public void periodic() {
         long currentTime = System.nanoTime();
+        long sectionStartTime = currentTime;
         for (LynxModule hub : allHubs) {
             hub.clearBulkCache();
         }
+        bulkClearMaxMs = Math.max(bulkClearMaxMs, (System.nanoTime() - sectionStartTime) / 1_000_000.0);
 
         if (lastLoopTime != 0) {
             loopTimeMs = (currentTime - lastLoopTime) / 1_000_000.0;
@@ -413,29 +426,9 @@ public class DriveTrain2 implements Subsystem {
             telemetryLoopCount++;
         }
         lastLoopTime = currentTime;
-
-        if (firsttime == true) {
-            // Schedule the command stored in the localize variable
-            Gamepads.gamepad1().rightBumper().whenBecomesTrue(()->openStopper.schedule())
-                    .whenBecomesFalse(()->closeStopper.schedule());
-            Gamepads.gamepad1().leftBumper().whenBecomesTrue(toggleAutoShoot);
-            Gamepads.gamepad1().rightTrigger().greaterThan(0.3).whenBecomesTrue(shooter);
-            //Gamepads.gamepad1().square().whenBecomesTrue(() -> farAngle());
-            Gamepads.gamepad1().rightBumper().whenBecomesTrue(turretzero);
-            Gamepads.gamepad1().leftBumper().whenBecomesTrue(turrethalf);
-            MotorEx intakeMotor = new MotorEx("intakeMotor");
-            transfer1 = new MotorEx("transferMotor");
-            //transfer2 = new ServoEx("transferServo1");
-            firsttime = false;
-
-
-            /*ParallelGroup HoodPowerZero=new ParallelGroup(
-                    new SetPosition(hoodServo1,0),
-                    new SetPosition(hoodServo2,0)
-            );
-            HoodPowerZero.schedule();*/
-        }
+        sectionStartTime = System.nanoTime();
         follower.update();
+        followerUpdateMaxMs = Math.max(followerUpdateMaxMs, (System.nanoTime() - sectionStartTime) / 1_000_000.0);
 
 
         Pose currPose = follower.getPose();
@@ -459,7 +452,9 @@ public class DriveTrain2 implements Subsystem {
         calculateShotVectorandUpdateHeading(robotHeading, robotToGoalDistance, robotToGoalTheta, robotVelocity, 1.7, shotVectorResult, false);
         double headingError = shotVectorResult.headingAngle;
         double flywheelSpeed = shotVectorResult.flywheelSpeed;
+        sectionStartTime = System.nanoTime();
         shooterWithoutBindingUpdate((float) flywheelSpeed);
+        shooterUpdateMaxMs = Math.max(shooterUpdateMaxMs, (System.nanoTime() - sectionStartTime) / 1_000_000.0);
         double hoodAngle = shotVectorResult.hoodTime;
         setHoodPositionCached(hoodAngle);
         double robotAngularVelocityRads = follower.getAngularVelocity();
@@ -510,6 +505,9 @@ public class DriveTrain2 implements Subsystem {
             telemetry.addData("Loop Time (ms)", loopTimeMs);
             telemetry.addData("Avg Loop Time (ms)", telemetryLoopCount == 0 ? 0 : telemetryLoopTimeSumMs / telemetryLoopCount);
             telemetry.addData("Max Loop Time (ms)", telemetryLoopTimeMaxMs);
+            telemetry.addData("Max Bulk Clear (ms)", bulkClearMaxMs);
+            telemetry.addData("Max Follower Update (ms)", followerUpdateMaxMs);
+            telemetry.addData("Max Shooter Update (ms)", shooterUpdateMaxMs);
             //ActiveOpMode.telemetry().addData("Motor1Speed", s1speed);
             //ActiveOpMode.telemetry().addData("Motor2Speed", s2speed);
             telemetry.addData("far", far);
@@ -550,21 +548,10 @@ public class DriveTrain2 implements Subsystem {
             telemetryLoopTimeSumMs = 0;
             telemetryLoopTimeMaxMs = 0;
             telemetryLoopCount = 0;
+            bulkClearMaxMs = 0;
+            followerUpdateMaxMs = 0;
+            shooterUpdateMaxMs = 0;
         }
-
-
-
-
-
-
-
-        if (firsttime == true) {
-            // Correct binding: Runs the path once per press, and automatically clears out when done
-            Gamepads.gamepad1().dpadUp().whenBecomesTrue(getDriveToGateCommand());
-
-            firsttime = false; // Prevents re-binding buttons every loop
-        }
-
     }
 
 

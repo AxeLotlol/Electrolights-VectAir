@@ -16,6 +16,7 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.Vector;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImpl;
@@ -23,6 +24,7 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Tuning;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 import dev.nextftc.core.commands.Command;
@@ -221,6 +223,7 @@ public class DriveTrain2 implements Subsystem {
     public void initialize() {
 
         firsttime = true;
+
         shooting = false;
         follower = PedroComponent.follower();
         intakeMotor = new MotorEx("intakeMotor");
@@ -348,8 +351,17 @@ public class DriveTrain2 implements Subsystem {
         //shoot = true;
     }
 
+
+
     @Override
     public void periodic() {
+        List<LynxModule> allHubs = ActiveOpMode.hardwareMap().getAll(LynxModule.class);
+        for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
+        for (LynxModule hub : allHubs) {
+            hub.clearBulkCache();
+        }
         long currentTime = System.nanoTime();
         if (lastLoopTime != 0) {
             loopTimeMs = (currentTime - lastLoopTime) / 1_000_000.0;
@@ -418,9 +430,9 @@ public class DriveTrain2 implements Subsystem {
         ActiveOpMode.telemetry().addData("Loop Time (ms)", loopTimeMs);
         //ActiveOpMode.telemetry().addData("Motor1Speed", s1speed);
         //ActiveOpMode.telemetry().addData("Motor2Speed", s2speed);
-        ActiveOpMode.telemetry().addData("far", far);
+        //ActiveOpMode.telemetry().addData("far", far);
         ActiveOpMode.telemetry().addData("alliance", alliance);
-        ActiveOpMode.telemetry().addData("hoodPos", hoodServo.getPosition());
+        //ActiveOpMode.telemetry().addData("hoodPos", hoodServo.getPosition());
         //ActiveOpMode.telemetry().addData("servo2pos", hoodServo2.getPosition());
 
         //double frontLeftRPM = 28 / 60 * fL.getVelocity();
@@ -436,22 +448,22 @@ public class DriveTrain2 implements Subsystem {
         ActiveOpMode.telemetry().addData("goalY", goalY);
         ActiveOpMode.telemetry().addData("RobotX", currPose.getX());
         ActiveOpMode.telemetry().addData("RobotY", currPose.getY());
-        ActiveOpMode.telemetry().addData("TurretX", turretPose.getX());
-        ActiveOpMode.telemetry().addData("TurretY", turretPose.getY());
+        //ActiveOpMode.telemetry().addData("TurretX", turretPose.getX());
+        //ActiveOpMode.telemetry().addData("TurretY", turretPose.getY());
         //ActiveOpMode.telemetry().addData("goalXDist", goalXDist);
         //ActiveOpMode.telemetry().addData("goalYDist", goalYDist);
         //ActiveOpMode.telemetry().addData("robotHeading", Math.toDegrees(robotHeading));
-        ActiveOpMode.telemetry().addData("velocity", follower.getVelocity());
-        ActiveOpMode.telemetry().addData("headingError", headingError);
-        ActiveOpMode.telemetry().addData("angularFF", feedforwardOffset);
+        //ActiveOpMode.telemetry().addData("velocity", follower.getVelocity());
+        //ActiveOpMode.telemetry().addData("headingError", headingError);
+        //ActiveOpMode.telemetry().addData    ("angularFF", feedforwardOffset);
         //ActiveOpMode.telemetry().addData("distance", distance);
         //ActiveOpMode.telemetry().addData("yVCtx", visionYawCommand(headingError));
         ActiveOpMode.telemetry().addData("Robot Heading: ",follower.getHeading());
-        ActiveOpMode.telemetry().addLine("==== BACKUP CONSTANTS ====");
+        //ActiveOpMode.telemetry().addLine("==== BACKUP CONSTANTS ====");
         ActiveOpMode.telemetry().addData("Turret Offset", turretOffset);
-        ActiveOpMode.telemetry().addData("Turret Forward Offset", turretForwardOffset);
-        ActiveOpMode.telemetry().addData("Turret Strafe Offset", turretStrafeOffset);
-        ActiveOpMode.telemetry().addData("RPM Vertical Shift", ShooterCalc.verticalShift);
+        //ActiveOpMode.telemetry().addData("Turret Forward Offset", turretForwardOffset);
+        //ActiveOpMode.telemetry().addData("Turret Strafe Offset", turretStrafeOffset);
+        //ActiveOpMode.telemetry().addData("RPM Vertical Shift", ShooterCalc.verticalShift);
         ActiveOpMode.telemetry().update();
         Gamepads.gamepad1().rightTrigger().greaterThan(0.3).whenBecomesTrue(shooter);
 

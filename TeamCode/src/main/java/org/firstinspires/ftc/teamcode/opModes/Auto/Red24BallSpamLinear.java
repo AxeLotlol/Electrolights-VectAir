@@ -380,6 +380,12 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
                             new Pose(gateX1, gateY1)))
                     .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(gateHeading1))
                     .build();
+            Path4 = follower.pathBuilder()
+                    .addPath(new BezierLine(
+                            new Pose(80.854, 69.703),
+                            new Pose(gateX1, gateY1)))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(gateHeading1))
+                    .build();
 
             Path5 = follower.pathBuilder()
                     .addPath(new BezierLine(

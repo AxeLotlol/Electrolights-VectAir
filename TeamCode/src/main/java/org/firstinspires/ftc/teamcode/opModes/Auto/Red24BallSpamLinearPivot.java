@@ -29,8 +29,11 @@ import dev.nextftc.core.commands.delays.Delay;
 import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.components.BindingsComponent;
+import dev.nextftc.core.units.Angle;
 import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.extensions.pedro.PedroComponent;
+import dev.nextftc.extensions.pedro.TurnBy;
+import dev.nextftc.extensions.pedro.TurnTo;
 import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
@@ -66,7 +69,7 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
 
     double goalY = 144;
     double goalX = 144;
-    public static double gateX = 133.5;
+    public static double gateX = 133;
     public static double gateY = 58.75;
 
     public static double gateHeading = 41.25;
@@ -117,7 +120,7 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
             .setStart(() -> {
                 servoStopper.setPosition(0.86);
             });
-
+    private List<LynxModule> allHubs;
     public Pose currPose;
 
     public double getClosestValidTurretAngle(double relativeGoalDegrees) {
@@ -188,6 +191,10 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
     // ----------------------
 
     public void onInit() {
+        allHubs = ActiveOpMode.hardwareMap().getAll(LynxModule.class);
+        for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
         follower = PedroComponent.follower();
         follower.setStartingPose(start);
         paths = new Paths(follower);
@@ -227,24 +234,27 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
                 intakeMotorOn,
                 new FollowPath(paths.Path2, false, 1.0),
                 turnOffPreload(),
-                turnOffManualtps(),
+
 
                 new FollowPath(paths.Path3, false, 1.0),
                 new FollowPath(paths.Path4, true, 1.0),
-                turnTo(new Pose(132.23,63),0.4),
+                new FollowPath(paths.Path16,true,1.0),
+                //new TurnTo(Angle.fromDeg(41)),
+                //turnTo(new Pose(132.23,63),0.4),
+                //new TurnBy(Angle.fromDeg(10)),
                 new Delay(1.25),
 
                 new FollowPath(paths.Path5, false, 1.0),
                 //shoot,
 
                 new FollowPath(paths.Path6, true, 1.0),
-                new Delay(2.15),
+                new Delay(2.25),
 
                 new FollowPath(paths.Path7, false, 1.0),
                 //shoot,
 
                 new FollowPath(paths.Path8, true, 1.0),
-                new Delay(2.15),
+                new Delay(2.25),
 
                 new FollowPath(paths.Path9, false, 1.0),
                 new FollowPath(paths.Path14, false, 1.0),
@@ -257,7 +267,7 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
                 new FollowPath(paths.Path11, false, 1.0),
                 //shoot,
                 new FollowPath(paths.Path12, true, 1.0),
-                new Delay(2.15),
+                new Delay(2.25),
                 new FollowPath(paths.Path13, false, 1.0)
         );
     }
@@ -265,8 +275,7 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
     public void onStartButtonPressed() {
         opmodeTimer.resetTimer();
         matchStarted = true;
-        flywheel.setPower(1);
-        flywheel2.setPower(-1);
+        shooter(2000);
         Auto().schedule();
     }
     private boolean preload = true;
@@ -274,10 +283,6 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
 
     @Override
     public void onUpdate() {
-        List<LynxModule> allHubs = ActiveOpMode.hardwareMap().getAll(LynxModule.class);
-        for (LynxModule hub : allHubs) {
-            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
-        }
         for (LynxModule hub : allHubs) {
             hub.clearBulkCache();
         }
@@ -296,14 +301,11 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
             flywheelSpeed = results[0];
 
         if(preload==true){
-            flywheel.setPower(1);
-            flywheel2.setPower(-1);
+            shooter(1800);
             //hoodServo.setPosition(0.5);
         }
         if(preload==false){
-
             shooter((float) flywheelSpeed - 38);
-
         }
         double hoodAngle = results[1];
         hoodServo.setPosition(hoodAngle);
@@ -320,7 +322,7 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
         currentTurretPos = targetTurretAngle;
         Pose futurepose = new Pose(follower.getPose().getX()+follower.getVelocity().getXComponent()*0.5, follower.getPose().getY()+follower.getVelocity().getYComponent()*0.5, follower.getHeading());
         //if((isOverlappingLaunchZone(PedroComponent.follower().getPose())||isOverlappingLaunchZone(futurepose)) && robotToGoalVector.getMagnitude()>40){
-        if(isOverlappingLaunchZone(futurepose) && robotToGoalVector.getMagnitude()>45){
+        if(isOverlappingLaunchZone(futurepose) && robotToGoalVector.getMagnitude()>45&&autoShoot){
             intakeMotor.setPower(1);
             transfer.setPower(1);
             openStopper.schedule();
@@ -362,7 +364,7 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
                             new Pose(startX, startY),
                             new Pose(95.005, 94.650)))
                     .setLinearHeadingInterpolation(Math.toRadians(270), Math.toRadians(240))
-                    //.addPoseCallback(new Pose(96.892,99.572), autoShootEnable(),0.9 )
+                    .addPoseCallback(new Pose(97.745,101.833), autoShootEnable(),0.8 )
                     .build();
 
             Path2 = follower.pathBuilder()
@@ -383,14 +385,20 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
             Path4 = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(80.854, 69.703),
-                            new Pose(131.5, 61.15)))
+                            new Pose(133, 61.15)))
                     .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(5))
-                    //.addPoseCallback(new Pose(124.792,61.580),turnTo(new Pose(132.23,63),0.4),0.8)
+                    //.addPoseCallback(new Pose(121.354,62.215),new TurnTo(Angle.fromDeg(41)),0.76)
+                    .build();
+            Path16 = follower.pathBuilder()
+                    .addPath(new BezierLine(
+                            new Pose(133,61.115),
+                            new Pose(132.8,61)))
+                    .setLinearHeadingInterpolation(Math.toRadians(5),Math.toRadians(37))
                     .build();
 
             Path5 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(131.5, 61.15),
+                            new Pose(132.5, 61.15),
                             new Pose(82.058, 73.32)))
                     .setLinearHeadingInterpolation(Math.toRadians(gateHeading1), Math.toRadians(-15))
                     .build();
@@ -469,12 +477,7 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
                     .setConstantHeadingInterpolation(Math.toRadians(0))
                     .build();
 
-            Path16 = follower.pathBuilder()
-                    .addPath(new BezierLine(
-                            new Pose(82, 73.328),
-                            new Pose(104.777, 81.009)))
-                    .setConstantHeadingInterpolation(Math.toRadians(0))
-                    .build();
+
         }
     }
 }

@@ -41,6 +41,7 @@ public class TeleOpRed2 extends NextFTCOpMode {
     @Override
     public void onInit() {
         red=true;
+        TeleOpBlue2.blue = false;
         intakeMotor = new MotorEx("intakeMotor");
         transfer = new MotorEx("transferMotor");
         Gamepads.gamepad1().leftTrigger().greaterThan(0.3).whenBecomesTrue(()-> intakeMotor.setPower(1))

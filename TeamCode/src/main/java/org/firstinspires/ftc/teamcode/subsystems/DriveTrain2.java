@@ -105,16 +105,7 @@ public class DriveTrain2 implements Subsystem {
     @Override
     public Command getDefaultCommand() {
 
-        if (isBlue() != true && isRed() != true) {
-            ActiveOpMode.telemetry().addLine("No direction set");
-        } else {
-            if (isBlue() == true) {
-                alliance = 1;
-            }
-            if (isRed() == true) {
-                alliance = -1;
-            }
-        }
+        configureAllianceTarget();
         follower.update();
         currPose = follower.getPose();
         {
@@ -165,27 +156,7 @@ public class DriveTrain2 implements Subsystem {
 
     public double getClosestValidTurretAngle(double relativeGoalDegrees) {
         double option1 = normalizeDegrees(relativeGoalDegrees);
-
-        // Option 2: The 360-degree alternative wrap position
-        double option2 = (option1 >= 0.0) ? (option1 - 360.0) : (option1 + 360.0);
-
-        boolean opt1Valid = (option1 >= MIN_ANGLE && option1 <= MAX_ANGLE);
-        boolean opt2Valid = (option2 >= MIN_ANGLE && option2 <= MAX_ANGLE);
-
-        // If both options are mechanically safe, pick the one closest to current position
-        if (opt1Valid && opt2Valid) {
-            return (Math.abs(option1 - currentTurretPos) < Math.abs(option2 - currentTurretPos)) ? option1 : option2;
-        }
-
-        if (opt1Valid) {
-            return option1;
-        }
-        if (opt2Valid) {
-            wrapping = true;
-            return option2;
-        }
-
-        // Safety fallback clamp
+        wrapping = false;
         return Math.max(MIN_ANGLE, Math.min(MAX_ANGLE, option1));
     }
 
@@ -218,6 +189,22 @@ public class DriveTrain2 implements Subsystem {
         );
     }
 
+    private void configureAllianceTarget() {
+        if (isRed()) {
+            alliance = -1;
+            goalXDist = 144;
+            goalX = 144;
+            localizeX = 8;
+        } else if (isBlue()) {
+            alliance = 1;
+            goalXDist = 0;
+            goalX = 0;
+            localizeX = 136;
+        } else {
+            ActiveOpMode.telemetry().addLine("No direction set");
+        }
+    }
+
     public static Command closeStopper = new LambdaCommand()
             .setStart(() -> {
                 stopperServo.setPosition(closeStopperPos); // close
@@ -236,16 +223,7 @@ public class DriveTrain2 implements Subsystem {
         intakeMotor = new MotorEx("intakeMotor");
         transfer = new MotorEx("transferMotor");
         closeStopper.schedule();
-        if (isBlue() != true && isRed() != true) {
-            ActiveOpMode.telemetry().addLine("No direction set");
-        } else {
-            if (isBlue() == true) {
-                alliance = 1;
-            }
-            if (isRed() == true) {
-                alliance = -1;
-            }
-        }
+        configureAllianceTarget();
         imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
         Pose startingpose = new Pose(72, 72, Math.toRadians(90));
         if(Storage.setPose){
@@ -393,16 +371,6 @@ public class DriveTrain2 implements Subsystem {
         follower.update();
 
 
-        if (isBlue() == true) {
-            goalXDist = 0;
-            goalX = 0;
-            localizeX = 136;
-        }
-        if (isRed() == true) {
-            goalXDist = 144;
-            goalX = 144;
-            localizeX = 8;
-        }
         Pose currPose = follower.getPose();
         Pose turretPose = getTurretPose(currPose);
         double robotHeading = currPose.getHeading();
@@ -455,8 +423,8 @@ public class DriveTrain2 implements Subsystem {
         //ActiveOpMode.telemetry().addData("frontLeftRPM", frontLeftRPM);
         //ActiveOpMode.telemetry().addData("backLeftRPM", backLeftRPM);
 
-        //ActiveOpMode.telemetry().addData("goalX", goalX);
-        //ActiveOpMode.telemetry().addData("goalY", goalY);
+        ActiveOpMode.telemetry().addData("goalX", goalX);
+        ActiveOpMode.telemetry().addData("goalY", goalY);
         ActiveOpMode.telemetry().addData("RobotX", currPose.getX());
         ActiveOpMode.telemetry().addData("RobotY", currPose.getY());
         ActiveOpMode.telemetry().addData("TurretX", turretPose.getX());

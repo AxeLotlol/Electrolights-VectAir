@@ -15,10 +15,15 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.Vector;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.PwmControl;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Storage;
+
+import java.util.List;
 
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
@@ -27,6 +32,7 @@ import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.extensions.pedro.PedroComponent;
+import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
 import dev.nextftc.hardware.impl.MotorEx;
@@ -52,9 +58,7 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
     public Pose start = new Pose(startX, startY, Math.toRadians(270));
 
     // --- Turret tracking ---
-    private ServoEx turret1;
     private ServoEx servoStopper;
-    private ServoEx turret2;
     private ServoEx hoodServo;
     public static double startX = 111;
     public static double startY = 135;
@@ -84,6 +88,15 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
     private boolean autoShoot = false;
     private boolean useAutoGoalTracking = true;
 
+    private ServoImplEx turret1;
+    private ServoImplEx turret2;
+
+    public static double turretOffset = 6;
+    public static double turretOffsetStep = -5;
+    // Inches from the Pinpoint/Pedro robot pose origin to the turret pivot.
+    public static double turretForwardOffset = -0.52588;
+    public static double turretStrafeOffset = 0;
+
     private Command intakeMotorOn = new LambdaCommand()
             .setStart(() -> {
                 intakeMotor.setPower(1);
@@ -107,6 +120,42 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
                 servoStopper.setPosition(0.86);
             });
 
+    public Pose currPose;
+
+    public double getClosestValidTurretAngle(double relativeGoalDegrees) {
+        double option1 = normalizeDegrees(relativeGoalDegrees);
+        return Math.max(MIN_ANGLE, Math.min(MAX_ANGLE, option1));
+    }
+
+    private double normalizeDegrees(double degrees) {
+        while (degrees > 180.0) {
+            degrees -= 360.0;
+        }
+        while (degrees <= -180.0) {
+            degrees += 360.0;
+        }
+        return degrees;
+    }
+
+    private Pose getTurretPose(Pose robotPose) {
+        double heading = robotPose.getHeading();
+        double turretX = robotPose.getX()
+                + turretForwardOffset * Math.cos(heading)
+                - turretStrafeOffset * Math.sin(heading);
+        double turretY = robotPose.getY()
+                + turretForwardOffset * Math.sin(heading)
+                + turretStrafeOffset * Math.cos(heading);
+
+        return new Pose(turretX, turretY, heading);
+    }
+
+    private Vector getTurretToGoalVector(Pose turretPose) {
+        return new Vector(
+                turretPose.distanceFrom(new Pose(goalX, goalY)),
+                Math.atan2(goalY - turretPose.getY(), goalX - turretPose.getX())
+        );
+    }
+
     //public SequentialGroup shoot = new SequentialGroup(
     //servoOpen,
     //new Delay(0.3)
@@ -118,31 +167,6 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
 
 
 
-    public double getClosestValidTurretAngle(double relativeGoalDegrees) {
-        // Option 1: The raw 0-360 input from your vector calculation
-        double option1 = relativeGoalDegrees;
-
-        // Option 2: The 360-degree alternative wrap position
-        double option2 = (option1 > 180.0) ? (option1 - 360.0) : (option1 + 360.0);
-
-        boolean opt1Valid = (option1 >= MIN_ANGLE && option1 <= MAX_ANGLE);
-        boolean opt2Valid = (option2 >= MIN_ANGLE && option2 <= MAX_ANGLE);
-
-        // If both options are mechanically safe, pick the one closest to current position
-        if (opt1Valid && opt2Valid) {
-            return (Math.abs(option1 - currentTurretPos) < Math.abs(option2 - currentTurretPos)) ? option1 : option2;
-        }
-
-        if (opt1Valid) {
-            return option1;
-        }
-        if (opt2Valid) {
-            return option2;
-        }
-
-        // Safety fallback clamp
-        return Math.max(MIN_ANGLE, Math.min(MAX_ANGLE, option1));
-    }
     public boolean manualTPS = true;
 
 
@@ -172,8 +196,10 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
         opmodeTimer = new Timer();
         intakeMotor = new MotorEx("intakeMotor");
         transfer = new MotorEx("transferMotor");
-        turret1  = new ServoEx("turretServo1");
-        turret2  = new ServoEx("turretServo2");
+        turret1 = ActiveOpMode.hardwareMap().get(ServoImplEx.class, "turretServo1");
+        turret2 = ActiveOpMode.hardwareMap().get(ServoImplEx.class,"turretServo2");
+        turret1.setPwmRange(new PwmControl.PwmRange(500, 2500));
+        turret2.setPwmRange(new PwmControl.PwmRange(500, 2500));
         hoodServo = new ServoEx("hoodServo");
         servoStopper = new ServoEx("stopperServo");
         telemetry.addLine("Initialized");
@@ -227,7 +253,7 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
                 new FollowPath(paths.Path11, false, 1.0),
                 //shoot,
                 new FollowPath(paths.Path12, true, 1.0),
-                new Delay(2.1),
+                new Delay(2.15),
                 new FollowPath(paths.Path13, false, 1.0),
 
 
@@ -235,7 +261,6 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
                 new FollowPath(paths.Path16, false, 1.0)
         );
     }
-    public static double turretOffset=-50;
 
     public void onStartButtonPressed() {
         opmodeTimer.resetTimer();
@@ -249,6 +274,13 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
 
     @Override
     public void onUpdate() {
+        List<LynxModule> allHubs = ActiveOpMode.hardwareMap().getAll(LynxModule.class);
+        for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
+        for (LynxModule hub : allHubs) {
+            hub.clearBulkCache();
+        }
         follower.update();
         Storage.currentPose = follower.getPose();
 
@@ -256,8 +288,9 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
 
         // --- Continuous Tracking / Calculation Logic ---
         Pose currPose = follower.getPose();
+        Pose turretPose = getTurretPose(currPose);
         double robotHeading = follower.getPose().getHeading();
-        Vector robotToGoalVector = new Vector(follower.getPose().distanceFrom(new Pose(goalX, goalY)), Math.atan2(goalY - currPose.getY(), goalX - currPose.getX()));
+        Vector robotToGoalVector = getTurretToGoalVector(turretPose);
         Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity().times(1), follower.getAcceleration());
 
             flywheelSpeed = results[0];
@@ -276,19 +309,18 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
         hoodServo.setPosition(hoodAngle);
 
         double headingError = results[2];
-        targetTurretAngle = headingError;
         double robotAngularVelocityRads = follower.getAngularVelocity();
         double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
-        double feedforwardOffset = robotAngularVelocityDegs * 0.2;
+        double feedforwardOffset = robotAngularVelocityDegs * 0.225;
         double targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset - feedforwardOffset);
         double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
         servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
         turret1.setPosition(servoPositionSignal);
         turret2.setPosition(servoPositionSignal);
-        currentTurretPos=targetTurretAngle;
+        currentTurretPos = targetTurretAngle;
         Pose futurepose = new Pose(follower.getPose().getX()+follower.getVelocity().getXComponent()*0.5, follower.getPose().getY()+follower.getVelocity().getYComponent()*0.5, follower.getHeading());
         //if((isOverlappingLaunchZone(PedroComponent.follower().getPose())||isOverlappingLaunchZone(futurepose)) && robotToGoalVector.getMagnitude()>40){
-        if(isOverlappingLaunchZone(futurepose) && robotToGoalVector.getMagnitude()>40){
+        if(isOverlappingLaunchZone(futurepose) && robotToGoalVector.getMagnitude()>45){
             intakeMotor.setPower(1);
             transfer.setPower(1);
             openStopper.schedule();

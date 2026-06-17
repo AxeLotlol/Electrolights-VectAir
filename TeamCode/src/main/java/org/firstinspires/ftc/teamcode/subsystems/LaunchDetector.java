@@ -5,19 +5,18 @@ public class LaunchDetector {
 
         private static class Triangle {
             double x1, y1, x2, y2, x3, y3;
-            double detT;
 
             Triangle(double x1, double y1, double x2, double y2, double x3, double y3) {
                 this.x1 = x1; this.y1 = y1;
                 this.x2 = x2; this.y2 = y2;
                 this.x3 = x3; this.y3 = y3;
-                this.detT = (y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3);
             }
 
             /**
              * Checks if the center point (px, py) is inside the triangle using Barycentric coordinates.
              */
             boolean containsCenter(double px, double py) {
+                double detT = (y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3);
                 double alpha = ((y2 - y3) * (px - x3) + (x3 - x2) * (py - y3)) / detT;
                 double beta = ((y3 - y1) * (px - x3) + (x1 - x3) * (py - y3)) / detT;
                 double gamma = 1.0 - alpha - beta;
@@ -33,8 +32,6 @@ public class LaunchDetector {
         // --- ROBOT DIMENSIONS (412.7mm x 429.612mm -> Inches) ---
         private static final double ROBOT_WIDTH = 16.248;
         private static final double ROBOT_LENGTH = 16.914;
-        private static final double HALF_ROBOT_WIDTH = ROBOT_WIDTH / 2.0;
-        private static final double HALF_ROBOT_LENGTH = ROBOT_LENGTH / 2.0;
 
         public static boolean isOverlappingLaunchZone(Pose robotPose) {
             double cx = robotPose.getX();
@@ -47,8 +44,8 @@ public class LaunchDetector {
             }
 
             // TEST 2: Straddling Check (Do the robot's perimeter walls cross the triangle tape lines?)
-            double hW = HALF_ROBOT_WIDTH;
-            double hL = HALF_ROBOT_LENGTH;
+            double hW = ROBOT_WIDTH / 2.0;
+            double hL = ROBOT_LENGTH / 2.0;
 
             double cos = Math.cos(heading);
             double sin = Math.sin(heading);

@@ -182,16 +182,21 @@ public class DriveTrain2 implements Subsystem {
 
     private Pose getTurretPose(Pose robotPose) {
         double heading = robotPose.getHeading();
-        double cosHeading = Math.cos(heading);
-        double sinHeading = Math.sin(heading);
         double turretX = robotPose.getX()
-                + turretForwardOffset * cosHeading
-                - turretStrafeOffset * sinHeading;
+                + turretForwardOffset * Math.cos(heading)
+                - turretStrafeOffset * Math.sin(heading);
         double turretY = robotPose.getY()
-                + turretForwardOffset * sinHeading
-                + turretStrafeOffset * cosHeading;
+                + turretForwardOffset * Math.sin(heading)
+                + turretStrafeOffset * Math.cos(heading);
 
         return new Pose(turretX, turretY, heading);
+    }
+
+    private Vector getTurretToGoalVector(Pose turretPose) {
+        return new Vector(
+                turretPose.distanceFrom(new Pose(goalX, goalY)),
+                Math.atan2(goalY - turretPose.getY(), goalX - turretPose.getX())
+        );
     }
 
     private void configureAllianceTarget() {
@@ -434,11 +439,8 @@ public class DriveTrain2 implements Subsystem {
         Pose turretPose = getTurretPose(currPose);
         double robotHeading = currPose.getHeading();
         Vector robotVelocity = follower.getVelocity();
-        double goalDeltaX = goalX - turretPose.getX();
-        double goalDeltaY = goalY - turretPose.getY();
-        double robotToGoalDistance = Math.hypot(goalDeltaX, goalDeltaY);
-        double robotToGoalTheta = Math.atan2(goalDeltaY, goalDeltaX);
-        calculateShotVectorandUpdateHeading(robotHeading, robotToGoalDistance, robotToGoalTheta, robotVelocity, 1.7, shotVectorResult);
+        Vector robotToGoalVector = getTurretToGoalVector(turretPose);
+        calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, robotVelocity, 1.7, shotVectorResult);
         double headingError = shotVectorResult.headingAngle;
         double flywheelSpeed = shotVectorResult.flywheelSpeed;
         shooter((float) flywheelSpeed);
@@ -459,7 +461,7 @@ public class DriveTrain2 implements Subsystem {
         Pose futurepose = new Pose(currPose.getX()+robotVelocity.getXComponent()*0.3, currPose.getY()+robotVelocity.getYComponent()*0.3, robotHeading);
         boolean futureLaunchZone = isOverlappingLaunchZone(futurepose);
         //if((isOverlappingLaunchZone(PedroComponent.follower().getPose())||isOverlappingLaunchZone(futurepose)) && robotToGoalVector.getMagnitude()>40){
-        if(((launchZone||futureLaunchZone) && robotToGoalDistance>50)|| shooting ==true){
+        if(((launchZone||futureLaunchZone) && robotToGoalVector.getMagnitude()>50)|| shooting ==true){
             setIntakePowerCached(1);
             setTransferPowerCached(1);
             setStopperPositionCached(openStopperPos);

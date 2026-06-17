@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode.opModes.TeleOp;
 
-
-import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
-
 import com.pedropathing.geometry.Pose;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
@@ -50,7 +47,7 @@ public class TeleOpRed2 extends NextFTCOpMode {
                 .whenBecomesFalse(() -> intakeMotor.setPower(0));
         Gamepads.gamepad1().leftTrigger().greaterThan(0.3).whenBecomesTrue(()-> transfer.setPower(1))
                 .whenBecomesFalse(() -> transfer.setPower(0));
-        Gamepads.gamepad1().x().whenBecomesTrue(()->follower.setPose(new Pose(79.967,9.271,Math.toRadians(90))));
+        Gamepads.gamepad1().x().whenBecomesTrue(()-> PedroComponent.follower().setPose(new Pose(79.967,9.271,Math.toRadians(90))));
 
         // Backup Controls
         Gamepads.gamepad2().leftTrigger().greaterThan(0.5).whenBecomesTrue(() -> DriveTrain2.turretOffset -= DriveTrain2.turretOffsetStep);

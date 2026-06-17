@@ -81,6 +81,9 @@ public class DriveTrain2 implements Subsystem {
     public Command driveToGate = new LambdaCommand()
             .setStart(() -> dToGate = true);
     public static boolean dToGate = false;
+    // Loop time tracking
+    private long lastLoopTime = 0;
+    private double loopTimeMs = 0;
     public Pose currPose;
 
 
@@ -347,6 +350,12 @@ public class DriveTrain2 implements Subsystem {
 
     @Override
     public void periodic() {
+        long currentTime = System.nanoTime();
+        if (lastLoopTime != 0) {
+            loopTimeMs = (currentTime - lastLoopTime) / 1_000_000.0;
+        }
+        lastLoopTime = currentTime;
+
         if (firsttime == true) {
             // Schedule the command stored in the localize variable
             Gamepads.gamepad1().rightBumper().whenBecomesTrue(()->openStopper.schedule())
@@ -406,7 +415,7 @@ public class DriveTrain2 implements Subsystem {
             closeStopper.schedule();
         }
 
-
+        ActiveOpMode.telemetry().addData("Loop Time (ms)", loopTimeMs);
         //ActiveOpMode.telemetry().addData("Motor1Speed", s1speed);
         //ActiveOpMode.telemetry().addData("Motor2Speed", s2speed);
         ActiveOpMode.telemetry().addData("far", far);

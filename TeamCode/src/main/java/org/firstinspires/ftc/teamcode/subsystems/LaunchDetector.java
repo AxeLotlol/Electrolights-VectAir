@@ -37,10 +37,10 @@ public class LaunchDetector {
         private static final double HALF_ROBOT_LENGTH = ROBOT_LENGTH / 2.0;
 
         public static boolean isOverlappingLaunchZone(Pose robotPose) {
-            double cx = robotPose.getX();
-            double cy = robotPose.getY();
-            double heading = robotPose.getHeading();
+            return isOverlappingLaunchZone(robotPose.getX(), robotPose.getY(), robotPose.getHeading());
+        }
 
+        public static boolean isOverlappingLaunchZone(double cx, double cy, double heading) {
             // TEST 1: Absolute Subsumption Check (Is the robot's center fully inside either zone?)
             if (LARGE_LAUNCH_ZONE.containsCenter(cx, cy) || SMALL_LAUNCH_ZONE.containsCenter(cx, cy)) {
                 return true;

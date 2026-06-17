@@ -15,7 +15,6 @@ import dev.nextftc.core.components.SubsystemComponent;
 import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.ftc.Gamepads;
 import dev.nextftc.ftc.NextFTCOpMode;
-import dev.nextftc.ftc.components.BulkReadComponent;
 import dev.nextftc.hardware.impl.MotorEx;
 
 
@@ -27,7 +26,6 @@ public class TeleOpRed2 extends NextFTCOpMode {
         addComponents(
                 new PedroComponent(Constants::createFollower),
                 new SubsystemComponent(DriveTrain2.INSTANCE),
-                BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE
 
 

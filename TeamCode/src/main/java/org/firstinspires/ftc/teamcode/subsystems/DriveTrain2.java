@@ -188,20 +188,6 @@ public class DriveTrain2 implements Subsystem {
         return degrees;
     }
 
-    private Pose getTurretPose(Pose robotPose) {
-        double heading = robotPose.getHeading();
-        double cosHeading = Math.cos(heading);
-        double sinHeading = Math.sin(heading);
-        double turretX = robotPose.getX()
-                + turretForwardOffset * cosHeading
-                - turretStrafeOffset * sinHeading;
-        double turretY = robotPose.getY()
-                + turretForwardOffset * sinHeading
-                + turretStrafeOffset * cosHeading;
-
-        return new Pose(turretX, turretY, heading);
-    }
-
     private void configureAllianceTarget() {
         if (isRed()) {
             alliance = -1;
@@ -452,13 +438,21 @@ public class DriveTrain2 implements Subsystem {
         follower.update();
 
 
-        Telemetry telemetry = ActiveOpMode.telemetry();
         Pose currPose = follower.getPose();
-        Pose turretPose = getTurretPose(currPose);
         double robotHeading = currPose.getHeading();
         Vector robotVelocity = follower.getVelocity();
-        double goalDeltaX = goalX - turretPose.getX();
-        double goalDeltaY = goalY - turretPose.getY();
+        double robotX = currPose.getX();
+        double robotY = currPose.getY();
+        double cosHeading = Math.cos(robotHeading);
+        double sinHeading = Math.sin(robotHeading);
+        double turretX = robotX
+                + turretForwardOffset * cosHeading
+                - turretStrafeOffset * sinHeading;
+        double turretY = robotY
+                + turretForwardOffset * sinHeading
+                + turretStrafeOffset * cosHeading;
+        double goalDeltaX = goalX - turretX;
+        double goalDeltaY = goalY - turretY;
         double robotToGoalDistance = Math.hypot(goalDeltaX, goalDeltaY);
         double robotToGoalTheta = Math.atan2(goalDeltaY, goalDeltaX);
         boolean shouldUpdateTelemetry = currentTime - lastTelemetryTime >= TELEMETRY_INTERVAL_NANOS;
@@ -477,11 +471,24 @@ public class DriveTrain2 implements Subsystem {
         setTurretPositionCached(servoPositionSignal);
         currentTurretPos = targetTurretAngle;
 
-        boolean launchZone = isOverlappingLaunchZone(currPose);
-        Pose futurepose = new Pose(currPose.getX()+robotVelocity.getXComponent()*0.3, currPose.getY()+robotVelocity.getYComponent()*0.3, robotHeading);
-        boolean futureLaunchZone = isOverlappingLaunchZone(futurepose);
+        boolean launchZone = false;
+        boolean futureLaunchZone = false;
+        boolean shouldFeed = shooting == true;
+        if (!shouldFeed && robotToGoalDistance > 50) {
+            launchZone = isOverlappingLaunchZone(robotX, robotY, robotHeading);
+            if (!launchZone) {
+                futureLaunchZone = isOverlappingLaunchZone(
+                        robotX+robotVelocity.getXComponent()*0.3,
+                        robotY+robotVelocity.getYComponent()*0.3,
+                        robotHeading
+                );
+            }
+            shouldFeed = launchZone || futureLaunchZone;
+        } else if (shouldUpdateTelemetry) {
+            launchZone = isOverlappingLaunchZone(robotX, robotY, robotHeading);
+        }
         //if((isOverlappingLaunchZone(PedroComponent.follower().getPose())||isOverlappingLaunchZone(futurepose)) && robotToGoalVector.getMagnitude()>40){
-        if(((launchZone||futureLaunchZone) && robotToGoalDistance>50)|| shooting ==true){
+        if(shouldFeed){
             setIntakePowerCached(1);
             setTransferPowerCached(1);
             setStopperPositionCached(openStopperPos);
@@ -493,6 +500,7 @@ public class DriveTrain2 implements Subsystem {
         }
 
         if (shouldUpdateTelemetry) {
+            Telemetry telemetry = ActiveOpMode.telemetry();
             lastTelemetryTime = currentTime;
             telemetry.addData("hoodAngle", shotVectorResult.hoodDegrees);
             telemetry.addData("ballVelocity", shotVectorResult.ballVelocity);
@@ -520,10 +528,10 @@ public class DriveTrain2 implements Subsystem {
 
             telemetry.addData("goalX", goalX);
             telemetry.addData("goalY", goalY);
-            telemetry.addData("RobotX", currPose.getX());
-            telemetry.addData("RobotY", currPose.getY());
-            telemetry.addData("TurretX", turretPose.getX());
-            telemetry.addData("TurretY", turretPose.getY());
+            telemetry.addData("RobotX", robotX);
+            telemetry.addData("RobotY", robotY);
+            telemetry.addData("TurretX", turretX);
+            telemetry.addData("TurretY", turretY);
             //ActiveOpMode.telemetry().addData("goalXDist", goalXDist);
             //ActiveOpMode.telemetry().addData("goalYDist", goalYDist);
             //ActiveOpMode.telemetry().addData("robotHeading", Math.toDegrees(robotHeading));

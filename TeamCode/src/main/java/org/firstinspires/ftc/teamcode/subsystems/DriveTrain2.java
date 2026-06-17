@@ -21,6 +21,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImpl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.pedroPathing.Tuning;
 
 import java.util.function.Supplier;
@@ -85,6 +86,14 @@ public class DriveTrain2 implements Subsystem {
     private long lastLoopTime = 0;
     private double loopTimeMs = 0;
     public Pose currPose;
+    private static final double POWER_EPSILON = 0.0001;
+    private static final double SERVO_EPSILON = 0.0001;
+    private static double lastStopperPosition = Double.NaN;
+    private double lastIntakePower = Double.NaN;
+    private double lastTransferPower = Double.NaN;
+    private double lastHoodPosition = Double.NaN;
+    private double lastTurretPosition = Double.NaN;
+    private final ShooterCalc.ShotVectorResult shotVectorResult = new ShooterCalc.ShotVectorResult();
 
 
     public Supplier<Double> yVCtx;
@@ -138,14 +147,12 @@ public class DriveTrain2 implements Subsystem {
     public Command turretzero = new LambdaCommand()
             .setStart(() -> {
                 //`5transfer2.setPosition(-0.25);
-                turret1.setPosition(0);
-                turret2.setPosition(0);
+                setTurretPositionCached(0);
             }).setIsDone(() -> true);
     public Command turrethalf = new LambdaCommand()
             .setStart(() -> {
                 //`5transfer2.setPosition(-0.25);
-                turret1.setPosition(0.5);
-                turret2.setPosition(0.5);
+                setTurretPositionCached(0.5);
             }).setIsDone(() -> true);
 
 
@@ -210,18 +217,65 @@ public class DriveTrain2 implements Subsystem {
 
     public static Command closeStopper = new LambdaCommand()
             .setStart(() -> {
-                stopperServo.setPosition(closeStopperPos); // close
+                setStopperPositionCached(closeStopperPos); // close
             }).setIsDone(() -> true);
     public static Command openStopper = new LambdaCommand()
             .setStart(() -> {
-                stopperServo.setPosition(openStopperPos); // open
+                setStopperPositionCached(openStopperPos); // open
             }).setIsDone(() -> true);
+
+    private static void setStopperPositionCached(double position) {
+        if (Double.isNaN(lastStopperPosition) || Math.abs(position - lastStopperPosition) > SERVO_EPSILON) {
+            stopperServo.setPosition(position);
+            lastStopperPosition = position;
+        }
+    }
+
+    private void setIntakePowerCached(double power) {
+        if (Double.isNaN(lastIntakePower) || Math.abs(power - lastIntakePower) > POWER_EPSILON) {
+            intakeMotor.setPower(power);
+            lastIntakePower = power;
+        }
+    }
+
+    private void setTransferPowerCached(double power) {
+        if (Double.isNaN(lastTransferPower) || Math.abs(power - lastTransferPower) > POWER_EPSILON) {
+            transfer.setPower(power);
+            lastTransferPower = power;
+        }
+    }
+
+    public void invalidateIntakeTransferPowerCache() {
+        lastIntakePower = Double.NaN;
+        lastTransferPower = Double.NaN;
+    }
+
+    private void setHoodPositionCached(double position) {
+        if (Double.isNaN(lastHoodPosition) || Math.abs(position - lastHoodPosition) > SERVO_EPSILON) {
+            hoodServo.setPosition(position);
+            lastHoodPosition = position;
+        }
+    }
+
+    private void setTurretPositionCached(double position) {
+        if (Double.isNaN(lastTurretPosition) || Math.abs(position - lastTurretPosition) > SERVO_EPSILON) {
+            turret1.setPosition(position);
+            turret2.setPosition(position);
+            lastTurretPosition = position;
+        }
+    }
 
     @Override
     public void initialize() {
 
         firsttime = true;
         shooting = false;
+        lastIntakePower = Double.NaN;
+        lastTransferPower = Double.NaN;
+        lastHoodPosition = Double.NaN;
+        lastTurretPosition = Double.NaN;
+        lastStopperPosition = Double.NaN;
+        Flywheel.resetPowerCache();
         follower = PedroComponent.follower();
         intakeMotor = new MotorEx("intakeMotor");
         transfer = new MotorEx("transferMotor");
@@ -380,47 +434,50 @@ public class DriveTrain2 implements Subsystem {
         follower.update();
 
 
+        Telemetry telemetry = ActiveOpMode.telemetry();
         Pose currPose = follower.getPose();
         Pose turretPose = getTurretPose(currPose);
         double robotHeading = currPose.getHeading();
+        Vector robotVelocity = follower.getVelocity();
         Vector robotToGoalVector = getTurretToGoalVector(turretPose);
-        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity(), 1.7);
-        Double headingError = results[2];
-        double flywheelSpeed = results[0];
+        calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, robotVelocity, 1.7, shotVectorResult);
+        double headingError = shotVectorResult.headingAngle;
+        double flywheelSpeed = shotVectorResult.flywheelSpeed;
         shooter((float) flywheelSpeed);
-        double hoodAngle = results[1];
-        hoodServo.setPosition(hoodAngle);
+        double hoodAngle = shotVectorResult.hoodTime;
+        setHoodPositionCached(hoodAngle);
         double robotAngularVelocityRads = follower.getAngularVelocity();
         double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
         double feedforwardOffset = robotAngularVelocityDegs * 0.225;
         double targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset - feedforwardOffset);
         double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
         servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
-        turret1.setPosition(servoPositionSignal);
-        turret2.setPosition(servoPositionSignal);
+        setTurretPositionCached(servoPositionSignal);
         currentTurretPos = targetTurretAngle;
 
-        ActiveOpMode.telemetry().addData("launch?", isOverlappingLaunchZone(follower.getPose()));
-        ActiveOpMode.telemetry().addData("turret", servoPositionSignal);
-        Pose futurepose = new Pose(follower.getPose().getX()+follower.getVelocity().getXComponent()*0.3, follower.getPose().getY()+follower.getVelocity().getYComponent()*0.3, follower.getHeading());
+        boolean launchZone = isOverlappingLaunchZone(currPose);
+        telemetry.addData("launch?", launchZone);
+        telemetry.addData("turret", servoPositionSignal);
+        Pose futurepose = new Pose(currPose.getX()+robotVelocity.getXComponent()*0.3, currPose.getY()+robotVelocity.getYComponent()*0.3, robotHeading);
+        boolean futureLaunchZone = isOverlappingLaunchZone(futurepose);
         //if((isOverlappingLaunchZone(PedroComponent.follower().getPose())||isOverlappingLaunchZone(futurepose)) && robotToGoalVector.getMagnitude()>40){
-        if(((isOverlappingLaunchZone(follower.getPose())||isOverlappingLaunchZone(futurepose)) && robotToGoalVector.getMagnitude()>50)|| shooting ==true){
-            intakeMotor.setPower(1);
-            transfer.setPower(1);
-            openStopper.schedule();
+        if(((launchZone||futureLaunchZone) && robotToGoalVector.getMagnitude()>50)|| shooting ==true){
+            setIntakePowerCached(1);
+            setTransferPowerCached(1);
+            setStopperPositionCached(openStopperPos);
         }
         else{
-            intakeMotor.setPower(0);
-            transfer.setPower(0);
-            closeStopper.schedule();
+            setIntakePowerCached(0);
+            setTransferPowerCached(0);
+            setStopperPositionCached(closeStopperPos);
         }
 
-        ActiveOpMode.telemetry().addData("Loop Time (ms)", loopTimeMs);
+        telemetry.addData("Loop Time (ms)", loopTimeMs);
         //ActiveOpMode.telemetry().addData("Motor1Speed", s1speed);
         //ActiveOpMode.telemetry().addData("Motor2Speed", s2speed);
-        ActiveOpMode.telemetry().addData("far", far);
-        ActiveOpMode.telemetry().addData("alliance", alliance);
-        ActiveOpMode.telemetry().addData("hoodPos", hoodServo.getPosition());
+        telemetry.addData("far", far);
+        telemetry.addData("alliance", alliance);
+        telemetry.addData("hoodPos", hoodAngle);
         //ActiveOpMode.telemetry().addData("servo2pos", hoodServo2.getPosition());
 
         //double frontLeftRPM = 28 / 60 * fL.getVelocity();
@@ -432,28 +489,27 @@ public class DriveTrain2 implements Subsystem {
         //ActiveOpMode.telemetry().addData("frontLeftRPM", frontLeftRPM);
         //ActiveOpMode.telemetry().addData("backLeftRPM", backLeftRPM);
 
-        ActiveOpMode.telemetry().addData("goalX", goalX);
-        ActiveOpMode.telemetry().addData("goalY", goalY);
-        ActiveOpMode.telemetry().addData("RobotX", currPose.getX());
-        ActiveOpMode.telemetry().addData("RobotY", currPose.getY());
-        ActiveOpMode.telemetry().addData("TurretX", turretPose.getX());
-        ActiveOpMode.telemetry().addData("TurretY", turretPose.getY());
+        telemetry.addData("goalX", goalX);
+        telemetry.addData("goalY", goalY);
+        telemetry.addData("RobotX", currPose.getX());
+        telemetry.addData("RobotY", currPose.getY());
+        telemetry.addData("TurretX", turretPose.getX());
+        telemetry.addData("TurretY", turretPose.getY());
         //ActiveOpMode.telemetry().addData("goalXDist", goalXDist);
         //ActiveOpMode.telemetry().addData("goalYDist", goalYDist);
         //ActiveOpMode.telemetry().addData("robotHeading", Math.toDegrees(robotHeading));
-        ActiveOpMode.telemetry().addData("velocity", follower.getVelocity());
-        ActiveOpMode.telemetry().addData("headingError", headingError);
-        ActiveOpMode.telemetry().addData("angularFF", feedforwardOffset);
+        telemetry.addData("velocity", robotVelocity);
+        telemetry.addData("headingError", headingError);
+        telemetry.addData("angularFF", feedforwardOffset);
         //ActiveOpMode.telemetry().addData("distance", distance);
         //ActiveOpMode.telemetry().addData("yVCtx", visionYawCommand(headingError));
-        ActiveOpMode.telemetry().addData("Robot Heading: ",follower.getHeading());
-        ActiveOpMode.telemetry().addLine("==== BACKUP CONSTANTS ====");
-        ActiveOpMode.telemetry().addData("Turret Offset", turretOffset);
-        ActiveOpMode.telemetry().addData("Turret Forward Offset", turretForwardOffset);
-        ActiveOpMode.telemetry().addData("Turret Strafe Offset", turretStrafeOffset);
-        ActiveOpMode.telemetry().addData("RPM Vertical Shift", ShooterCalc.verticalShift);
-        ActiveOpMode.telemetry().update();
-        Gamepads.gamepad1().rightTrigger().greaterThan(0.3).whenBecomesTrue(shooter);
+        telemetry.addData("Robot Heading: ",robotHeading);
+        telemetry.addLine("==== BACKUP CONSTANTS ====");
+        telemetry.addData("Turret Offset", turretOffset);
+        telemetry.addData("Turret Forward Offset", turretForwardOffset);
+        telemetry.addData("Turret Strafe Offset", turretStrafeOffset);
+        telemetry.addData("RPM Vertical Shift", ShooterCalc.verticalShift);
+        telemetry.update();
 
 
 

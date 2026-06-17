@@ -47,41 +47,35 @@ public class LaunchDetector {
             double hW = ROBOT_WIDTH / 2.0;
             double hL = ROBOT_LENGTH / 2.0;
 
-            double[][] localCorners = {
-                    { hL, -hW}, { hL,  hW}, {-hL,  hW}, {-hL, -hW}
-            };
-
-            double[][] globalCorners = new double[4][2];
             double cos = Math.cos(heading);
             double sin = Math.sin(heading);
 
-            for (int i = 0; i < 4; i++) {
-                globalCorners[i][0] = cx + (localCorners[i][0] * cos - localCorners[i][1] * sin);
-                globalCorners[i][1] = cy + (localCorners[i][0] * sin + localCorners[i][1] * cos);
-            }
+            double x0 = cx + (hL * cos + hW * sin);
+            double y0 = cy + (hL * sin - hW * cos);
+            double x1 = cx + (hL * cos - hW * sin);
+            double y1 = cy + (hL * sin + hW * cos);
+            double x2 = cx + (-hL * cos - hW * sin);
+            double y2 = cy + (-hL * sin + hW * cos);
+            double x3 = cx + (-hL * cos + hW * sin);
+            double y3 = cy + (-hL * sin - hW * cos);
 
-            return robotEdgesIntersectTriangle(globalCorners, LARGE_LAUNCH_ZONE) ||
-                    robotEdgesIntersectTriangle(globalCorners, SMALL_LAUNCH_ZONE);
+            return robotEdgesIntersectTriangle(x0, y0, x1, y1, x2, y2, x3, y3, LARGE_LAUNCH_ZONE) ||
+                    robotEdgesIntersectTriangle(x0, y0, x1, y1, x2, y2, x3, y3, SMALL_LAUNCH_ZONE);
         }
 
-        private static boolean robotEdgesIntersectTriangle(double[][] rCorners, Triangle t) {
-            double[][] tEdges = {
-                    {t.x1, t.y1, t.x2, t.y2},
-                    {t.x2, t.y2, t.x3, t.y3},
-                    {t.x3, t.y3, t.x1, t.y1}
-            };
+        private static boolean robotEdgesIntersectTriangle(double x0, double y0, double x1, double y1,
+                                                           double x2, double y2, double x3, double y3,
+                                                           Triangle t) {
+            return robotEdgeIntersectsTriangle(x0, y0, x1, y1, t)
+                    || robotEdgeIntersectsTriangle(x1, y1, x2, y2, t)
+                    || robotEdgeIntersectsTriangle(x2, y2, x3, y3, t)
+                    || robotEdgeIntersectsTriangle(x3, y3, x0, y0, t);
+        }
 
-            for (int i = 0; i < 4; i++) {
-                double rx1 = rCorners[i][0]; double ry1 = rCorners[i][1];
-                double rx2 = rCorners[(i + 1) % 4][0]; double ry2 = rCorners[(i + 1) % 4][1];
-
-                for (double[] tEdge : tEdges) {
-                    if (lineIntersectsSegment(rx1, ry1, rx2, ry2, tEdge[0], tEdge[1], tEdge[2], tEdge[3])) {
-                        return true;
-                    }
-                }
-            }
-            return false;
+        private static boolean robotEdgeIntersectsTriangle(double rx1, double ry1, double rx2, double ry2, Triangle t) {
+            return lineIntersectsSegment(rx1, ry1, rx2, ry2, t.x1, t.y1, t.x2, t.y2)
+                    || lineIntersectsSegment(rx1, ry1, rx2, ry2, t.x2, t.y2, t.x3, t.y3)
+                    || lineIntersectsSegment(rx1, ry1, rx2, ry2, t.x3, t.y3, t.x1, t.y1);
         }
 
         private static boolean lineIntersectsSegment(double x1, double y1, double x2, double y2,

@@ -30,7 +30,13 @@ public class ShooterCalc implements Subsystem {
 
     public static double accelScalar = 0.015; // Set to 0 to disable
 
-    public static Double[] calculateShotVectorandUpdateHeading(double robotHeading, Vector robotToGoalVector, Vector robotVel, double sotmFactor){
+    public static class ShotVectorResult {
+        public double flywheelSpeed;
+        public double hoodTime;
+        public double headingAngle;
+    }
+
+    public static void calculateShotVectorandUpdateHeading(double robotHeading, Vector robotToGoalVector, Vector robotVel, double sotmFactor, ShotVectorResult result){
         double g = 32.174*12;
         double x = robotToGoalVector.getMagnitude()-ShooterConstants.PASS_THROUGH_POINT_RADIUS;
         double temp = x/39.37;
@@ -98,7 +104,14 @@ public class ShooterCalc implements Subsystem {
         ActiveOpMode.telemetry().addData("ballVelocity", flywheelSpeed);
         ActiveOpMode.telemetry().addData("flywheelSpeed", requiredTPS);
 
-        Double[] returnvalue = {requiredTPS, hoodTime, headingAngle};
-        return returnvalue;
+        result.flywheelSpeed = requiredTPS;
+        result.hoodTime = hoodTime;
+        result.headingAngle = headingAngle;
+    }
+
+    public static Double[] calculateShotVectorandUpdateHeading(double robotHeading, Vector robotToGoalVector, Vector robotVel, double sotmFactor){
+        ShotVectorResult result = new ShotVectorResult();
+        calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, robotVel, sotmFactor, result);
+        return new Double[] {result.flywheelSpeed, result.hoodTime, result.headingAngle};
     }
 }

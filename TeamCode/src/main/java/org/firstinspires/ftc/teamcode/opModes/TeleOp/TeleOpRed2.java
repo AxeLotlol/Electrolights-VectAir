@@ -7,8 +7,6 @@ import com.pedropathing.geometry.Pose;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain2;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterCalc;
-import org.firstinspires.ftc.teamcode.vision.KalmanFilter;
-import org.firstinspires.ftc.teamcode.vision.Limelight;
 
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
@@ -22,10 +20,6 @@ import dev.nextftc.hardware.impl.MotorEx;
 public class TeleOpRed2 extends NextFTCOpMode {
     public MotorEx intakeMotor;
     public MotorEx transfer;
-
-    private Limelight limelight;
-    private KalmanFilter kalmanFilter;
-    private boolean limelightEnabled = false;
 
     public TeleOpRed2() {
         addComponents(
@@ -61,43 +55,10 @@ public class TeleOpRed2 extends NextFTCOpMode {
         Gamepads.gamepad2().a().whenBecomesTrue(() -> DriveTrain2.turretOffset = 0);
         Gamepads.gamepad2().dpadUp().whenBecomesTrue(() -> ShooterCalc.verticalShift += ShooterCalc.verticalShiftStep);
         Gamepads.gamepad2().dpadDown().whenBecomesTrue(() -> ShooterCalc.verticalShift -= ShooterCalc.verticalShiftStep);
-
-        // Limelight + Kalman Filter — pipeline setup only, no polling until toggled
-        limelight = new Limelight(hardwareMap);
-        limelight.initialize();
-        kalmanFilter = new KalmanFilter(follower.getPose(), 0.05, 0.3);
-
-        Gamepads.gamepad1().dpadLeft().whenBecomesTrue(() -> {
-            limelightEnabled = !limelightEnabled;
-            if (limelightEnabled) {
-                limelight.start();
-                telemetry.addLine("Limelight: ON");
-                gamepad1.rumble(100);
-            } else {
-                limelight.stop();
-                telemetry.addLine("Limelight: OFF");
-                gamepad1.rumble(0.5, 0.5, 100);
-            }
-        });
     }
 
     @Override
     public void onUpdate() {
-        if (limelightEnabled) {
-            limelight.periodic();
-            Pose odomPose = follower.getPose();
-            kalmanFilter.predict(odomPose);
-
-            if (limelight.canSeeTarget()) {
-                double dist = limelight.getDistanceInches();
-                Pose visionPose = limelight.getPose(odomPose.getHeading());
-                if (visionPose != null) {
-                    kalmanFilter.correct(visionPose, dist);
-                    follower.setPose(kalmanFilter.getFusedPose(odomPose.getHeading()));
-                    telemetry.addData("Limelight Dist (in)", dist);
-                }
-            }
-        }
     }
 
     @Override
@@ -105,9 +66,6 @@ public class TeleOpRed2 extends NextFTCOpMode {
     }
 
     public void onStop(){
-        if (limelight != null && limelightEnabled) {
-            limelight.stop();
-        }
         red=false;
     }
 }

@@ -16,6 +16,8 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.Vector;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+// import org.firstinspires.ftc.teamcode.vision.KalmanFilter;
+// import org.firstinspires.ftc.teamcode.vision.Limelight;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -70,6 +72,11 @@ public class DriveTrain2 implements Subsystem {
 
     public int alliance;
     public boolean far;
+
+    // Limelight + Kalman Filter (commented out until mount is ready)
+    // private Limelight limelight;
+    // private KalmanFilter kalmanFilter;
+    // private boolean limelightEnabled = false;
 
     private ServoImplEx turret1;
     private ServoImplEx turret2;
@@ -255,6 +262,24 @@ public class DriveTrain2 implements Subsystem {
         turret1.setPwmRange(new PwmControl.PwmRange(500, 2500));
         turret2.setPwmRange(new PwmControl.PwmRange(500, 2500));
         follower.update();
+
+        // Limelight + Kalman Filter initialization (commented out until mount is ready)
+        // limelight = new Limelight(ActiveOpMode.hardwareMap());
+        // limelight.initialize();
+        // kalmanFilter = new KalmanFilter(follower.getPose(), 0.05, 0.3);
+
+        // Gamepads.gamepad1().dpadLeft().whenBecomesTrue(() -> {
+        //     limelightEnabled = !limelightEnabled;
+        //     if (limelightEnabled) {
+        //         limelight.start();
+        //         ActiveOpMode.telemetry().addLine("Limelight: ON");
+        //         Gamepads.gamepad1().rumble(100);
+        //     } else {
+        //         limelight.stop();
+        //         ActiveOpMode.telemetry().addLine("Limelight: OFF");
+        //         Gamepads.gamepad1().rumble(0.5, 0.5, 100);
+        //     }
+        // });
     }
     private boolean autoShoot = true;
 
@@ -393,6 +418,22 @@ public class DriveTrain2 implements Subsystem {
         }
         follower.update();
 
+        // Limelight + Kalman Filter periodic update (commented out until mount is ready)
+        // if (limelightEnabled) {
+        //     limelight.periodic();
+        //     Pose odomPose = follower.getPose();
+        //     kalmanFilter.predict(odomPose);
+        //
+        //     if (limelight.canSeeTarget()) {
+        //         double dist = limelight.getDistanceInches();
+        //         Pose visionPose = limelight.getPose(odomPose.getHeading());
+        //         if (visionPose != null) {
+        //             kalmanFilter.correct(visionPose, dist);
+        //             follower.setPose(kalmanFilter.getFusedPose(odomPose.getHeading()));
+        //             ActiveOpMode.telemetry().addData("Limelight Dist (in)", dist);
+        //         }
+        //     }
+        // }
 
         Pose currPose = follower.getPose();
         Pose turretPose = getTurretPose(currPose);

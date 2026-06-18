@@ -39,7 +39,7 @@ public class AutoShooterCalc implements Subsystem {
             hoodAngle=Math.toRadians(75);
         }
         double flywheelSpeed = Math.sqrt(g * x * x / (2 * Math.pow(Math.cos(hoodAngle), 2) * (x * Math. tan(hoodAngle) - y)));
-        if(x<50){
+        if(x<60){
             a=Math.toRadians(-45);
             y=SCORE_HEIGHT + 4;
         }

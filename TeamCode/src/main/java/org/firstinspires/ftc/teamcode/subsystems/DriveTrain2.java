@@ -5,7 +5,7 @@ import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpRed2.isRed;
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 import static org.firstinspires.ftc.teamcode.subsystems.LaunchDetector.isOverlappingLaunchZone;
-import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
+import static org.firstinspires.ftc.teamcode.subsystems.AutoShooterCalc.calculateShotVectorandUpdateHeading;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
@@ -75,6 +75,7 @@ public class DriveTrain2 implements Subsystem {
     private ServoImplEx turret2;
 
     public static double turretOffset = 8;
+    public static double turretOffset2 = -8;
     public static double turretOffsetStep = -5;
     // Inches from the Pinpoint/Pedro robot pose origin to the turret pivot.
     public static double turretForwardOffset = -0.52588;
@@ -352,6 +353,7 @@ public class DriveTrain2 implements Subsystem {
     public static void shootreal(){
         //shoot = true;
     }
+    private double targetTurretAngle;
 
 
 
@@ -398,7 +400,7 @@ public class DriveTrain2 implements Subsystem {
         Pose turretPose = getTurretPose(currPose);
         double robotHeading = currPose.getHeading();
         Vector robotToGoalVector = getTurretToGoalVector(turretPose);
-        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity(), 1.7);
+        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity(), follower.getAcceleration());
         Double headingError = results[2];
         double flywheelSpeed = results[0];
         shooter((float) flywheelSpeed);
@@ -406,8 +408,14 @@ public class DriveTrain2 implements Subsystem {
         hoodServo.setPosition(hoodAngle);
         double robotAngularVelocityRads = follower.getAngularVelocity();
         double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
-        double feedforwardOffset = robotAngularVelocityDegs * 0.225;
-        double targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset - feedforwardOffset);
+        double feedforwardOffset = robotAngularVelocityDegs * 0.2;
+        if(alliance == -1){
+            targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset - feedforwardOffset);
+        }
+        else{
+            targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset2 - feedforwardOffset);
+        }
+
         double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
         servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
         turret1.setPosition(servoPositionSignal + servoOffset);

@@ -59,7 +59,7 @@ public class Blue24BallSpamLinearPivot extends NextFTCOpMode {
 
     public static double startX = 33.83; // 144 - 110.17
     public static double startY = 134.4;
-    public Pose start = new Pose(startX, startY, Math.toRadians(-90)); // 180 - 270
+    public Pose start = new Pose(startX, startY, Math.toRadians(270)); // 180 - 270
 
     // --- Turret tracking ---
     private ServoEx servoStopper;
@@ -67,8 +67,11 @@ public class Blue24BallSpamLinearPivot extends NextFTCOpMode {
 
     double goalY = 144;
     double goalX = 0; // 144 - 144
-    public static double gateX = 11; // 144 - 133.2
-    public static double gateY = 59.25;
+    public static double gateX = 13.5   ; // 144 - 133.2
+    public static double gateY = 59.1;
+
+    public static double gateX2 = 13.5;
+    public static double gateY2 = 58.85;
 
     public static double gateHeading = 138.75; // 180 - 41.25
 
@@ -86,11 +89,16 @@ public class Blue24BallSpamLinearPivot extends NextFTCOpMode {
     private boolean matchStarted = false;
     private boolean autoShoot = false;
     private boolean useAutoGoalTracking = true;
+
+    // --- Goal Tracking Override Flags ---
+    private boolean isOverridden = false;
+    private double overriddenTurretAngle = 0.0;
+
     private MotorEx intakeMotor;
     private ServoImplEx turret1;
     private ServoImplEx turret2;
 
-    public static double turretOffset = 6;
+    public static double turretOffset = -9;
     public static double turretOffsetStep = -5;
     // Inches from the Pinpoint/Pedro robot pose origin to the turret pivot.
     public static double turretForwardOffset = -0.52588;
@@ -171,6 +179,24 @@ public class Blue24BallSpamLinearPivot extends NextFTCOpMode {
                 .setStart(()->preload=false);
     }
 
+    // --- Custom Override Tracking Commands ---
+    public Command setTurretHeading(double degrees) {
+        return new LambdaCommand("Set Turret Heading: " + degrees)
+                .setStart(() -> {
+                    isOverridden = true;
+                    overriddenTurretAngle = getClosestValidTurretAngle(degrees);
+                })
+                .setIsDone(() -> true);
+    }
+
+    public Command enableGoalTracking() {
+        return new LambdaCommand("Enable Goal Tracking")
+                .setStart(() -> {
+                    isOverridden = false;
+                })
+                .setIsDone(() -> true);
+    }
+
     public static MotorEx flywheel = new MotorEx("launchingmotor");
     public static MotorEx flywheel2 = new MotorEx("launchingmotor2");
 
@@ -180,6 +206,7 @@ public class Blue24BallSpamLinearPivot extends NextFTCOpMode {
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
+        setTurretHeading(140);
         follower = PedroComponent.follower();
         follower.setStartingPose(start);
         paths = new Paths(follower);
@@ -215,8 +242,9 @@ public class Blue24BallSpamLinearPivot extends NextFTCOpMode {
 
     public Command Auto() {
         return new SequentialGroup(
+                setTurretHeading(-160),
                 new FollowPath(paths.Path1, false, 1.0),
-
+                enableGoalTracking(),
                 intakeMotorOn,
                 new FollowPath(paths.Path2, false, 1.0),
                 turnOffPreload(),
@@ -224,7 +252,7 @@ public class Blue24BallSpamLinearPivot extends NextFTCOpMode {
                 new FollowPath(paths.Path3, false, 1.0),
                 new FollowPath(paths.Path4, true, 1.0),
                 new FollowPath(paths.Path16,true,1.0),
-                new Delay(1.25),
+                new Delay(1.05),
 
                 new FollowPath(paths.Path5, false, 1.0),
 
@@ -242,7 +270,8 @@ public class Blue24BallSpamLinearPivot extends NextFTCOpMode {
                 new FollowPath(paths.Path15, false, 1.0),
                 intakeMotorOn,
                 new FollowPath(paths.Path10, true, 1.0),
-                new Delay(1.25),
+                //new FollowPath(paths.Pivot2,false,1.0),
+                new Delay(1.05),
                 new FollowPath(paths.Path11, false, 1.0),
                 new FollowPath(paths.Path12, true, 1.0),
                 new Delay(2.25),
@@ -290,7 +319,17 @@ public class Blue24BallSpamLinearPivot extends NextFTCOpMode {
         double robotAngularVelocityRads = follower.getAngularVelocity();
         double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
         double feedforwardOffset = robotAngularVelocityDegs * 0.225;
-        double targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset - feedforwardOffset);
+
+        // --- Intercepted for Heading Overrides ---
+        double targetTurretAngle;
+        if (isOverridden) {
+            // Evaluates target angle directly based on user's manual call while preserving feedforward stabilization
+            targetTurretAngle = getClosestValidTurretAngle(overriddenTurretAngle - feedforwardOffset);
+        } else {
+            // Default Vector Math Goal Tracking
+            targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset - feedforwardOffset);
+        }
+
         double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
         servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
         turret1.setPosition(servoPositionSignal);
@@ -327,6 +366,8 @@ public class Blue24BallSpamLinearPivot extends NextFTCOpMode {
         public PathChain Path8;
         public PathChain Path9;
         public PathChain Path10;
+
+        public PathChain Pivot2;
         public PathChain Path11;
         public PathChain Path12;
         public PathChain Path13;
@@ -361,20 +402,20 @@ public class Blue24BallSpamLinearPivot extends NextFTCOpMode {
             Path4 = follower.pathBuilder() //gateItake
                     .addPath(new BezierLine(
                             new Pose(63.146, 69.703),
-                            new Pose(14.86, 62.15))) // 144 - 133
+                            new Pose(14, 62.15))) // 144 - 133
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(175)) // 180-0, 180-5
                     .build();
 
             Path16 = follower.pathBuilder() //Pivot path
                     .addPath(new BezierLine(
-                            new Pose(14.86, 62.15),
-                            new Pose(14.96, 62.5))) // 144 - 132.8
+                            new Pose(14, 62.15),
+                            new Pose(14.2, 62.5))) // 144 - 132.8
                     .setLinearHeadingInterpolation(Math.toRadians(175), Math.toRadians(143)) // 180-5, 180-37
                     .build();
 
             Path5 = follower.pathBuilder() //shoot
                     .addPath(new BezierLine(
-                            new Pose(14.96, 62.5), // 144 - 132.5
+                            new Pose(14.2, 62.5), // 144 - 132.5
                             new Pose(61.942, 73.32))) // 144 - 82.058
                     .setLinearHeadingInterpolation(Math.toRadians(gateHeading1), Math.toRadians(195)) // 180 - (-15)
                     .build();
@@ -389,13 +430,13 @@ public class Blue24BallSpamLinearPivot extends NextFTCOpMode {
             Path7 = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(gateX, gateY),
-                            new Pose(61.942, 73.32))) // 144 - 82.100
+                            new Pose(61.942, 75))) // 144 - 82.100
                     .setLinearHeadingInterpolation(Math.toRadians(gateHeading), Math.toRadians(195))
                     .build();
 
             Path8 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(61.942, 73.32),
+                            new Pose(61.942, 75),
                             new Pose(gateX, gateY)))
                     .setLinearHeadingInterpolation(Math.toRadians(195), Math.toRadians(gateHeading))
                     .build();
@@ -403,45 +444,52 @@ public class Blue24BallSpamLinearPivot extends NextFTCOpMode {
             Path9 = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(gateX, gateY),
-                            new Pose(61.942, 73.32)))
+                            new Pose(61.942, 75)))
                     .setLinearHeadingInterpolation(Math.toRadians(gateHeading), Math.toRadians(195))
                     .build();
 
             Path10 = follower.pathBuilder() // gateintake
                     .addPath(new BezierCurve(
                             new Pose(49.03304037608623, 83.71111297536585), // 144 - 94.9669...
-                            new Pose(40.981, 63.28), // 144 - 103.019
-                            new Pose(12, 59.25)))
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(gateHeading)) // 180-0
+                            new Pose(40.981, 63.28),  // 144 - 103.019
+                            new Pose(gateX2, gateY2)))
+                    .setLinearHeadingInterpolation(Math.toRadians(195), Math.toRadians(gateHeading)) // 180-0
                     .build();
+            /*Pivot2 = follower.pathBuilder()
+                    .addPath(new BezierLine(
+                            new Pose(14.86, 62.8),
+                            new Pose(14.96, 62.5)))
+                    .setLinearHeadingInterpolation(Math.toRadians(175),Math.toRadians(143))
+                    .build();*/
+
 
             Path11 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(12, 59.25),
-                            new Pose(48.19, 91.6))) // 144 - 95.81
+                            new Pose(gateX2, gateY2),
+                            new Pose(48.19, 92))) // 144 - 95.81
                     .setLinearHeadingInterpolation(Math.toRadians(gateHeading), Math.toRadians(215)) // 180 - (-35)
                     .build();
 
             Path12 = follower.pathBuilder()
                     .addPath(new BezierCurve(
-                            new Pose(48.19, 91.6),
+                            new Pose(48.19, 92),
                             new Pose(35.086, 66.749), // 144 - 108.914
-                            new Pose(13, 59.25)))
+                            new Pose(gateX2, gateY2)))
                     .setLinearHeadingInterpolation(Math.toRadians(215), Math.toRadians(gateHeading))
                     .build();
 
             Path13 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(gateX, gateY),
+                            new Pose(gateX2, gateY2),
                             new Pose(60.0, 104.0))) // 144 - 84
                     .setLinearHeadingInterpolation(Math.toRadians(gateHeading), Math.toRadians(90)) // 180-90
                     .build();
 
             Path14 = follower.pathBuilder()
                     .addPath(new BezierCurve(
-                            new Pose(61.942, 73.32), // 144 - 82
+                            new Pose(61.942, 75), // 144 - 82
                             new Pose(56.19133149606427, 79.2375828716257), // 144 - 87.8086...
-                            new Pose(23.0, 83.8))) // 144 - 121
+                            new Pose(20, 83.8))) // 144 - 121
                     .setLinearHeadingInterpolation(Math.toRadians(195), Math.toRadians(180))
                     .build();
 

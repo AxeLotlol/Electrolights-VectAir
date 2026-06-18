@@ -66,13 +66,15 @@ public class DriveTrain2 implements Subsystem {
 
     public boolean firsttime = true;
 
+    public static double servoOffset = 0.025;
+
     public int alliance;
     public boolean far;
 
     private ServoImplEx turret1;
     private ServoImplEx turret2;
 
-    public static double turretOffset = 6;
+    public static double turretOffset = 8;
     public static double turretOffsetStep = -5;
     // Inches from the Pinpoint/Pedro robot pose origin to the turret pivot.
     public static double turretForwardOffset = -0.52588;
@@ -408,8 +410,8 @@ public class DriveTrain2 implements Subsystem {
         double targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset - feedforwardOffset);
         double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
         servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
-        turret1.setPosition(servoPositionSignal);
-        turret2.setPosition(servoPositionSignal);
+        turret1.setPosition(servoPositionSignal + servoOffset);
+        turret2.setPosition(servoPositionSignal - servoOffset);
         currentTurretPos = targetTurretAngle;
 
         ActiveOpMode.telemetry().addData("launch?", isOverlappingLaunchZone(follower.getPose()));

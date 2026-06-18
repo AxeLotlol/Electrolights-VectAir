@@ -21,7 +21,7 @@ public class AutoShooterCalc implements Subsystem {
     public static double requiredRPM;
 
     public static double requiredTPS = (28*requiredRPM)/60;
-    public static double verticalShift = 0;
+    public static double verticalShift = 20;
 
     public static double accelScalar = 0.015; // Set to 0 to disable
 
@@ -32,6 +32,10 @@ public class AutoShooterCalc implements Subsystem {
         //double y = -4.5745*temp*temp*temp + 25.978*temp*temp - 48.395*temp + 58.675;
         double y = SCORE_HEIGHT + 2;
         double a = Math.toRadians(-20);
+        if(x<50){
+            a=Math.toRadians(-45);
+            y=SCORE_HEIGHT + 4;
+        }
         double hoodAngle = MathFunctions.clamp(Math.atan(2 * y / x - Math.tan(a)), Math.toRadians(40),
                 Math.toRadians(75));
 
@@ -39,10 +43,7 @@ public class AutoShooterCalc implements Subsystem {
             hoodAngle=Math.toRadians(75);
         }
         double flywheelSpeed = Math.sqrt(g * x * x / (2 * Math.pow(Math.cos(hoodAngle), 2) * (x * Math. tan(hoodAngle) - y)));
-        if(x<60){
-            a=Math.toRadians(-45);
-            y=SCORE_HEIGHT + 4;
-        }
+
         Vector robotVelocity = new Vector(robotVel.getMagnitude(), robotVel.getTheta());
         if(robotAccel.getMagnitude() > 10) {
             robotVelocity.setMagnitude(robotVelocity.getMagnitude() + (robotAccel.getMagnitude() * accelScalar));
@@ -72,7 +73,7 @@ public class AutoShooterCalc implements Subsystem {
         flywheelSpeed = Math.sqrt(g * ndr * ndr / (2 * Math.pow(Math.cos(hoodAngle), 2) * (ndr * Math. tan(hoodAngle) - y)));
         flywheelSpeed = flywheelSpeed/ 39.37;
 
-        double headingVelCompOffset = 1.5*Math.atan(perpendicularComponent / ivr);
+        double headingVelCompOffset = 1.44*Math.atan(perpendicularComponent / ivr);
         double headingAngle = Math.toDegrees(robotToGoalVector.getTheta() - robotHeading - headingVelCompOffset);
 
         //requiredRPM = (1.4286* Math.pow(flywheelSpeed, 3) - 39.264*Math.pow(flywheelSpeed, 2) + 863.57*flywheelSpeed-1373.9 + rpmoffset);

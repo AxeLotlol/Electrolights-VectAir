@@ -69,7 +69,7 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
 
     double goalY = 144;
     double goalX = 144;
-    public static double gateX = 133;
+    public static double gateX = 133.2;
     public static double gateY = 58.75;
 
     public static double gateHeading = 41.25;
@@ -275,7 +275,7 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
     public void onStartButtonPressed() {
         opmodeTimer.resetTimer();
         matchStarted = true;
-        shooter(2000);
+        shooter(2200);
         Auto().schedule();
     }
     private boolean preload = true;
@@ -301,7 +301,7 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
             flywheelSpeed = results[0];
 
         if(preload==true){
-            shooter(1800);
+            shooter(2200);
             //hoodServo.setPosition(0.5);
         }
         if(preload==false){
@@ -466,13 +466,13 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
                     .addPath(new BezierCurve(
                             new Pose(82.000, 73.328),
                             new Pose(87.80866850393573, 79.2375828716257),
-                            new Pose(119.796411454575153, 81.1828200643779)))
+                            new Pose(121, 81.1828200643779)))
                     .setLinearHeadingInterpolation(Math.toRadians(-15), Math.toRadians(0))
                     .build();
 
             Path15 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(119.796411454575153, 81.1828200643779),
+                            new Pose(121, 81.1828200643779),
                             new Pose(94.96695962391377, 83.71111297536585)))
                     .setConstantHeadingInterpolation(Math.toRadians(0))
                     .build();

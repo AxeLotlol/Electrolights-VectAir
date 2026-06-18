@@ -1,12 +1,10 @@
 package org.firstinspires.ftc.teamcode.opModes.TeleOp;
 
-
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 
 import com.pedropathing.geometry.Pose;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain2;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterCalc;
 
@@ -18,24 +16,21 @@ import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
 import dev.nextftc.hardware.impl.MotorEx;
 
-
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOpRed2")
 public class TeleOpRed2 extends NextFTCOpMode {
     public MotorEx intakeMotor;
     public MotorEx transfer;
+
     public TeleOpRed2() {
         addComponents(
                 new PedroComponent(Constants::createFollower),
                 new SubsystemComponent(DriveTrain2.INSTANCE),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE
-
-
         );
     }
 
     public static boolean red;
-
 
     public static boolean isRed(){
         return red;
@@ -66,12 +61,9 @@ public class TeleOpRed2 extends NextFTCOpMode {
     public void onUpdate() {
     }
 
-
     @Override
     public void onStartButtonPressed() {
-
     }
-
 
     public void onStop(){
         red=false;

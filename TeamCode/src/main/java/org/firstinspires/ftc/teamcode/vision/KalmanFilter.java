@@ -14,8 +14,8 @@ public class KalmanFilter {
     private double py;
 
     // Process noise (trust in odometry) and Measurement noise (trust in Limelight)
-    private static double q = 0.1;
-    private static double r = 0.4;
+    private static double q = 0.05;
+    private static double r = 0.3;
 
     private Pose lastOdomPose;
 

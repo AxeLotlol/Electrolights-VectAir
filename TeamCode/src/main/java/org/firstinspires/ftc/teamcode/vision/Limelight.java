@@ -50,7 +50,14 @@ public class Limelight implements Subsystem {
     @Override
     public void initialize() {
         limelight.pipelineSwitch(pipeline);
+    }
+
+    public void start() {
         limelight.start();
+    }
+
+    public void stop() {
+        limelight.stop();
     }
 
     /**

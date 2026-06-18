@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.opModes.TeleOp;
 
-
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 
 import com.pedropathing.geometry.Pose;
@@ -16,24 +15,21 @@ import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
 import dev.nextftc.hardware.impl.MotorEx;
 
-
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOpBlue2")
 public class TeleOpBlue2 extends NextFTCOpMode {
     public MotorEx intakeMotor;
     public MotorEx transfer;
+
     public TeleOpBlue2() {
         addComponents(
                 new PedroComponent(Constants::createFollower),
                 new SubsystemComponent(DriveTrain2.INSTANCE),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE
-
-
         );
     }
 
     public static boolean blue;
-
 
     public static boolean isBlue(){
         return blue;
@@ -49,24 +45,15 @@ public class TeleOpBlue2 extends NextFTCOpMode {
         Gamepads.gamepad1().leftTrigger().greaterThan(0.3).whenBecomesTrue(()-> transfer.setPower(1))
                 .whenBecomesFalse(() -> transfer.setPower(0));
         Gamepads.gamepad1().x().whenBecomesTrue(()->follower.setPose(new Pose(79.967,9.271,Math.toRadians(90))));
-
-
-
-
-
-
     }
 
     @Override
     public void onUpdate() {
     }
 
-
     @Override
     public void onStartButtonPressed() {
-
     }
-
 
     public void onStop(){
         blue=false;

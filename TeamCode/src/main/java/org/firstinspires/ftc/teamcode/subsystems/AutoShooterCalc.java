@@ -21,9 +21,10 @@ public class AutoShooterCalc implements Subsystem {
     public static double requiredRPM;
 
     public static double requiredTPS = (28*requiredRPM)/60;
-    public static double verticalShift = 20;
+    public static double verticalShift = 0;
 
-    public static double accelScalar = 0.015; // Set to 0 to disable
+    //public static double accelScalar = 0.015; // Set to 0 to disable
+    public static double accelScalar = 0;
 
     public static Double[] calculateShotVectorandUpdateHeading(double robotHeading, Vector robotToGoalVector, Vector robotVel, Vector robotAccel){
         double g = 32.174*12;
@@ -31,7 +32,7 @@ public class AutoShooterCalc implements Subsystem {
         double temp = x/39.37;
         //double y = -4.5745*temp*temp*temp + 25.978*temp*temp - 48.395*temp + 58.675;
         double y = SCORE_HEIGHT + 2;
-        double a = Math.toRadians(-20);
+        double a = Math.toRadians(-24);
         if(x<50){
             a=Math.toRadians(-45);
             y=SCORE_HEIGHT + 4;
@@ -73,7 +74,7 @@ public class AutoShooterCalc implements Subsystem {
         flywheelSpeed = Math.sqrt(g * ndr * ndr / (2 * Math.pow(Math.cos(hoodAngle), 2) * (ndr * Math. tan(hoodAngle) - y)));
         flywheelSpeed = flywheelSpeed/ 39.37;
 
-        double headingVelCompOffset = 1.44*Math.atan(perpendicularComponent / ivr);
+        double headingVelCompOffset = 1.5*Math.atan(perpendicularComponent / ivr);
         double headingAngle = Math.toDegrees(robotToGoalVector.getTheta() - robotHeading - headingVelCompOffset);
 
         //requiredRPM = (1.4286* Math.pow(flywheelSpeed, 3) - 39.264*Math.pow(flywheelSpeed, 2) + 863.57*flywheelSpeed-1373.9 + rpmoffset);
@@ -82,7 +83,7 @@ public class AutoShooterCalc implements Subsystem {
 
         requiredTPS = (-16.19*Math.pow(flywheelSpeed, 2)+ 449.11*flywheelSpeed- 964.9) + verticalShift;
         if(robotVel.getMagnitude()>20){
-            requiredTPS=requiredTPS+50;
+            requiredTPS=requiredTPS+40;
         }
         double what = Math.toDegrees(hoodAngle);
 

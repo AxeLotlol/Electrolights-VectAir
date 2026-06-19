@@ -67,10 +67,10 @@ public class Blue24BallSpamLinearPivot extends NextFTCOpMode {
 
     double goalY = 144;
     double goalX = 0; // 144 - 144
-public static double gateX = 12.7   ; // 144                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         - 133.2
+public static double gateX = 12.4   ; // 144                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         - 133.2
     public static double gateY = 58.85;
 
-    public static double gateX2 = 12.7;
+    public static double gateX2 = 11.8;
     public static double gateY2 = 58.85;
 
     public static double gateHeading = 138.75; // 180 - 41.25
@@ -242,30 +242,33 @@ public static double gateX = 12.7   ; // 144                                    
 
     public Command Auto() {
         return new SequentialGroup(
-                setTurretHeading(-150),
-                new FollowPath(paths.Path1, false, 1.0),
+                setTurretHeading(-165),
+                new FollowPath(paths.Preload, false, 1.0),
 
                 intakeMotorOn,
-                enableGoalTracking(),
-                new FollowPath(paths.Path2, false, 1.0),
-                turnOffPreload(),
 
-                new FollowPath(paths.Path3, false, 1.0),
-                new FollowPath(paths.Path4, true, 1.0),
+                new FollowPath(paths.Spike2, false, 1.0),
+                setTurretHeading(-30),
+                new FollowPath(paths.launcgSpike3, false, 1.0),
+                new FollowPath(paths.gateIntake1, true, 1.0),
                 new FollowPath(paths.Path16,true,1.0),
                 new Delay(1.05),
+                setTurretHeading(-35),
 
                 new FollowPath(paths.Path5, false, 1.0),
 
                 new FollowPath(paths.Path6, true, 1.0),
                 new Delay(2.25),
+                setTurretHeading(-25),
 
                 new FollowPath(paths.Path7, false, 1.0),
 
                 new FollowPath(paths.Path8, true, 1.0),
+
                 new Delay(2.25),
 
                 new FollowPath(paths.Path9, false, 1.0),
+                enableGoalTracking(),
                 new FollowPath(paths.Path14, false, 1.0),
                 intakeMotorOff,
                 new FollowPath(paths.Path15, false, 1.0),
@@ -336,7 +339,7 @@ public static double gateX = 12.7   ; // 144                                    
         turret1.setPosition(servoPositionSignal);
         turret2.setPosition(servoPositionSignal);
         currentTurretPos = targetTurretAngle;
-        Pose futurepose = new Pose(follower.getPose().getX()+follower.getVelocity().getXComponent()*0.5, follower.getPose().getY()+follower.getVelocity().getYComponent()*0.5, follower.getHeading());
+        Pose futurepose = new Pose(follower.getPose().getX()+follower.getVelocity().getXComponent()*0.5, follower.getPose().getY()+follower.getVelocity().getYComponent()*0.3, follower.getHeading());
 
         if(isOverlappingLaunchZone(futurepose) && robotToGoalVector.getMagnitude()>45&&autoShoot){
             intakeMotor.setPower(1);
@@ -357,10 +360,10 @@ public static double gateX = 12.7   ; // 144                                    
     }
 
     public class Paths {
-        public PathChain Path1;
-        public PathChain Path2;
-        public PathChain Path3;
-        public PathChain Path4;
+        public PathChain Preload;
+        public PathChain Spike2;
+        public PathChain launcgSpike3;
+        public PathChain gateIntake1;
         public PathChain Path5;
         public PathChain Path6;
         public PathChain Path7;
@@ -377,7 +380,7 @@ public static double gateX = 12.7   ; // 144                                    
         public PathChain Path16;
 
         public Paths(Follower follower) {
-            Path1 = follower.pathBuilder()
+            Preload = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(startX, startY),
                             new Pose(48.995, 94.650))) // 144 - 95.005
@@ -385,22 +388,25 @@ public static double gateX = 12.7   ; // 144                                    
                     .addPoseCallback(new Pose(46.255,101.833), autoShootEnable(),0.8 ) // 144 - 97.745
                     .build();
 
-            Path2 = follower.pathBuilder()
+            Spike2 = follower.pathBuilder()
                     .addPath(new BezierCurve(
                             new Pose(48.995, 94.650),
                             new Pose(50.52, 59.7), // 144 - 93.48
                             new Pose(18.5, 59.5))) // 144 - 125.5
                     .setLinearHeadingInterpolation(Math.toRadians(-60), Math.toRadians(160)) // 180-240, 180-20
+                    .addPoseCallback(new Pose(45.002,72.527),enableGoalTracking(),0.5)
+                    .addPoseCallback(new Pose(45.002,72.527),turnOffPreload(),0.5)
                     .build();
 
-            Path3 = follower.pathBuilder()
+            launcgSpike3 = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(18.5, 59.5), // 144 - 125.790
                             new Pose(63.146, 69.703))) // 144 - 80.854
-                    .setLinearHeadingInterpolation(Math.toRadians(160), Math.toRadians(180)) // 180-20, 180-0
+                    .setLinearHeadingInterpolation(Math.toRadians(160), Math.toRadians(180))// 180-20, 180-0
+                    .addPoseCallback(new Pose(49.376,66.556),enableGoalTracking(),0.78)
                     .build();
 
-            Path4 = follower.pathBuilder() //gateItake
+            gateIntake1 = follower.pathBuilder() //gateItake
                     .addPath(new BezierLine(
                             new Pose(63.146, 69.703),
                             new Pose(14, 61.5))) // 144 - 133
@@ -419,6 +425,7 @@ public static double gateX = 12.7   ; // 144                                    
                             new Pose(14.2, 62.5), // 144 - 132.5
                             new Pose(61.942, 73.32))) // 144 - 82.058
                     .setLinearHeadingInterpolation(Math.toRadians(gateHeading1), Math.toRadians(195)) // 180 - (-15)
+                    .addPoseCallback(new Pose(48.435,70.259),enableGoalTracking(),0.78)
                     .build();
 
             Path6 = follower.pathBuilder()
@@ -433,6 +440,7 @@ public static double gateX = 12.7   ; // 144                                    
                             new Pose(gateX, gateY),
                             new Pose(61.942, 75))) // 144 - 82.100
                     .setLinearHeadingInterpolation(Math.toRadians(gateHeading), Math.toRadians(195))
+
                     .build();
 
             Path8 = follower.pathBuilder()

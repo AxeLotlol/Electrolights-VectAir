@@ -66,11 +66,12 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
     public static double startY = 134.4;
 
     private MotorEx intakeMotor;
-
+    private boolean isOverridden = false;
+    private double overriddenTurretAngle = 0.0;
     double goalY = 144;
     double goalX = 144;
-    public static double gateX = 133.2;
-    public static double gateY = 58.75;
+    public static double gateX = 135;
+    public static double gateY = 59.25;
 
     public static double gateHeading = 41.25;
 
@@ -171,6 +172,10 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
     public boolean manualTPS = true;
 
 
+
+
+
+
     public Command autoShootEnable(){
         return new LambdaCommand()
                 .setStart(()->autoShoot = true);
@@ -182,6 +187,24 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
     public Command turnOffPreload(){
         return new LambdaCommand()
                 .setStart(()->preload=false);
+    }
+
+    // --- Custom Override Tracking Commands ---
+    public Command setTurretHeading(double degrees) {
+        return new LambdaCommand("Set Turret Heading: " + degrees)
+                .setStart(() -> {
+                    isOverridden = true;
+                    overriddenTurretAngle = getClosestValidTurretAngle(degrees);
+                })
+                .setIsDone(() -> true);
+    }
+
+    public Command enableGoalTracking() {
+        return new LambdaCommand("Enable Goal Tracking")
+                .setStart(() -> {
+                    isOverridden = false;
+                })
+                .setIsDone(() -> true);
     }
 
     public static MotorEx flywheel = new MotorEx("launchingmotor");
@@ -229,11 +252,14 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
 
     public Command Auto() {
         return new SequentialGroup(
+                setTurretHeading(165),
+
                 new FollowPath(paths.Path1, false, 1.0),
 
                 intakeMotorOn,
                 new FollowPath(paths.Path2, false, 1.0),
-                turnOffPreload(),
+                setTurretHeading(30),
+
 
 
                 new FollowPath(paths.Path3, false, 1.0),
@@ -242,13 +268,16 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
                 //new TurnTo(Angle.fromDeg(41)),
                 //turnTo(new Pose(132.23,63),0.4),
                 //new TurnBy(Angle.fromDeg(10)),
-                new Delay(1.25),
+                new Delay(1.05),
+                setTurretHeading(35),
 
                 new FollowPath(paths.Path5, false, 1.0),
                 //shoot,
 
                 new FollowPath(paths.Path6, true, 1.0),
                 new Delay(2.25),
+                setTurretHeading(25),
+
 
                 new FollowPath(paths.Path7, false, 1.0),
                 //shoot,
@@ -257,6 +286,7 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
                 new Delay(2.25),
 
                 new FollowPath(paths.Path9, false, 1.0),
+                enableGoalTracking(),
                 new FollowPath(paths.Path14, false, 1.0),
                 intakeMotorOff,
                 new FollowPath(paths.Path15, false, 1.0),
@@ -275,7 +305,7 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
     public void onStartButtonPressed() {
         opmodeTimer.resetTimer();
         matchStarted = true;
-        shooter(2200);
+        shooter(2500);
         Auto().schedule();
     }
     private boolean preload = true;
@@ -291,18 +321,16 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
 
         if (!matchStarted) return;
 
-        // --- Continuous Tracking / Calculation Logic ---
         Pose currPose = follower.getPose();
         Pose turretPose = getTurretPose(currPose);
         double robotHeading = follower.getPose().getHeading();
         Vector robotToGoalVector = getTurretToGoalVector(turretPose);
         Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity().times(1), follower.getAcceleration());
 
-            flywheelSpeed = results[0];
+        flywheelSpeed = results[0];
 
         if(preload==true){
-            shooter(2200);
-            //hoodServo.setPosition(0.5);
+            shooter(2500);
         }
         if(preload==false){
             shooter((float) flywheelSpeed - 38);
@@ -314,14 +342,24 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
         double robotAngularVelocityRads = follower.getAngularVelocity();
         double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
         double feedforwardOffset = robotAngularVelocityDegs * 0.225;
-        double targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset - feedforwardOffset);
+
+        // --- Intercepted for Heading Overrides ---
+        double targetTurretAngle;
+        if (isOverridden) {
+            // Evaluates target angle directly based on user's manual call while preserving feedforward stabilization
+            targetTurretAngle = getClosestValidTurretAngle(overriddenTurretAngle - feedforwardOffset);
+        } else {
+            // Default Vector Math Goal Tracking
+            targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset - feedforwardOffset);
+        }
+
         double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
         servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
         turret1.setPosition(servoPositionSignal);
         turret2.setPosition(servoPositionSignal);
         currentTurretPos = targetTurretAngle;
-        Pose futurepose = new Pose(follower.getPose().getX()+follower.getVelocity().getXComponent()*0.5, follower.getPose().getY()+follower.getVelocity().getYComponent()*0.5, follower.getHeading());
-        //if((isOverlappingLaunchZone(PedroComponent.follower().getPose())||isOverlappingLaunchZone(futurepose)) && robotToGoalVector.getMagnitude()>40){
+        Pose futurepose = new Pose(follower.getPose().getX()+follower.getVelocity().getXComponent()*0.5, follower.getPose().getY()+follower.getVelocity().getYComponent()*0.3, follower.getHeading());
+
         if(isOverlappingLaunchZone(futurepose) && robotToGoalVector.getMagnitude()>45&&autoShoot){
             intakeMotor.setPower(1);
             transfer.setPower(1);
@@ -364,21 +402,24 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
                             new Pose(startX, startY),
                             new Pose(95.005, 94.650)))
                     .setLinearHeadingInterpolation(Math.toRadians(270), Math.toRadians(240))
-                    .addPoseCallback(new Pose(97.745,101.833), autoShootEnable(),0.8 )
+                    .addPoseCallback(new Pose(103.524,103.524), autoShootEnable(),0.8 )
                     .build();
 
             Path2 = follower.pathBuilder()
                     .addPath(new BezierCurve(
                             new Pose(95.005, 94.650),
-                            new Pose(93.48, 59.7),
+                            new Pose(89.2, 59.7),
                             new Pose(125.5, 59.5)))
                     .setLinearHeadingInterpolation(Math.toRadians(240), Math.toRadians(20))
+                    .addPoseCallback(new Pose(97.491,71.544),enableGoalTracking(),0.5)
+                    .addPoseCallback(new Pose(97.491,71.544),turnOffPreload(),0.78)
                     .build();
 
             Path3 = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(125.790, 58.117),
                             new Pose(80.854, 69.703)))
+                    .addPoseCallback(new Pose(92.068,63.042),enableGoalTracking(),0.78)
                     .setLinearHeadingInterpolation(Math.toRadians(20),Math.toRadians(0))
                     .build();
 
@@ -394,6 +435,7 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
                             new Pose(133,61.115),
                             new Pose(132.8,61)))
                     .setLinearHeadingInterpolation(Math.toRadians(5),Math.toRadians(37))
+                    .addPoseCallback(new Pose(48.435,70.259),enableGoalTracking(),0.78)
                     .build();
 
             Path5 = follower.pathBuilder()
@@ -401,6 +443,7 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
                             new Pose(132.5, 61.15),
                             new Pose(82.058, 73.32)))
                     .setLinearHeadingInterpolation(Math.toRadians(gateHeading1), Math.toRadians(-15))
+                    .addPoseCallback(new Pose(48.435,70.259),enableGoalTracking(),0.78)
                     .build();
 
             Path6 = follower.pathBuilder()

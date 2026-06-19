@@ -443,7 +443,7 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
                             new Pose(132.5, 61.15),
                             new Pose(82.058, 73.32)))
                     .setLinearHeadingInterpolation(Math.toRadians(gateHeading1), Math.toRadians(-15))
-                    .addPoseCallback(new Pose(48.435,70.259),enableGoalTracking(),0.78)
+                    .addPoseCallback(new Pose(113.619,64.351),enableGoalTracking(),0.78)
                     .build();
 
             Path6 = follower.pathBuilder()

@@ -1,8 +1,10 @@
+
 package org.firstinspires.ftc.teamcode.opModes.Auto;
 
-import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
+import static org.firstinspires.ftc.teamcode.subsystems.DriveTrain2.closeStopperPos;
+import static org.firstinspires.ftc.teamcode.subsystems.DriveTrain2.openStopperPos;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
-import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
+import static org.firstinspires.ftc.teamcode.subsystems.LaunchDetector.isOverlappingLaunchZone;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
@@ -12,278 +14,247 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.Vector;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.PwmControl;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
+import org.firstinspires.ftc.teamcode.subsystems.AutoShooterCalc;
 import org.firstinspires.ftc.teamcode.subsystems.Storage;
-//import org.firstinspires.ftc.teamcode.subsystems.Storage;
+
+import java.util.List;
 
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
-import dev.nextftc.core.commands.groups.ParallelGroup;
 import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.components.BindingsComponent;
-import dev.nextftc.core.components.SubsystemComponent;
+import dev.nextftc.core.units.Angle;
 import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.extensions.pedro.PedroComponent;
+import dev.nextftc.extensions.pedro.TurnBy;
+import dev.nextftc.extensions.pedro.TurnTo;
 import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
-import dev.nextftc.hardware.impl.Direction;
-import dev.nextftc.hardware.impl.IMUEx;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
-import dev.nextftc.hardware.positionable.SetPosition;
-
 
 @Autonomous
 @Configurable
 public class Red21BallSpamLinear extends NextFTCOpMode {
-    public Red21BallSpamLinear(){
+
+    public Red21BallSpamLinear() {
         addComponents(
-                new SubsystemComponent(Flywheel.INSTANCE),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE,
                 new PedroComponent(hwMap -> Constants.createFollower(hwMap))
-
-
         );
     }
+
     private Follower follower;
-    private Timer pathTimer, actionTimer, opmodeTimer;
-    private int pathState;
-
-
+    private MotorEx transfer;
+    private Timer opmodeTimer;
     private Paths paths;
-    public MotorEx intakeMotor;
 
-    int tagId = 0;
+    public Pose start = new Pose(startX, startY, Math.toRadians(270));
 
-    public Pose start = new Pose(112.158,135.289, Math.toRadians(90));
+    // --- Turret tracking ---
+    private ServoEx servoStopper;
+    private ServoEx hoodServo;
+    public static double startX = 110.17;
+    public static double startY = 134.4;
+
+    private MotorEx intakeMotor;
+    private boolean isOverridden = false;
+    private double overriddenTurretAngle = 0.0;
+    double goalY = 144;
+    double goalX = 144;
+    public static double gateX = 135;
+    public static double gateY = 59.25;
+
+    public static double gateHeading = 41.25;
+
+    public static double gateX1 = 133.5;
+    public static double gateY1 = 58.75;
+    public static double turretHeading1=60;
+    public static double turretHeading2=55;
+    public static double turretHeading3=75;
+    public static double gateHeading1 = 42;
+    private static final double MIN_ANGLE = -224.75;
+    private static final double MAX_ANGLE =  224.75;
+    private static final double TURRET_RANGE =  449.51;
+    private double currentTurretPos = 180.0;
+
+    private boolean matchStarted = false;
+    private boolean autoShoot = false;
+    private boolean useAutoGoalTracking = true;
+
+    private ServoImplEx turret1;
+    private ServoImplEx turret2;
+
+    public static double turretOffset = 6;
+    public static double turretOffsetStep = -5;
+    // Inches from the Pinpoint/Pedro robot pose origin to the turret pivot.
+    public static double turretForwardOffset = -0.52588;
+    public static double turretStrafeOffset = 0;
+
+    private Command intakeMotorOn = new LambdaCommand()
+            .setStart(() -> {
+                intakeMotor.setPower(1);
+                transfer.setPower(1);
+            });
 
 
-    private MotorEx transfer1;
+    private Command intakeMotorOff = new LambdaCommand()
+            .setStart(() -> {
+                intakeMotor.setPower(0);
+                transfer.setPower(0);
+            });
 
-    private ServoEx transfer2;
+    public Command servoOpen = new LambdaCommand()
+            .setStart(() -> {
+                servoStopper.setPosition(0.96);
+            });
+
+    public Command servoClose = new LambdaCommand()
+            .setStart(() -> {
+                servoStopper.setPosition(0.86);
+            });
+    private List<LynxModule> allHubs;
+    public Pose currPose;
+
+    public double getClosestValidTurretAngle(double relativeGoalDegrees) {
+        double option1 = normalizeDegrees(relativeGoalDegrees);
+        return Math.max(MIN_ANGLE, Math.min(MAX_ANGLE, option1));
+    }
+
+    private double normalizeDegrees(double degrees) {
+        while (degrees > 180.0) {
+            degrees -= 360.0;
+        }
+        while (degrees <= -180.0) {
+            degrees += 360.0;
+        }
+        return degrees;
+    }
+
+    private Pose getTurretPose(Pose robotPose) {
+        double heading = robotPose.getHeading();
+        double turretX = robotPose.getX()
+                + turretForwardOffset * Math.cos(heading)
+                - turretStrafeOffset * Math.sin(heading);
+        double turretY = robotPose.getY()
+                + turretForwardOffset * Math.sin(heading)
+                + turretStrafeOffset * Math.cos(heading);
+
+        return new Pose(turretX, turretY, heading);
+    }
+
+    private Vector getTurretToGoalVector(Pose turretPose) {
+        return new Vector(
+                turretPose.distanceFrom(new Pose(goalX, goalY)),
+                Math.atan2(goalY - turretPose.getY(), goalX - turretPose.getX())
+        );
+    }
+
+
+
+    double targetTurretAngle;
+
+
+
+
+    public boolean manualTPS = true;
+
+
+
+
+
+    public Command autoShootEnable(){
+        return new LambdaCommand()
+                .setStart(()->autoShoot = true);
+    }
+    public Command turnOffManualtps(){
+        return new LambdaCommand()
+                .setStart(()->manualTPS=false);
+    }
+    public Command turnOffPreload(){
+        return new LambdaCommand()
+                .setStart(()->preload=false);
+    }
+
+    // --- Custom Override Tracking Commands ---
+    public Command setTurretHeading(double degrees) {
+        return new LambdaCommand("Set Turret Heading: " + degrees)
+                .setStart(() -> {
+                    isOverridden = true;
+                    overriddenTurretAngle = getClosestValidTurretAngle(degrees);
+                })
+                .setIsDone(() -> true);
+    }
+
+    public Command enableGoalTracking() {
+        return new LambdaCommand("Enable Goal Tracking")
+                .setStart(() -> {
+                    isOverridden = false;
+                })
+                .setIsDone(() -> true);
+    }
 
     public static MotorEx flywheel = new MotorEx("launchingmotor");
 
     public static MotorEx flywheel2 = new MotorEx("launchingmotor2");
 
-           /* private CRServo hoodServo1n;
-            private CRServo hoodServo2n;
+    // ----------------------
 
-            private CRServoEx hoodServo1 = new CRServoEx(() -> hoodServo1n);
-            private CRServoEx hoodServo2 = new CRServoEx(() -> hoodServo2n);
-
-
-
-
-
-
-            ParallelGroup HoodRunUp=new ParallelGroup(
-                    new SetPower(hoodServo1,-1),
-                    new SetPower(hoodServo2,1)
-            );
-
-            public ParallelGroup HoodPowerZero=new ParallelGroup(
-                    new SetPower(hoodServo1,0),
-                    new SetPower(hoodServo2,0)
-            );
-
-            public SequentialGroup HoodUp=new SequentialGroup(
-                    HoodRunUp,
-                    new Delay(0.18),
-                    HoodPowerZero
-            );
-
-            ParallelGroup HoodRunDown=new ParallelGroup(
-                    new SetPower(hoodServo1,1),
-                    new SetPower(hoodServo2,-1)
-            );
-
-            public SequentialGroup HoodDown=new SequentialGroup(
-                    HoodRunDown,
-                    new Delay(0.17),
-                    HoodPowerZero
-            );
-
-            public SequentialGroup HoodUpAuto=new SequentialGroup(
-                    HoodRunUp,
-                    new Delay(0.12),
-                    HoodPowerZero
-            );*/
-
-    private Boolean preloadspin;
-
-    private double preloadtps;
-
-    private double shoottps;
-
-
-    private static Servo hoodServo1n;
-    private static Servo hoodServo2n;
-
-    private static ServoEx hoodServo1 = new ServoEx(() -> hoodServo1n);
-    private static ServoEx hoodServo2 = new ServoEx(() -> hoodServo2n);
     public void onInit() {
-        telemetry.addLine("Initializing Follower...");
-
-        telemetry.update();
+        allHubs = ActiveOpMode.hardwareMap().getAll(LynxModule.class);
+        for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
         follower = PedroComponent.follower();
-                /*Limelight3A limelight = hardwareMap.get(Limelight3A.class, "limelight");
-                limelight.pipelineSwitch(APRILTAG_PIPELINE);
-                limelight.start();*/
-
-
-        IMUEx imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
-
-        Limelight3A limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.pipelineSwitch(7);
-        limelight.start();
-        paths = new Paths(follower);
-        intakeMotor = new MotorEx("intake");
-        transfer1 = new MotorEx("transfer");
-        transfer2 = new ServoEx("transferServo1");
-        //hoodServo1n= ActiveOpMode.hardwareMap().get(CRServo.class, "hoodServo1");
-        // hoodServo2n=  ActiveOpMode.hardwareMap().get(CRServo.class, "hoodServo2");
-        pathTimer = new Timer();
-        actionTimer = new Timer();
-        opmodeTimer = new Timer();
         follower.setStartingPose(start);
-
-
-        pathState = 0;
-        telemetry.addLine("Follower + IMU + Odo Pods initialized successfully!");
-        telemetry.addLine("Initialization complete!");
+        paths = new Paths(follower);
+        opmodeTimer = new Timer();
+        intakeMotor = new MotorEx("intakeMotor");
+        transfer = new MotorEx("transferMotor");
+        turret1 = ActiveOpMode.hardwareMap().get(ServoImplEx.class, "turretServo1");
+        turret2 = ActiveOpMode.hardwareMap().get(ServoImplEx.class,"turretServo2");
+        turret1.setPwmRange(new PwmControl.PwmRange(500, 2500));
+        turret2.setPwmRange(new PwmControl.PwmRange(500, 2500));
+        hoodServo = new ServoEx("hoodServo");
+        servoStopper = new ServoEx("stopperServo");
+        telemetry.addLine("Initialized");
         telemetry.update();
-        hoodServo1n= ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo1");
-        hoodServo2n=  ActiveOpMode.hardwareMap().get(Servo.class, "hoodServo2");
-
-        follower.update();
-
-
     }
-
-    public static double hoodToPos(double runtime) {
-        if(Double.isNaN(runtime)!=true) {
-            ActiveOpMode.telemetry().addData("runtime", runtime);
-            ParallelGroup HoodRunUp = new ParallelGroup(
-                    new SetPosition(hoodServo1, runtime),
-                    new SetPosition(hoodServo2, -1*runtime)
-            );
-            HoodRunUp.schedule();
-            return runtime;
-        }
-        else {
-            ActiveOpMode.telemetry().addLine("NaN");
-            return 0;
-        }
+    public Command turnTo(Pose targetPose, double timeoutSeconds) {
+        return new LambdaCommand("Turn to " + targetPose.getHeading())
+                .setStart(() -> follower.holdPoint(targetPose))
+                .setIsDone(() -> false)
+                .raceWith(new Delay(timeoutSeconds));
     }
+    private boolean manualShooting = true;
 
-    private Command intakeMotorOn = new LambdaCommand()
-            .setStart(() -> intakeMotor.setPower(-1));
-
-    Command intakeMotorOff = new LambdaCommand()
-            .setStart(() -> intakeMotor.setPower(0));
-
-    double distance;
-
-    Command transferOn = new LambdaCommand()
-            .setStart(()-> transfer1.setPower(-1));
-    Command transferOff = new LambdaCommand()
-            .setStart(() -> transfer1.setPower(0));
-    Command transferOnForIntake = new LambdaCommand()
-            .setStart(()-> transfer1.setPower(-1));
-
-    public Command opentransfer = new LambdaCommand()
-            .setStart(()-> {
-                //`5transfer2.setPosition(-0.25);
-                transfer2.setPosition(0.3);
-            });
-
-    public Command closeTransfer = new LambdaCommand()
+    public Command closeStopper = new LambdaCommand()
             .setStart(() -> {
-                transfer2.setPosition(0.635);
-            });
-    //niggers are black = (NO SHIT SHERLOCK);
-    public SequentialGroup shoot = new SequentialGroup(opentransfer, new Delay(0.05), transferOn, new Delay(0.3), transferOff, closeTransfer);
-
-    public boolean spinup = true;
-    public Command spinupfalse = new LambdaCommand()
-            .setStart(()-> {
-                spinup=false;
-            });
-
-    Command spinupPLEASEEIsagiINEEDTHIS = new LambdaCommand()
-            .setStart(()->{
-                flywheel.setPower(1);
-                flywheel2.setPower(-1);
-
-            });
-    public Command reverseIntakeForMe = new LambdaCommand()
-            .setStart(() -> intakeMotor.setPower(0.5));
-    public Command aimAtGoal = new LambdaCommand()
+                servoStopper.setPosition(closeStopperPos);
+            }).setIsDone(() -> true);
+    public Command openStopper = new LambdaCommand()
             .setStart(() -> {
-                Pose currPose = follower.getPose();
-
-                // 1. Calculate the vector to the goal (138, 141)
-                Vector robotToGoalVector = new Vector(
-                        follower.getPose().distanceFrom(new Pose(138, 141)),
-                        Math.atan2(141 - currPose.getY(), 138 - currPose.getX())
-                );
-
-                // 2. Get the required heading and flywheel/hood specs from your utility
-               double robotHeading= currPose.getHeading();
-                Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity(), 1.3);        Double headingError = results[2];
-
-
-                double targetHeading = results[2]; // Assuming index 2 is the target heading from your calc
-                double flywheelSpeed = results[0];
-                double hoodAngle = results[1];
-
-                // 3. Update Hardware
-                shooter((float) (flywheelSpeed + 30));
-                hoodToPos(hoodAngle);
-
-                // 4. Force Pedro Pathing to face the goal
-                // This overrides the path's heading interpolation with the live target
-                follower.turn(targetHeading);
-            });
-    public boolean lift;
-    boolean lowerangle = false;
-    private Boolean preloadspinreal = false;
-
-    Command preloadSpun = new LambdaCommand().setStart(() -> preloadspinreal = true);
-    Command preloadSpunReal = new LambdaCommand().setStart(() -> preloadspinreal = false);
-    public boolean intake3 = false;
-    Command shootIntake3 = new LambdaCommand()
-            .setStart(()->intake3=true);
-
-    public boolean intakeSpam = false;
-
-    Command shootIntakeSpam = new LambdaCommand()
-            .setStart(()->intakeSpam=true);
-
-
+                servoStopper.setPosition(openStopperPos);
+            }).setIsDone(() -> true);
 
 
     public Command Auto(){
         return new SequentialGroup(
-
-                        /*spinupPLEASEEIsagiINEEDTHIS,
-                        preloadSpun*/
-                new Delay(0.3),
+                setTurretHeading(0),
                 new FollowPath(paths.preloadLaunch,true,1.0),
                 shoot,
                 intakeMotorOn,
-                transferOn,
-                closeTransfer,
-
+                servoClose,
+                turnOffPreload(),
                 new FollowPath(paths.intakeSet2,true,1.0),
 
 
@@ -291,115 +262,122 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
                 new FollowPath(paths.launchSet2,true,1.0),
                 shoot,
                 intakeMotorOn,
-                transferOn,
+
 
                 new FollowPath(paths.resetAndIntake1,true,1.0),
-                new Delay(0.1),
-                new FollowPath(paths.moverBacker,true,1.0),
-                new Delay(0.3),
+                new Delay(1.25),
                 //reverseIntakeForMe,
                 new FollowPath(paths.launchSpam1, true, 1.0),
                 shoot,
 
                 intakeMotorOn,
-                transferOn,
-
 
                 new FollowPath(paths.resetAndIntake2, true, 1.0),
-                new Delay(1.3),
+                new Delay(2.2),
                 //reverseIntakeForMe,
-
                 new FollowPath(paths.launchSpam2, true, 1.0),
                 shoot,
                 intakeMotorOn,
-                transferOn,
                 new FollowPath(paths.resetAndIntake2, true, 1.0),
-                new Delay(1.6),
+                new Delay(2.2),
                 //reverseIntakeForMe,
-
                 new FollowPath(paths.launchSpam2, true, 1.0),
                 shoot,
-
                 intakeMotorOn,
-                transferOn,
                 new FollowPath(paths.intakeSet1,true,1.0),
                 new FollowPath(paths.launchSet1,true,1.0),
                 shoot,
-
                 intakeMotorOn,
-                transferOn,
                 new FollowPath(paths.intakeSet3,true,1.0),
                 new FollowPath(paths.launchSet3,true,1.0),
-
-
                 new FollowPath(paths.teleOpPark,true,1.0)
         );
     }
 
     public void onStartButtonPressed() {
         opmodeTimer.resetTimer();
-        pathTimer.resetTimer();
-                /*flywheel.setPower(1);
-                flywheel2.setPower(-1);*/
-
-        preloadspinreal = true;
-        shooter(1085);
-
-        //int tag=MotifScanning.INSTANCE.findMotif();
+        matchStarted = true;
+        shooter(2100);
         Auto().schedule();
-
-
-
     }
+    private boolean preload = true;
+    private double flywheelSpeed;
 
     @Override
-    public void onUpdate(){
+    public void onUpdate() {
+        for (LynxModule hub : allHubs) {
+            hub.clearBulkCache();
+        }
         follower.update();
-
-                /*if(preloadspinreal) {
-                    shooter(1080);
-                }
-                else{
-                    if (DistanceRed.INSTANCE.getDistanceFromTag() != 0) {
-                        shooter(findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
-                        ActiveOpMode.telemetry().addData("Limelight!", findTPS(DistanceRed.INSTANCE.getDistanceFromTag()));
-                    } else if (DistanceRed.INSTANCE.getDistanceFromTag() == 0 && !intake3&&!intakeSpam) {
-                        shooter(1065);
-                    }
-                    else if(intake3){
-                        shooter(1070);
-                    }
-                    else if(intakeSpam){
-                        shooter(1065);
-                    }
-                }*/
-
-        Pose currPose = follower.getPose();
-        double robotHeading = follower.getPose().getHeading();
-        Vector robotToGoalVector = new Vector(follower.getPose().distanceFrom(new Pose(138, 141)), Math.atan2(141 - currPose.getY(), 138 - currPose.getX()));
-        //Vector v = new Vector(new Pose(138, 138));
-        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity(), 1.3);        double flywheelSpeed = results[0];
-        shooter((float) (flywheelSpeed+30));
-        double hoodAngle = results[1];
-        hoodToPos(hoodAngle);
         Storage.currentPose = follower.getPose();
 
+        if (!matchStarted) return;
+
+        Pose currPose = follower.getPose();
+        Pose turretPose = getTurretPose(currPose);
+        double robotHeading = follower.getPose().getHeading();
+        Vector robotToGoalVector = getTurretToGoalVector(turretPose);
+        Double[] results = AutoShooterCalc.calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity().times(1), follower.getAcceleration());
+
+        flywheelSpeed = results[0];
+
+        if(preload==true){
+            shooter(2100);
+        }
+        if(preload==false){
+            shooter((float) flywheelSpeed - 38);
+        }
+        double hoodAngle = results[1];
+        hoodServo.setPosition(hoodAngle);
+
+        double headingError = results[2];
+        double robotAngularVelocityRads = follower.getAngularVelocity();
+        double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
+        double feedforwardOffset = robotAngularVelocityDegs * 0.225;
+
+        // --- Intercepted for Heading Overrides ---
+        double targetTurretAngle;
+        if (isOverridden) {
+            // Evaluates target angle directly based on user's manual call while preserving feedforward stabilization
+            targetTurretAngle = getClosestValidTurretAngle(overriddenTurretAngle - feedforwardOffset);
+        } else {
+            // Default Vector Math Goal Tracking
+            targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset - feedforwardOffset);
+        }
+
+        double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
+        servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
+        turret1.setPosition(servoPositionSignal);
+        turret2.setPosition(servoPositionSignal);
+        currentTurretPos = targetTurretAngle;
+        Pose futurepose = new Pose(follower.getPose().getX()+follower.getVelocity().getXComponent()*0.5, follower.getPose().getY()+follower.getVelocity().getYComponent()*0.3, follower.getHeading());
+
+        if(isOverlappingLaunchZone(futurepose) && robotToGoalVector.getMagnitude()>45&&autoShoot){
+            intakeMotor.setPower(1);
+            transfer.setPower(1);
+            openStopper.schedule();
+        }
+        else{
+            closeStopper.schedule();
+        }
+        Storage.currentPose = follower.getPose();
+        Storage.setPose = true;
     }
-
-
-
 
     @Override
     public void onStop() {
         Storage.currentPose = follower.getPose();
         follower.breakFollowing();
-        telemetry.addLine("Autonomous Stopped.");
-        telemetry.update();
     }
-
-
-
-
+    public SequentialGroup shoot = new SequentialGroup(
+            openStopper,
+            intakeMotorOn,
+            new Delay(0.3),
+            closeStopper,
+            intakeMotorOff
+    );
+    public Command reverseIntakeForMe = new LambdaCommand()
+            .setStart(() -> intakeMotor.setPower(-1));
     public class Paths {
         public PathChain preloadLaunch;
         public PathChain intakeSet2;
@@ -423,6 +401,7 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
                                     new Pose(100.000, 100.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(90),Math.toRadians(46))
+                    .addPoseCallback(new Pose(102,105),autoShootEnable(),0.8)
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
 
@@ -455,22 +434,23 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
                     //.addTemporalCallback(0.2,transferOff)
 
                     .build();
-
+//public static double gateX = 135;
+//    public static double gateY = 59.25;
             resetAndIntake1 = follower.pathBuilder().addPath(
                             new BezierCurve(
                                     new Pose(92.000, 94.000),
                                     new Pose(104.000, 67.000),
-                                    new Pose(128, 64)
+                                    new Pose(135, 59.25)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(47), Math.toRadians(20))
+                    ).setLinearHeadingInterpolation(Math.toRadians(47), Math.toRadians(40))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
                     .addTemporalCallback(0.1,intakeMotorOn)
-                    .addTemporalCallback(0.1,transferOn)
+
 
                     .build();
 
-            moverBacker = follower.pathBuilder().addPath(
+           /* moverBacker = follower.pathBuilder().addPath(
                             new BezierLine(
                                     new Pose(128, 64),
                                     new Pose(130, 59.75)
@@ -479,7 +459,7 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
 
-                    .build();
+                    .build();*/
 
             launchSpam1 = follower.pathBuilder().addPath(
                             new BezierCurve(
@@ -498,14 +478,13 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
             resetAndIntake2 = follower.pathBuilder().addPath(
                             new BezierCurve(
                                     new Pose(92.000, 94.000),
-                                    new Pose(104.000, 67.000),
-                                    new Pose(130.5, 62)
+                                    new Pose(100, 67.000),
+                                    new Pose(135, 59.25)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(46), Math.toRadians(23))
+                    ).setLinearHeadingInterpolation(Math.toRadians(46), Math.toRadians(40))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
                     .addTemporalCallback(0.1,intakeMotorOn)
-                    .addTemporalCallback(0.1,transferOn)
 
                     .build();
 
@@ -538,7 +517,6 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
                     .addTemporalCallback(0.1,intakeMotorOn)
-                    .addTemporalCallback(0.1,transferOn)
 
 
                     .build();
@@ -549,7 +527,7 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
 
                                     new Pose(92.000, 94.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(1), Math.toRadians(47))
+                    ).setLinearHeadingInterpolation(Math.toRadians(1), Math.toRadians(53))
                     .setVelocityConstraint(0.3)
                     .setTValueConstraint(0.95)
                     .addPoseCallback(new Pose(102,86),reverseIntakeForMe,0.4)
@@ -566,11 +544,11 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
                                     new Pose(75, 28.615),
                                     new Pose(129.151, 38)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(44), Math.toRadians(0))
+                    ).setLinearHeadingInterpolation(Math.toRadians(53), Math.toRadians(0))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
                     .addTemporalCallback(0.1,intakeMotorOn)
-                    .addTemporalCallback(0.1,transferOn)
+
 
                     .build();
 
@@ -580,7 +558,7 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
 
                                     new Pose(84, 103)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(1), Math.toRadians(27))
+                    ).setLinearHeadingInterpolation(Math.toRadians(1), Math.toRadians(43))
 
                     .setVelocityConstraint(0.3)
                     .setTValueConstraint(0.8)

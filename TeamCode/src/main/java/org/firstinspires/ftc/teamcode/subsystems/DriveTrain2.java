@@ -348,14 +348,24 @@ public class DriveTrain2 implements Subsystem {
 
     //private static ServoEx hoodServo1 = new ServoEx(() -> hoodServo1n);
     //private static ServoEx hoodServo2 = new ServoEx(() -> hoodServo2n);
-    /*Command shooter = new LambdaCommand()
-            .setStart(()-> shoot());*/
     public Command Localize() {
         return localize;
     }
 
     Command shooter = new LambdaCommand()
             .setStart(() -> shoot());
+    private static Command intakeMotorOn = new LambdaCommand()
+            .setStart(() -> {
+                intakeMotor.setPower(1);
+                transfer.setPower(1);
+            });
+
+
+    private static Command intakeMotorOff = new LambdaCommand()
+            .setStart(() -> {
+                intakeMotor.setPower(0);
+                transfer.setPower(0);
+            });
 
 
     /*public boolean wraptofalseexecuted = false;
@@ -365,14 +375,11 @@ public class DriveTrain2 implements Subsystem {
             wraptofalse.schedule();
     }*/
     public static void shoot() {
-        //if (shooting == false) {
-        //    shooting = true;
-        //SequentialGroup shoot = new SequentialGroup(new Delay(0.3), shootFalse);
-        //    shoot.schedule();
-        //}
-        shooting = true;
-        new Delay(0.3);
-        shootFalse.schedule();
+        if (shooting == false) {
+            shooting = true;
+        SequentialGroup shoot = new SequentialGroup(intakeMotorOn, openStopper, new Delay(0.3), closeStopper, intakeMotorOff, shootFalse);
+        shoot.schedule();
+        }
     }
 
     public static void shootreal(){
@@ -516,7 +523,6 @@ public class DriveTrain2 implements Subsystem {
         //ActiveOpMode.telemetry().addData("Turret Strafe Offset", turretStrafeOffset);
         //ActiveOpMode.telemetry().addData("RPM Vertical Shift", ShooterCalc.verticalShift);
         ActiveOpMode.telemetry().update();
-        Gamepads.gamepad1().rightTrigger().greaterThan(0.3).whenBecomesTrue(shooter);
 
 
 

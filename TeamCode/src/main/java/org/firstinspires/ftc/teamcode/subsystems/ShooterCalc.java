@@ -35,8 +35,14 @@ public class ShooterCalc implements Subsystem {
         double x = robotToGoalVector.getMagnitude()-ShooterConstants.PASS_THROUGH_POINT_RADIUS;
         double temp = x/39.37;
         //double y = -4.5745*temp*temp*temp + 25.978*temp*temp - 48.395*temp + 58.675;
-        double y = SCORE_HEIGHT;
-        double a = ShooterConstants.SCORE_ANGLE;
+        //double y = SCORE_HEIGHT;
+        //double a = ShooterConstants.SCORE_ANGLE;
+        double y = SCORE_HEIGHT + 2;
+        double a = Math.toRadians(-33);
+        if(x<50){
+            a=Math.toRadians(-45);
+            y=SCORE_HEIGHT + 4;
+        }
         double hoodAngle = MathFunctions.clamp(Math.atan(2 * y / x - Math.tan(a)), Math.toRadians(40),
                 Math.toRadians(75));
 

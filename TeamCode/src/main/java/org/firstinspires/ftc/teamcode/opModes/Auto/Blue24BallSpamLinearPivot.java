@@ -67,10 +67,10 @@ public class Blue24BallSpamLinearPivot extends NextFTCOpMode {
 
     double goalY = 144;
     double goalX = 0; // 144 - 144
-    public static double gateX = 13.5   ; // 144 - 133.2
-    public static double gateY = 59.1;
+    public static double gateX = 12.9   ; // 144 - 133.2
+    public static double gateY = 58.85;
 
-    public static double gateX2 = 13.5;
+    public static double gateX2 = 12.9;
     public static double gateY2 = 58.85;
 
     public static double gateHeading = 138.75; // 180 - 41.25
@@ -242,10 +242,11 @@ public class Blue24BallSpamLinearPivot extends NextFTCOpMode {
 
     public Command Auto() {
         return new SequentialGroup(
-                setTurretHeading(-160),
+                setTurretHeading(-150),
                 new FollowPath(paths.Path1, false, 1.0),
-                enableGoalTracking(),
+
                 intakeMotorOn,
+                enableGoalTracking(),
                 new FollowPath(paths.Path2, false, 1.0),
                 turnOffPreload(),
 
@@ -282,7 +283,7 @@ public class Blue24BallSpamLinearPivot extends NextFTCOpMode {
     public void onStartButtonPressed() {
         opmodeTimer.resetTimer();
         matchStarted = true;
-        shooter(2200);
+        shooter(2500);
         Auto().schedule();
     }
     private boolean preload = true;
@@ -307,7 +308,7 @@ public class Blue24BallSpamLinearPivot extends NextFTCOpMode {
         flywheelSpeed = results[0];
 
         if(preload==true){
-            shooter(2200);
+            shooter(2500);
         }
         if(preload==false){
             shooter((float) flywheelSpeed - 38);
@@ -402,14 +403,14 @@ public class Blue24BallSpamLinearPivot extends NextFTCOpMode {
             Path4 = follower.pathBuilder() //gateItake
                     .addPath(new BezierLine(
                             new Pose(63.146, 69.703),
-                            new Pose(14, 62.15))) // 144 - 133
+                            new Pose(14, 61.5))) // 144 - 133
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(175)) // 180-0, 180-5
                     .build();
 
             Path16 = follower.pathBuilder() //Pivot path
                     .addPath(new BezierLine(
-                            new Pose(14, 62.15),
-                            new Pose(14.2, 62.5))) // 144 - 132.8
+                            new Pose(14, 61.5),
+                            new Pose(14.2, 61.3))) // 144 - 132.8
                     .setLinearHeadingInterpolation(Math.toRadians(175), Math.toRadians(143)) // 180-5, 180-37
                     .build();
 

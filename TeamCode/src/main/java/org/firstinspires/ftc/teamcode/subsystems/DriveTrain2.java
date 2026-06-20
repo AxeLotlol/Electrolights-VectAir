@@ -474,7 +474,7 @@ public class DriveTrain2 implements Subsystem {
         ActiveOpMode.telemetry().addData("turret", servoPositionSignal);
         Pose futurepose = new Pose(follower.getPose().getX()+follower.getVelocity().getXComponent()*0.3, follower.getPose().getY()+follower.getVelocity().getYComponent()*0.3, follower.getHeading());
         //if((isOverlappingLaunchZone(PedroComponent.follower().getPose())||isOverlappingLaunchZone(futurepose)) && robotToGoalVector.getMagnitude()>40){
-        if(((isOverlappingLaunchZone(follower.getPose())||isOverlappingLaunchZone(futurepose)) && robotToGoalVector.getMagnitude()>50) && autoShoot == true){
+        /*if(((isOverlappingLaunchZone(follower.getPose())||isOverlappingLaunchZone(futurepose)) && robotToGoalVector.getMagnitude()>50) && autoShoot == true){
             intakeMotor.setPower(1);
             transfer.setPower(1);
             openStopper.schedule();
@@ -483,7 +483,7 @@ public class DriveTrain2 implements Subsystem {
             intakeMotor.setPower(0);
             transfer.setPower(0);
             closeStopper.schedule();
-        }
+        }*/
 
         ActiveOpMode.telemetry().addData("Loop Time (ms)", loopTimeMs);
         //ActiveOpMode.telemetry().addData("Motor1Speed", s1speed);

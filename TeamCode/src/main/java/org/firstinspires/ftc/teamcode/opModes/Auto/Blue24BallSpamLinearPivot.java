@@ -100,7 +100,7 @@ public static double gateX = 11.8   ; // 144                                    
     private ServoImplEx turret1;
     private ServoImplEx turret2;
 
-    public static double turretOffset = -17.5;
+    public static double turretOffset = -14;
     public static double turretOffsetStep = -5;
     // Inches from the Pinpoint/Pedro robot pose origin to the turret pivot.
     public static double turretForwardOffset = -0.52588;

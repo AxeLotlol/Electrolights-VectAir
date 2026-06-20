@@ -26,6 +26,7 @@ import java.util.List;
 
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
+import dev.nextftc.core.commands.groups.ParallelGroup;
 import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.components.BindingsComponent;
@@ -85,7 +86,7 @@ public static double gateX = 11.8   ; // 144                                    
     private static final double MAX_ANGLE =  224.75;
     private static final double TURRET_RANGE =  449.51;
     private double currentTurretPos = 180.0;
-
+    public static double turretHeading4  = -140;
     private boolean matchStarted = false;
     private boolean autoShoot = false;
     private boolean useAutoGoalTracking = true;
@@ -128,10 +129,20 @@ public static double gateX = 11.8   ; // 144                                    
     private List<LynxModule> allHubs;
     public Pose currPose;
 
+    private static final double ppr = (.225 - .5) / (Math.PI / 2.0);
+    public Command setPosition(double position){
+        return new LambdaCommand()
+                .setStart(()->{
+                    turret1.setPosition(position);
+                    turret2.setPosition(position);
+                });
+    }
     public double getClosestValidTurretAngle(double relativeGoalDegrees) {
         double option1 = normalizeDegrees(relativeGoalDegrees);
         return Math.max(MIN_ANGLE, Math.min(MAX_ANGLE, option1));
     }
+
+
 
     private double normalizeDegrees(double degrees) {
         while (degrees > 180.0) {
@@ -206,7 +217,7 @@ public static double gateX = 11.8   ; // 144                                    
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
-        setTurretHeading(140);
+
         follower = PedroComponent.follower();
         follower.setStartingPose(start);
         paths = new Paths(follower);
@@ -217,6 +228,7 @@ public static double gateX = 11.8   ; // 144                                    
         turret2 = ActiveOpMode.hardwareMap().get(ServoImplEx.class,"turretServo2");
         turret1.setPwmRange(new PwmControl.PwmRange(500, 2500));
         turret2.setPwmRange(new PwmControl.PwmRange(500, 2500));
+        setPosition(0.35);
         hoodServo = new ServoEx("hoodServo");
         servoStopper = new ServoEx("stopperServo");
         telemetry.addLine("Initialized");
@@ -242,11 +254,14 @@ public static double gateX = 11.8   ; // 144                                    
 
     public Command Auto() {
         return new SequentialGroup(
-                setTurretHeading(-160),
+                setPosition(0.35),
                 new FollowPath(paths.Preload, false, 1.0),
 
                 intakeMotorOn,
-
+                openStopper,
+                new Delay(0.2),
+                closeStopper,
+                autoShootEnable(),
                 new FollowPath(paths.Spike2, false, 1.0),
                 setTurretHeading(-30),
                 new FollowPath(paths.launcgSpike3, false, 1.0),
@@ -385,7 +400,7 @@ public static double gateX = 11.8   ; // 144                                    
                             new Pose(startX, startY),
                             new Pose(48.995, 94.650))) // 144 - 95.005
                     .setLinearHeadingInterpolation(Math.toRadians(-90), Math.toRadians(-60)) // 180-270, 180-240
-                    .addPoseCallback(new Pose(46.255,101.833), autoShootEnable(),0.8 ) // 144 - 97.745
+                    //.addPoseCallback(new Pose(46.255,101.833), autoShootEnable(),0.8 ) // 144 - 97.745
                     .build();
 
             Spike2 = follower.pathBuilder()
@@ -426,6 +441,7 @@ public static double gateX = 11.8   ; // 144                                    
                             new Pose(61.942, 73.32))) // 144 - 82.058
                     .setLinearHeadingInterpolation(Math.toRadians(gateHeading1), Math.toRadians(195)) // 180 - (-15)
                     .addPoseCallback(new Pose(48.435,70.259),enableGoalTracking(),0.78)
+                    .addPoseCallback(new Pose(48.435,70.529),intakeMotorOff, 0.78)
                     .build();
 
             Path6 = follower.pathBuilder()

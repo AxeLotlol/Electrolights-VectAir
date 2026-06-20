@@ -46,6 +46,7 @@ public class AutoShooterCalc implements Subsystem {
         double flywheelSpeed = Math.sqrt(g * x * x / (2 * Math.pow(Math.cos(hoodAngle), 2) * (x * Math. tan(hoodAngle) - y)));
 
         Vector robotVelocity = new Vector(robotVel.getMagnitude(), robotVel.getTheta());
+
         if(robotAccel.getMagnitude() > 10) {
             robotVelocity.setMagnitude(robotVelocity.getMagnitude() + (robotAccel.getMagnitude() * accelScalar));
         }

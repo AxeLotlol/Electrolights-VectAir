@@ -18,16 +18,16 @@ public class Constants {
             .forwardZeroPowerAcceleration(-47)
             .lateralZeroPowerAcceleration(-83)
             .headingPIDFCoefficients(new PIDFCoefficients(
-                    0.28,
+                    1.6,
                     0,
-                    0.005,
-                    0.2
+                    0.215,
+                    0
             ))
             .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(
-                    1.5,
+                    0.7126,
                     0,
-                    0.1,
-                    0.0005
+                    0.1127,
+                    0
             ))
             .centripetalScaling(0);
     public static MecanumConstants driveConstants = new MecanumConstants()
@@ -44,8 +44,10 @@ public class Constants {
             .yVelocity(80);
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(4.86)
-            .strafePodX(0.84)
+//            .forwardPodY(4.86)
+//            .strafePodX(0.84)
+            .forwardPodY(4.955)
+            .strafePodX(0.89)
             .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
             .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED);
 

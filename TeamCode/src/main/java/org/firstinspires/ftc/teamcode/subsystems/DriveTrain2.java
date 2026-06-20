@@ -68,7 +68,7 @@ public class DriveTrain2 implements Subsystem {
 
     public boolean firsttime = true;
 
-    public static double servoOffset = 0.025;
+    public static double servoOffset = 0.0028;
 
     public int alliance;
     public boolean far;
@@ -81,15 +81,15 @@ public class DriveTrain2 implements Subsystem {
     private ServoImplEx turret1;
     private ServoImplEx turret2;
 
-    public static double turretOffset = 8;
-    public static double turretOffset2 = -8;
+    public static double turretOffset = 10  ;
+    public static double turretOffset2 = -10;
     public static double turretOffsetStep = -5;
     // Inches from the Pinpoint/Pedro robot pose origin to the turret pivot.
     public static double turretForwardOffset = -0.52588;
     public static double turretStrafeOffset = 0;
 
-    public static double openStopperPos = 1;
-    public static double closeStopperPos = 0.9;
+    public static double openStopperPos = 0.2;
+    public static double closeStopperPos = 0.13;
     public Command driveToGate = new LambdaCommand()
             .setStart(() -> dToGate = true);
     public static boolean dToGate = false;
@@ -457,7 +457,7 @@ public class DriveTrain2 implements Subsystem {
         double robotAngularVelocityRads = follower.getAngularVelocity();
         double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
         double feedforwardOffset = robotAngularVelocityDegs * 0.2;
-        if(alliance == -1){
+        if(alliance == -1) {
             targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset - feedforwardOffset);
         }
         else{
@@ -474,12 +474,12 @@ public class DriveTrain2 implements Subsystem {
         ActiveOpMode.telemetry().addData("turret", servoPositionSignal);
         Pose futurepose = new Pose(follower.getPose().getX()+follower.getVelocity().getXComponent()*0.3, follower.getPose().getY()+follower.getVelocity().getYComponent()*0.3, follower.getHeading());
         //if((isOverlappingLaunchZone(PedroComponent.follower().getPose())||isOverlappingLaunchZone(futurepose)) && robotToGoalVector.getMagnitude()>40){
-        if(((isOverlappingLaunchZone(follower.getPose())||isOverlappingLaunchZone(futurepose)) && robotToGoalVector.getMagnitude()>50)|| shooting ==true){
+        if(((isOverlappingLaunchZone(follower.getPose())||isOverlappingLaunchZone(futurepose)) && robotToGoalVector.getMagnitude()>50) && autoShoot == true){
             intakeMotor.setPower(1);
             transfer.setPower(1);
             openStopper.schedule();
         }
-        else{
+        else if(shooting == false){
             intakeMotor.setPower(0);
             transfer.setPower(0);
             closeStopper.schedule();

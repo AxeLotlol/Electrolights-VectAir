@@ -80,7 +80,7 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
     public static double gateX1 = 131.5; // 142 - 10.5
     public static double gateY1 = 58.75;
 
-    public static double turretHeading1 = -169;
+    public static double turretHeading1 = 169;
     public static double turretHeading2 = 125;
     public static double turretHeading3 = 105;
 
@@ -106,7 +106,7 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
     private ServoImplEx turret1;
     private ServoImplEx turret2;
 
-    public static double turretOffset = -17.5;
+    public static double turretOffset = 17.5;
     public static double turretOffsetStep = -5;
 
     // Inches from the Pinpoint/Pedro robot pose origin to the turret pivot.
@@ -399,7 +399,7 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
 
         if (preload == false) {
 
-            turretOffset = -17;
+            turretOffset = 17;
 
             shooter((float) flywheelSpeed - 38);
         }
@@ -486,6 +486,10 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
 
     public class Paths {
 
+        private double toRed(double blueDeg) {
+            return Math.toRadians(180.0 - blueDeg);
+        }
+
         public PathChain Preload;
         public PathChain Spike2;
         public PathChain launcgSpike3;
@@ -511,80 +515,56 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
             Preload = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(startX, startY),
-                            new Pose(93.005, 94.650))) // 142 - 48.995
+                            new Pose(93.005, 94.650)))
                     .setLinearHeadingInterpolation(
-                            Math.toRadians(-90),
-                            Math.toRadians(-60))
-                    .addPoseCallback(
-                            new Pose(95.745, 101.833),
-                            autoShootEnable(),
-                            0.8)
+                            toRed(-90),
+                            toRed(-60))
                     .build();
 
             Spike2 = follower.pathBuilder()
                     .addPath(new BezierCurve(
                             new Pose(93.005, 94.650),
-                            new Pose(91.48, 59.7), // 142 - 50.52
-                            new Pose(123.5, 59.5))) // 142 - 18.5
+                            new Pose(91.48, 59.7),
+                            new Pose(123.5, 59.5)))
                     .setLinearHeadingInterpolation(
-                            Math.toRadians(-60),
-                            Math.toRadians(160))
-                    .addPoseCallback(
-                            new Pose(96.998, 72.527),
-                            enableGoalTracking(),
-                            0.5)
-                    .addPoseCallback(
-                            new Pose(96.998, 72.527),
-                            turnOffPreload(),
-                            0.5)
+                            toRed(-60),
+                            toRed(160))
                     .build();
 
             launcgSpike3 = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(123.5, 59.5),
-                            new Pose(78.854, 69.703))) // 142 - 63.146
+                            new Pose(78.854, 69.703)))
                     .setLinearHeadingInterpolation(
-                            Math.toRadians(160),
-                            Math.toRadians(180))
-                    .addPoseCallback(
-                            new Pose(92.624, 66.556),
-                            enableGoalTracking(),
-                            0.78)
+                            toRed(160),
+                            toRed(180))
                     .build();
 
             gateIntake1 = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(78.854, 69.703),
-                            new Pose(128, 61.5))) // 142 - 14
+                            new Pose(128, 61.5)))
                     .setLinearHeadingInterpolation(
-                            Math.toRadians(180),
-                            Math.toRadians(175))
+                            toRed(180),
+                            toRed(175))
                     .build();
 
             Path16 = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(128, 61.5),
-                            new Pose(127.8, 61.3))) // 142 - 14.2
+                            new Pose(131, 61.3)))
                     .setLinearHeadingInterpolation(
-                            Math.toRadians(175),
-                            Math.toRadians(143))
+                            toRed(175),
+                            toRed(143))
                     .build();
 
             Path5 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(127.8, 62.5),
-                            new Pose(80.058, 73.32))) // 142 - 61.942
+                            new Pose(131, 62.5),
+                            new Pose(80.058, 73.32)))
                     .setLinearHeadingInterpolation(
-                            Math.toRadians(gateHeading1),
-                            Math.toRadians(195))
-                    .addPoseCallback(
-                            new Pose(93.565, 70.259),
-                            enableGoalTracking(),
-                            0.78)
-                    .addPoseCallback(
-                            new Pose(93.565, 70.529),
-                            intakeMotorOff,
-                            0.78)
+                            gateHeading1,
+                            toRed(195))
                     .build();
 
             Path6 = follower.pathBuilder()
@@ -592,8 +572,8 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
                             new Pose(80.058, 73.32),
                             new Pose(gateX, gateY)))
                     .setLinearHeadingInterpolation(
-                            Math.toRadians(195),
-                            Math.toRadians(gateHeading))
+                            toRed(195),
+                            gateHeading)
                     .build();
 
             Path7 = follower.pathBuilder()
@@ -601,8 +581,8 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
                             new Pose(gateX, gateY),
                             new Pose(80.058, 75)))
                     .setLinearHeadingInterpolation(
-                            Math.toRadians(gateHeading),
-                            Math.toRadians(195))
+                            gateHeading,
+                            toRed(195))
                     .build();
 
             Path8 = follower.pathBuilder()
@@ -610,8 +590,8 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
                             new Pose(80.058, 75),
                             new Pose(gateX, gateY)))
                     .setLinearHeadingInterpolation(
-                            Math.toRadians(195),
-                            Math.toRadians(gateHeading))
+                            toRed(195),
+                            gateHeading)
                     .build();
 
             Path9 = follower.pathBuilder()
@@ -619,75 +599,64 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
                             new Pose(gateX, gateY),
                             new Pose(80.058, 75)))
                     .setLinearHeadingInterpolation(
-                            Math.toRadians(gateHeading),
-                            Math.toRadians(195))
+                            gateHeading,
+                            toRed(195))
                     .build();
 
             Path10 = follower.pathBuilder()
                     .addPath(new BezierCurve(
-                            new Pose(92.967, 83.71111297536585), // 142 - 49.033
-                            new Pose(101.019, 63.28), // 142 - 40.981
+                            new Pose(92.967, 83.7111129),
+                            new Pose(101.019, 63.28),
                             new Pose(gateX2, gateY2)))
                     .setLinearHeadingInterpolation(
-                            Math.toRadians(195),
-                            Math.toRadians(gateHeading))
+                            toRed(195),
+                            gateHeading)
                     .build();
-
-        /*
-        Pivot2 = follower.pathBuilder()
-                .addPath(new BezierLine(
-                        new Pose(127.14, 62.8),
-                        new Pose(127.04, 62.5)))
-                .setLinearHeadingInterpolation(
-                        Math.toRadians(175),
-                        Math.toRadians(143))
-                .build();
-        */
 
             Path11 = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(gateX2, gateY2),
-                            new Pose(93.81, 92))) // 142 - 48.19
+                            new Pose(93.81, 92)))
                     .setLinearHeadingInterpolation(
-                            Math.toRadians(gateHeading),
-                            Math.toRadians(215))
+                            gateHeading,
+                            toRed(215))
                     .build();
 
             Path12 = follower.pathBuilder()
                     .addPath(new BezierCurve(
                             new Pose(93.81, 92),
-                            new Pose(106.914, 66.749), // 142 - 35.086
+                            new Pose(106.914, 66.749),
                             new Pose(gateX2, gateY2)))
                     .setLinearHeadingInterpolation(
-                            Math.toRadians(215),
-                            Math.toRadians(gateHeading))
+                            toRed(215),
+                            gateHeading)
                     .build();
 
             Path13 = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(gateX2, gateY2),
-                            new Pose(82.0, 104.0))) // 142 - 60
+                            new Pose(82.0, 104.0)))
                     .setLinearHeadingInterpolation(
-                            Math.toRadians(gateHeading),
-                            Math.toRadians(90))
+                            gateHeading,
+                            toRed(90))
                     .build();
 
             Path14 = follower.pathBuilder()
                     .addPath(new BezierCurve(
                             new Pose(80.058, 75),
-                            new Pose(85.809, 79.2375828716257), // 142 - 56.191
-                            new Pose(122, 83.8))) // 142 - 20
+                            new Pose(85.809, 79.2375),
+                            new Pose(122, 83.8)))
                     .setLinearHeadingInterpolation(
-                            Math.toRadians(195),
-                            Math.toRadians(180))
+                            toRed(195),
+                            toRed(180))
                     .build();
 
             Path15 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(119.0, 83.8), // 142 - 23
-                            new Pose(92.967, 83.71111297536585)))
+                            new Pose(119.0, 83.8),
+                            new Pose(92.967, 83.7111129)))
                     .setConstantHeadingInterpolation(
-                            Math.toRadians(180))
+                            toRed(180))
                     .build();
         }
     }

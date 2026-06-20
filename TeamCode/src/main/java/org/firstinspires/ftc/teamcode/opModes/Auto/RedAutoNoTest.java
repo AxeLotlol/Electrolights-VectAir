@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.DriveTrain2.openStopperP
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 import static org.firstinspires.ftc.teamcode.subsystems.LaunchDetector.isOverlappingLaunchZone;
 
+
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
@@ -26,6 +27,7 @@ import java.util.List;
 
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
+import dev.nextftc.core.commands.groups.ParallelGroup;
 import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.components.BindingsComponent;
@@ -42,9 +44,9 @@ import dev.nextftc.hardware.impl.ServoEx;
 
 @Autonomous
 @Configurable
-public class Red24BallSpamLinearPivot extends NextFTCOpMode {
+public class RedAutoNoTest extends NextFTCOpMode {
 
-    public Red24BallSpamLinearPivot() {
+    public RedAutoNoTest() {
         addComponents(
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE,
@@ -57,43 +59,35 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
     private Timer opmodeTimer;
     private Paths paths;
 
-    public static double startX = 107.17; // 142 - 33.83
+    public static double startX = 33.83; // 144 - 110.17
     public static double startY = 134.4;
-
-    public Pose start = new Pose(startX, startY, Math.toRadians(270));
+    public Pose start = new Pose(startX, startY, Math.toRadians(270)); // 180 - 270
 
     // --- Turret tracking ---
     private ServoEx servoStopper;
     private ServoEx hoodServo;
 
     double goalY = 144;
-    double goalX = 142;
-
-    public static double gateX = 130.2; // 142 - 11.8
+    double goalX = 0; // 144 - 144
+    public static double gateX = 11.8   ; // 144                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         - 133.2
     public static double gateY = 58.85;
 
-    public static double gateX2 = 130.8; // 142 - 11.2
+    public static double gateX2 = 11.2;
     public static double gateY2 = 58.85;
 
-    public static double gateHeading = 41.25;
+    public static double gateHeading = 138.75; // 180 - 41.25
 
-    public static double gateX1 = 131.5; // 142 - 10.5
+    public static double gateX1 = 10.5; // 144 - 133.5
     public static double gateY1 = 58.75;
-
-    public static double turretHeading1 = 169;
-    public static double turretHeading2 = 125;
-    public static double turretHeading3 = 105;
-
-    public static double gateHeading1 = 42;
-
+    public static double turretHeading1 = 60; // 180 - 60
+    public static double turretHeading2 = 125; // 180 - 55
+    public static double turretHeading3 = 105; // 180 - 75
+    public static double gateHeading1 = 138; // 180 - 42
     private static final double MIN_ANGLE = -224.75;
-    private static final double MAX_ANGLE = 224.75;
-    private static final double TURRET_RANGE = 449.51;
-
+    private static final double MAX_ANGLE =  224.75;
+    private static final double TURRET_RANGE =  449.51;
     private double currentTurretPos = 90;
-
-    public static double turretHeading4 = -140;
-
+    public static double turretHeading4  = -140;
     private boolean matchStarted = false;
     private boolean autoShoot = false;
     private boolean useAutoGoalTracking = true;
@@ -106,9 +100,8 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
     private ServoImplEx turret1;
     private ServoImplEx turret2;
 
-    public static double turretOffset = 17.5;
+    public static double turretOffset = -17.5;
     public static double turretOffsetStep = -5;
-
     // Inches from the Pinpoint/Pedro robot pose origin to the turret pivot.
     public static double turretForwardOffset = -0.52588;
     public static double turretStrafeOffset = 0;
@@ -118,7 +111,6 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
                 intakeMotor.setPower(1);
                 transfer.setPower(1);
             });
-
 
     private Command intakeMotorOff = new LambdaCommand()
             .setStart(() -> {
@@ -138,10 +130,22 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
     private List<LynxModule> allHubs;
     public Pose currPose;
 
+    private static final double ppr = (.225 - .5) / (Math.PI / 2.0);
+    public Command setPosition(double position){
+        return new LambdaCommand()
+                .setStart(()->{
+                    isOverridden = true;
+                    turret1.setPosition(position);
+                    turret2.setPosition(position);
+
+                });
+    }
     public double getClosestValidTurretAngle(double relativeGoalDegrees) {
         double option1 = normalizeDegrees(relativeGoalDegrees);
         return Math.max(MIN_ANGLE, Math.min(MAX_ANGLE, option1));
     }
+
+
 
     private double normalizeDegrees(double degrees) {
         while (degrees > 180.0) {
@@ -172,23 +176,9 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
         );
     }
 
-    //public SequentialGroup shoot = new SequentialGroup(
-    //servoOpen,
-    //new Delay(0.3)
-    //servoClose
-    //);
-
     double targetTurretAngle;
 
-
-
-
     public boolean manualTPS = true;
-
-
-
-
-
 
     public Command autoShootEnable(){
         return new LambdaCommand()
@@ -222,53 +212,33 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
     }
 
     public static MotorEx flywheel = new MotorEx("launchingmotor");
-
     public static MotorEx flywheel2 = new MotorEx("launchingmotor2");
-
-    // ----------------------
 
     @Override
     public void onInit() {
-
         allHubs = ActiveOpMode.hardwareMap().getAll(LynxModule.class);
-
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
 
         follower = PedroComponent.follower();
-
         follower.setStartingPose(start);
-
         paths = new Paths(follower);
-
         opmodeTimer = new Timer();
-
         intakeMotor = new MotorEx("intakeMotor");
         transfer = new MotorEx("transferMotor");
-
-        turret1 = ActiveOpMode.hardwareMap().get(
-                ServoImplEx.class,
-                "turretServo1");
-
-        turret2 = ActiveOpMode.hardwareMap().get(
-                ServoImplEx.class,
-                "turretServo2");
-
+        turret1 = ActiveOpMode.hardwareMap().get(ServoImplEx.class, "turretServo1");
+        turret2 = ActiveOpMode.hardwareMap().get(ServoImplEx.class,"turretServo2");
         turret1.setPwmRange(new PwmControl.PwmRange(500, 2500));
         turret2.setPwmRange(new PwmControl.PwmRange(500, 2500));
-
         isOverridden = true;
-
         setTurretHeading(turretHeading1).schedule();
-
         hoodServo = new ServoEx("hoodServo");
-
         servoStopper = new ServoEx("stopperServo");
-
         telemetry.addLine("Initialized");
         telemetry.update();
     }
+
     public Command turnTo(Pose targetPose, double timeoutSeconds) {
         return new LambdaCommand("Turn to " + targetPose.getHeading())
                 .setStart(() -> follower.holdPoint(targetPose))
@@ -279,11 +249,11 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
 
     public Command closeStopper = new LambdaCommand()
             .setStart(() -> {
-                servoStopper.setPosition(closeStopperPos); // close
+                servoStopper.setPosition(closeStopperPos);
             }).setIsDone(() -> true);
     public Command openStopper = new LambdaCommand()
             .setStart(() -> {
-                servoStopper.setPosition(openStopperPos); // open
+                servoStopper.setPosition(openStopperPos);
             }).setIsDone(() -> true);
 
     public Command Auto() {
@@ -361,120 +331,66 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
     private boolean preload = true;
     private double flywheelSpeed;
 
-
     @Override
     public void onUpdate() {
-
         for (LynxModule hub : allHubs) {
             hub.clearBulkCache();
         }
-
         follower.update();
-
         Storage.currentPose = follower.getPose();
 
         if (!matchStarted) return;
 
         Pose currPose = follower.getPose();
-
         Pose turretPose = getTurretPose(currPose);
-
         double robotHeading = follower.getPose().getHeading();
-
         Vector robotToGoalVector = getTurretToGoalVector(turretPose);
-
-        Double[] results = calculateShotVectorandUpdateHeading(
-                robotHeading,
-                robotToGoalVector,
-                follower.getVelocity().times(1.0),
-                follower.getAcceleration());
+        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity().times(1.0), follower.getAcceleration());
 
         flywheelSpeed = results[0];
 
-        if (preload == true) {
-
-            shooter((float) flywheelSpeed + 30);
-
+        if(preload==true){
+            shooter((float) flywheelSpeed+30);
+//            shooter(2500);
         }
-
-        if (preload == false) {
-
-            turretOffset = 17;
-
+        if(preload==false){
+            turretOffset = -17;
             shooter((float) flywheelSpeed - 38);
         }
-
         double hoodAngle = results[1];
-
         hoodServo.setPosition(hoodAngle);
 
         double headingError = results[2];
-
         double robotAngularVelocityRads = follower.getAngularVelocity();
+        double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
+        double feedforwardOffset = robotAngularVelocityDegs * 0.225;
 
-        double robotAngularVelocityDegs =
-                Math.toDegrees(robotAngularVelocityRads);
-
-        double feedforwardOffset =
-                robotAngularVelocityDegs * 0.225;
-
+        // --- Intercepted for Heading Overrides ---
         double targetTurretAngle;
-
         if (isOverridden) {
-
-            targetTurretAngle =
-                    getClosestValidTurretAngle(
-                            overriddenTurretAngle - feedforwardOffset);
-
+            // Evaluates target angle directly based on user's manual call while preserving feedforward stabilization
+            targetTurretAngle = getClosestValidTurretAngle(overriddenTurretAngle - feedforwardOffset);
         } else {
-
-            targetTurretAngle =
-                    getClosestValidTurretAngle(
-                            headingError
-                                    + turretOffset
-                                    - feedforwardOffset);
+            // Default Vector Math Goal Tracking
+            targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset - feedforwardOffset);
         }
 
-        double servoPositionSignal =
-                0.05
-                        + ((targetTurretAngle - MIN_ANGLE)
-                        / 449.51)
-                        * 0.90;
-
-        servoPositionSignal =
-                Math.max(0.05,
-                        Math.min(0.95, servoPositionSignal));
-
+        double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
+        servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
         turret1.setPosition(servoPositionSignal);
         turret2.setPosition(servoPositionSignal);
-
         currentTurretPos = targetTurretAngle;
+        Pose futurepose = new Pose(follower.getPose().getX()+follower.getVelocity().getXComponent()*0.5, follower.getPose().getY()+follower.getVelocity().getYComponent()*0.3, follower.getHeading());
 
-        Pose futurepose = new Pose(
-                follower.getPose().getX()
-                        + follower.getVelocity().getXComponent() * 0.5,
-
-                follower.getPose().getY()
-                        + follower.getVelocity().getYComponent() * 0.3,
-
-                follower.getHeading());
-
-        if (isOverlappingLaunchZone(futurepose)
-                && robotToGoalVector.getMagnitude() > 45
-                && autoShoot) {
-
+        if(isOverlappingLaunchZone(futurepose) && robotToGoalVector.getMagnitude()>45&&autoShoot){
             intakeMotor.setPower(1);
             transfer.setPower(1);
-
             openStopper.schedule();
-
-        } else {
-
+        }
+        else{
             closeStopper.schedule();
         }
-
         Storage.currentPose = follower.getPose();
-
         Storage.setPose = true;
     }
 

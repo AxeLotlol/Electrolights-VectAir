@@ -383,7 +383,7 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
                             new Pose(startX, startY),
                             new Pose(95.005, 94.650)))
                     .setLinearHeadingInterpolation(Math.toRadians(270), Math.toRadians(240))
-                    .addPoseCallback(new Pose(103.524,103.524), autoShootEnable(),0.8 )
+                    //.addPoseCallback(new Pose(103.524,103.524), autoShootEnable(),0.8 )
                     .build();
 
             Path2 = follower.pathBuilder()

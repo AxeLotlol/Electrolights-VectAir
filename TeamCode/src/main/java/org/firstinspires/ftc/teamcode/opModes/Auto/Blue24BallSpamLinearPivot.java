@@ -85,7 +85,7 @@ public static double gateX = 11.8   ; // 144                                    
     private static final double MIN_ANGLE = -224.75;
     private static final double MAX_ANGLE =  224.75;
     private static final double TURRET_RANGE =  449.51;
-    private double currentTurretPos = 180.0;
+    private double currentTurretPos = 90;
     public static double turretHeading4  = -140;
     private boolean matchStarted = false;
     private boolean autoShoot = false;
@@ -99,7 +99,7 @@ public static double gateX = 11.8   ; // 144                                    
     private ServoImplEx turret1;
     private ServoImplEx turret2;
 
-    public static double turretOffset = -9;
+    public static double turretOffset = -17.5;
     public static double turretOffsetStep = -5;
     // Inches from the Pinpoint/Pedro robot pose origin to the turret pivot.
     public static double turretForwardOffset = -0.52588;
@@ -133,8 +133,10 @@ public static double gateX = 11.8   ; // 144                                    
     public Command setPosition(double position){
         return new LambdaCommand()
                 .setStart(()->{
+                    isOverridden = true;
                     turret1.setPosition(position);
                     turret2.setPosition(position);
+
                 });
     }
     public double getClosestValidTurretAngle(double relativeGoalDegrees) {
@@ -228,7 +230,7 @@ public static double gateX = 11.8   ; // 144                                    
         turret2 = ActiveOpMode.hardwareMap().get(ServoImplEx.class,"turretServo2");
         turret1.setPwmRange(new PwmControl.PwmRange(500, 2500));
         turret2.setPwmRange(new PwmControl.PwmRange(500, 2500));
-        setPosition(0.35);
+        setPosition(0.895);
         hoodServo = new ServoEx("hoodServo");
         servoStopper = new ServoEx("stopperServo");
         telemetry.addLine("Initialized");
@@ -254,27 +256,29 @@ public static double gateX = 11.8   ; // 144                                    
 
     public Command Auto() {
         return new SequentialGroup(
-                setPosition(0.35),
+                setPosition(0.895),
+                new Delay(0.3),
                 new FollowPath(paths.Preload, false, 1.0),
 
                 intakeMotorOn,
                 openStopper,
                 new Delay(0.2),
                 closeStopper,
+                enableGoalTracking(),
                 autoShootEnable(),
                 new FollowPath(paths.Spike2, false, 1.0),
-                setTurretHeading(-30),
+                //setTurretHeading(-30),
                 new FollowPath(paths.launcgSpike3, false, 1.0),
                 new FollowPath(paths.gateIntake1, true, 1.0),
                 new FollowPath(paths.Path16,true,1.0),
                 new Delay(1.05),
-                setTurretHeading(-35),
+                //setTurretHeading(-35),
 
                 new FollowPath(paths.Path5, false, 1.0),
 
                 new FollowPath(paths.Path6, true, 1.0),
                 new Delay(2.25),
-                setTurretHeading(-25),
+                //setTurretHeading(-25),
 
                 new FollowPath(paths.Path7, false, 1.0),
 

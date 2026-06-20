@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.DriveTrain2.openStopperP
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 import static org.firstinspires.ftc.teamcode.subsystems.LaunchDetector.isOverlappingLaunchZone;
 
+
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
@@ -78,7 +79,7 @@ public static double gateX = 11.8   ; // 144                                    
 
     public static double gateX1 = 10.5; // 144 - 133.5
     public static double gateY1 = 58.75;
-    public static double turretHeading1 = 120; // 180 - 60
+    public static double turretHeading1 = -169; // 180 - 60
     public static double turretHeading2 = 125; // 180 - 55
     public static double turretHeading3 = 105; // 180 - 75
     public static double gateHeading1 = 138; // 180 - 42
@@ -230,7 +231,8 @@ public static double gateX = 11.8   ; // 144                                    
         turret2 = ActiveOpMode.hardwareMap().get(ServoImplEx.class,"turretServo2");
         turret1.setPwmRange(new PwmControl.PwmRange(500, 2500));
         turret2.setPwmRange(new PwmControl.PwmRange(500, 2500));
-        setPosition(0.895);
+       isOverridden = true;
+        setTurretHeading(turretHeading1).schedule();
         hoodServo = new ServoEx("hoodServo");
         servoStopper = new ServoEx("stopperServo");
         telemetry.addLine("Initialized");
@@ -256,8 +258,8 @@ public static double gateX = 11.8   ; // 144                                    
 
     public Command Auto() {
         return new SequentialGroup(
-                setPosition(0.895),
-                new Delay(0.3),
+
+                setTurretHeading(turretHeading1),
                 new FollowPath(paths.Preload, false, 1.0),
 
                 intakeMotorOn,
@@ -325,14 +327,16 @@ public static double gateX = 11.8   ; // 144                                    
         Pose turretPose = getTurretPose(currPose);
         double robotHeading = follower.getPose().getHeading();
         Vector robotToGoalVector = getTurretToGoalVector(turretPose);
-        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity().times(1), follower.getAcceleration());
+        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity().times(1.0), follower.getAcceleration());
 
         flywheelSpeed = results[0];
 
         if(preload==true){
-            shooter(2500);
+            shooter((float) flywheelSpeed+30);
+//            shooter(2500);
         }
         if(preload==false){
+            turretOffset = -17;
             shooter((float) flywheelSpeed - 38);
         }
         double hoodAngle = results[1];
@@ -404,7 +408,7 @@ public static double gateX = 11.8   ; // 144                                    
                             new Pose(startX, startY),
                             new Pose(48.995, 94.650))) // 144 - 95.005
                     .setLinearHeadingInterpolation(Math.toRadians(-90), Math.toRadians(-60)) // 180-270, 180-240
-                    //.addPoseCallback(new Pose(46.255,101.833), autoShootEnable(),0.8 ) // 144 - 97.745
+                    .addPoseCallback(new Pose(46.255,101.833), autoShootEnable(),0.8 ) // 144 - 97.745
                     .build();
 
             Spike2 = follower.pathBuilder()

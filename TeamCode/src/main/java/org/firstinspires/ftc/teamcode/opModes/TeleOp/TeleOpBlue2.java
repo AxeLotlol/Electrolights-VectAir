@@ -6,6 +6,7 @@ import com.pedropathing.geometry.Pose;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain2;
+import org.firstinspires.ftc.teamcode.subsystems.ShooterCalc;
 
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
@@ -45,6 +46,13 @@ public class TeleOpBlue2 extends NextFTCOpMode {
         Gamepads.gamepad1().leftTrigger().greaterThan(0.3).whenBecomesTrue(()-> transfer.setPower(1))
                 .whenBecomesFalse(() -> transfer.setPower(0));
         Gamepads.gamepad1().x().whenBecomesTrue(()->follower.setPose(new Pose(79.967,9.271,Math.toRadians(90))));
+        Gamepads.gamepad2().leftTrigger().greaterThan(0.5).whenBecomesTrue(() -> DriveTrain2.turretOffset2 -= DriveTrain2.turretOffsetStep);
+        Gamepads.gamepad2().rightTrigger().greaterThan(0.5).whenBecomesTrue(() -> DriveTrain2.turretOffset2 += DriveTrain2.turretOffsetStep);
+        Gamepads.gamepad2().rightBumper().whenBecomesTrue(()->DriveTrain2.turretOffset2+= 1);
+        Gamepads.gamepad2().leftBumper().whenBecomesTrue(()->DriveTrain2.turretOffset2-= 1);
+        Gamepads.gamepad2().a().whenBecomesTrue(() -> DriveTrain2.turretOffset2 = 0);
+        Gamepads.gamepad2().dpadUp().whenBecomesTrue(() -> ShooterCalc.verticalShift += ShooterCalc.verticalShiftStep);
+        Gamepads.gamepad2().dpadDown().whenBecomesTrue(() -> ShooterCalc.verticalShift -= ShooterCalc.verticalShiftStep);
     }
 
     @Override

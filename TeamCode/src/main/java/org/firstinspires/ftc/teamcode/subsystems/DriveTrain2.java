@@ -68,7 +68,7 @@ public class DriveTrain2 implements Subsystem {
 
     public boolean firsttime = true;
 
-    public static double servoOffset = 0.0028;
+    public static double servoOffset = 0.05;
 
     public int alliance;
     public boolean far;
@@ -81,15 +81,15 @@ public class DriveTrain2 implements Subsystem {
     private ServoImplEx turret1;
     private ServoImplEx turret2;
 
-    public static double turretOffset = 10  ;
-    public static double turretOffset2 = -10;
+    public static double turretOffset = 22  ;
+    public static double turretOffset2 = -22;
     public static double turretOffsetStep = -5;
     // Inches from the Pinpoint/Pedro robot pose origin to the turret pivot.
     public static double turretForwardOffset = -0.52588;
     public static double turretStrafeOffset = 0;
 
-    public static double openStopperPos = 0.2;
-    public static double closeStopperPos = 0.13;
+    public static double openStopperPos = 0.56;
+    public static double closeStopperPos = 0.635;
     public Command driveToGate = new LambdaCommand()
             .setStart(() -> dToGate = true);
     public static boolean dToGate = false;
@@ -352,7 +352,7 @@ public class DriveTrain2 implements Subsystem {
         return localize;
     }
 
-    Command shooter = new LambdaCommand()
+    Command shooterer = new LambdaCommand()
             .setStart(() -> shoot());
     private static Command intakeMotorOn = new LambdaCommand()
             .setStart(() -> {
@@ -367,17 +367,19 @@ public class DriveTrain2 implements Subsystem {
                 transfer.setPower(0);
             });
 
+    public boolean autoshoot = false;
+
 
     /*public boolean wraptofalseexecuted = false;
     public Command wrapfalse() {wrapping = false; wraptofalseexecuted=false; return null;}
-    public void wrapperforwrap(){
+    public void wrapperforwrap  (){
             SequentialGroup wraptofalse = new SequentialGroup(new Delay(0.3),wrapfalse());
             wraptofalse.schedule();
     }*/
     public static void shoot() {
         if (shooting == false) {
             shooting = true;
-        SequentialGroup shoot = new SequentialGroup(intakeMotorOn, openStopper, new Delay(0.3), closeStopper, intakeMotorOff, shootFalse);
+        SequentialGroup shoot = new SequentialGroup(openStopper, intakeMotorOn, new Delay(0.3), intakeMotorOff, closeStopper, shootFalse);
         shoot.schedule();
         }
     }
@@ -408,11 +410,9 @@ public class DriveTrain2 implements Subsystem {
             // Schedule the command stored in the localize variable
             Gamepads.gamepad1().rightBumper().whenBecomesTrue(()->openStopper.schedule())
                     .whenBecomesFalse(()->closeStopper.schedule());
-            Gamepads.gamepad1().leftBumper().whenBecomesTrue(toggleAutoShoot);
-            Gamepads.gamepad1().rightTrigger().greaterThan(0.3).whenBecomesTrue(shooter);
+            //Gamepads.gamepad1().leftBumper().whenBecomesTrue(toggleAutoShoot);
+            Gamepads.gamepad1().rightTrigger().greaterThan(0.3).whenBecomesTrue(shooterer);
             //Gamepads.gamepad1().square().whenBecomesTrue(() -> farAngle());
-            Gamepads.gamepad1().rightBumper().whenBecomesTrue(turretzero);
-            Gamepads.gamepad1().leftBumper().whenBecomesTrue(turrethalf);
             MotorEx intakeMotor = new MotorEx("intakeMotor");
             transfer1 = new MotorEx("transferMotor");
             //transfer2 = new ServoEx("transferServo1");

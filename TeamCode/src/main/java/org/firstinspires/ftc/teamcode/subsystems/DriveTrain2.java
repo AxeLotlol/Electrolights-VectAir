@@ -81,15 +81,15 @@ public class DriveTrain2 implements Subsystem {
     private ServoImplEx turret1;
     private ServoImplEx turret2;
 
-    public static double turretOffset = 22  ;
+    public static double turretOffset = -18  ;
     public static double turretOffset2 = -22;
     public static double turretOffsetStep = -5;
     // Inches from the Pinpoint/Pedro robot pose origin to the turret pivot.
     public static double turretForwardOffset = -0.52588;
     public static double turretStrafeOffset = 0;
 
-    public static double openStopperPos = 0.56;
-    public static double closeStopperPos = 0.635;
+    public static double openStopperPos = 0.4;
+    public static double closeStopperPos = 0.624;
     public Command driveToGate = new LambdaCommand()
             .setStart(() -> dToGate = true);
     public static boolean dToGate = false;

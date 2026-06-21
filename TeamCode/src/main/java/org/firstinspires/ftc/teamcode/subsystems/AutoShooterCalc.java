@@ -31,7 +31,7 @@ public class AutoShooterCalc implements Subsystem {
         double x = robotToGoalVector.getMagnitude()-ShooterConstants.PASS_THROUGH_POINT_RADIUS;
         double temp = x/39.37;
         //double y = -4.5745*temp*temp*temp + 25.978*temp*temp - 48.395*temp + 58.675;
-        double y = SCORE_HEIGHT +1;
+        double y = SCORE_HEIGHT;
         double a = Math.toRadians(-23);
         if(x<50){
             a=Math.toRadians(-45);

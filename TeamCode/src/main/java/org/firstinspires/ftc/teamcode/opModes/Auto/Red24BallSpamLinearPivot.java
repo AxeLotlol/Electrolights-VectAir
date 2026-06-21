@@ -106,7 +106,7 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
     private ServoImplEx turret1;
     private ServoImplEx turret2;
 
-    public static double turretOffset = 17.5;
+    public static double turretOffset = -18;
     public static double turretOffsetStep = -5;
 
     // Inches from the Pinpoint/Pedro robot pose origin to the turret pivot.
@@ -304,51 +304,7 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
 
                 new FollowPath(paths.Spike2, false, 1.0),
 
-                new FollowPath(paths.launcgSpike3, false, 1.0),
-
-                new FollowPath(paths.gateIntake1, true, 1.0),
-
-                new FollowPath(paths.Path16, true, 1.0),
-
-                new Delay(1.05),
-
-                new FollowPath(paths.Path5, false, 1.0),
-
-                new FollowPath(paths.Path6, true, 1.0),
-
-                new Delay(2.25),
-
-                new FollowPath(paths.Path7, false, 1.0),
-
-                new FollowPath(paths.Path8, true, 1.0),
-
-                new Delay(2.25),
-
-                new FollowPath(paths.Path9, false, 1.0),
-
-                enableGoalTracking(),
-
-                new FollowPath(paths.Path14, false, 1.0),
-
-                intakeMotorOff,
-
-                new FollowPath(paths.Path15, false, 1.0),
-
-                intakeMotorOn,
-
-                new FollowPath(paths.Path10, true, 1.0),
-
-                // new FollowPath(paths.Pivot2, false, 1.0),
-
-                new Delay(1.05),
-
-                new FollowPath(paths.Path11, false, 1.0),
-
-                new FollowPath(paths.Path12, true, 1.0),
-
-                new Delay(2.25),
-
-                new FollowPath(paths.Path13, false, 1.0)
+                new FollowPath(paths.launcgSpike3, false, 1.0)
         );
     }
 
@@ -393,7 +349,7 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
 
         if (preload == true) {
 
-            shooter((float) flywheelSpeed + 30);
+            shooter((float) flywheelSpeed + 50);
 
         }
 
@@ -517,8 +473,8 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
                             new Pose(startX, startY),
                             new Pose(93.005, 94.650)))
                     .setLinearHeadingInterpolation(
-                            toRed(-90),
-                            toRed(-60))
+                            Math.toRadians(270),
+                            Math.toRadians(240))
                     .build();
 
             Spike2 = follower.pathBuilder()
@@ -527,44 +483,46 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
                             new Pose(91.48, 59.7),
                             new Pose(123.5, 59.5)))
                     .setLinearHeadingInterpolation(
-                            toRed(-60),
-                            toRed(160))
+                            Math.toRadians(240),
+                            Math.toRadians(20))
                     .build();
 
-            launcgSpike3 = follower.pathBuilder()
-                    .addPath(new BezierLine(
-                            new Pose(123.5, 59.5),
-                            new Pose(78.854, 69.703)))
-                    .setLinearHeadingInterpolation(
-                            toRed(160),
-                            toRed(180))
+            launcgSpike3 = follower.pathBuilder().addPath(
+                            new BezierCurve(
+                                    new Pose(123.5, 59.5),
+                                    new Pose(78.854, 69.703)
+                            )
+                    ).setLinearHeadingInterpolation(Math.toRadians(46), Math.toRadians(0))
+                    .setVelocityConstraint(1.0)
+                    .setTValueConstraint(0.8)
+
+
                     .build();
 
             gateIntake1 = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(78.854, 69.703),
-                            new Pose(128, 61.5)))
+                            new Pose(131, 61.5)))
                     .setLinearHeadingInterpolation(
-                            toRed(180),
-                            toRed(175))
+                            Math.toRadians(0),Math.toRadians(5))
                     .build();
 
             Path16 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(128, 61.5),
-                            new Pose(131, 61.3)))
+                            new Pose(131, 61.5),
+                            new Pose(131.2, 61.3)))
                     .setLinearHeadingInterpolation(
-                            toRed(175),
-                            toRed(143))
+                            Math.toRadians(5),
+                            Math.toRadians(gateHeading1))
                     .build();
 
             Path5 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(131, 62.5),
+                            new Pose(131.2, 61.3),
                             new Pose(80.058, 73.32)))
                     .setLinearHeadingInterpolation(
                             gateHeading1,
-                            toRed(195))
+                            Math.toRadians(-15))
                     .build();
 
             Path6 = follower.pathBuilder()
@@ -572,7 +530,7 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
                             new Pose(80.058, 73.32),
                             new Pose(gateX, gateY)))
                     .setLinearHeadingInterpolation(
-                            toRed(195),
+                            Math.toRadians(-15),
                             gateHeading)
                     .build();
 
@@ -582,7 +540,7 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
                             new Pose(80.058, 75)))
                     .setLinearHeadingInterpolation(
                             gateHeading,
-                            toRed(195))
+                            Math.toRadians(-15))
                     .build();
 
             Path8 = follower.pathBuilder()
@@ -590,7 +548,7 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
                             new Pose(80.058, 75),
                             new Pose(gateX, gateY)))
                     .setLinearHeadingInterpolation(
-                            toRed(195),
+                            Math.toRadians(-15),
                             gateHeading)
                     .build();
 
@@ -600,7 +558,7 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
                             new Pose(80.058, 75)))
                     .setLinearHeadingInterpolation(
                             gateHeading,
-                            toRed(195))
+                            Math.toRadians(-15))
                     .build();
 
             Path10 = follower.pathBuilder()
@@ -609,7 +567,7 @@ public class Red24BallSpamLinearPivot extends NextFTCOpMode {
                             new Pose(101.019, 63.28),
                             new Pose(gateX2, gateY2)))
                     .setLinearHeadingInterpolation(
-                            toRed(195),
+                            Math.toRadians(-15),
                             gateHeading)
                     .build();
 

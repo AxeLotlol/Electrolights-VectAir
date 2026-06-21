@@ -94,7 +94,7 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
     private ServoImplEx turret1;
     private ServoImplEx turret2;
 
-    public static double turretOffset = 6;
+    public static double turretOffset = -10;
     public static double turretOffsetStep = -5;
     // Inches from the Pinpoint/Pedro robot pose origin to the turret pivot.
     public static double turretForwardOffset = -0.52588;
@@ -440,9 +440,9 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
                             new BezierCurve(
                                     new Pose(92.000, 94.000),
                                     new Pose(104.000, 67.000),
-                                    new Pose(135, 59.25)
+                                    new Pose(135, 59.65)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(47), Math.toRadians(40))
+                    ).setLinearHeadingInterpolation(Math.toRadians(47), Math.toRadians(0))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
                     .addTemporalCallback(0.1,intakeMotorOn)
@@ -463,7 +463,7 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
 
             launchSpam1 = follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(130, 58.25),
+                                    new Pose(135, 57.65),
                                     new Pose(104.000, 67.000),
                                     new Pose(92.000, 94.000)
                             )
@@ -490,7 +490,7 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
 
             launchSpam2 = follower.pathBuilder().addPath(
                             new BezierCurve(
-                                    new Pose(130.5, 63),
+                                    new Pose(135, 59.25),
                                     new Pose(104.000, 67.000),
                                     new Pose(92, 94)
                             )

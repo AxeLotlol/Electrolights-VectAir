@@ -53,13 +53,13 @@ public class AutoLeave extends NextFTCOpMode {
     private Timer opmodeTimer;
     private Paths paths;
 
-    public Pose start = new Pose(startX, startY, Math.toRadians(270));
+    public Pose start = new Pose(startX, startY, Math.toRadians(90));
 
     // --- Turret tracking ---
     private ServoEx servoStopper;
     private ServoEx hoodServo;
     public static double startX = 79.318;
-    public static double startY = 8.2;
+    public static double startY = 9.2;
 
     private MotorEx intakeMotor;
     private boolean isOverridden = false;
@@ -89,7 +89,7 @@ public class AutoLeave extends NextFTCOpMode {
     private ServoImplEx turret1;
     private ServoImplEx turret2;
 
-    public static double turretOffset = 6;
+    public static double turretOffset = -18;
     public static double turretOffsetStep = -5;
     // Inches from the Pinpoint/Pedro robot pose origin to the turret pivot.
     public static double turretForwardOffset = -0.52588;
@@ -249,10 +249,10 @@ public class AutoLeave extends NextFTCOpMode {
 
     public Command Auto() {
         return new SequentialGroup(
-
+                enableGoalTracking(),
+                new Delay(3),
+                autoShootEnable(),
                 new FollowPath(paths.MainChain)
-
-
 
 
         );
@@ -261,10 +261,10 @@ public class AutoLeave extends NextFTCOpMode {
     public void onStartButtonPressed() {
         opmodeTimer.resetTimer();
         matchStarted = true;
-        shooter(2500);
+
         Auto().schedule();
     }
-    private boolean preload = true;
+    private boolean preload = false;
     private double flywheelSpeed;
 
     @Override
@@ -342,8 +342,8 @@ public class AutoLeave extends NextFTCOpMode {
             MainChain = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(79.318, 8.200),
-                                    new Pose(108.8133, 9.693)
+                                    new Pose(79.318, 9.2),
+                                    new Pose(108.8133, 9.5)
                             )
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(90))

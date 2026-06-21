@@ -209,12 +209,12 @@ public class DriveTrain2 implements Subsystem {
             alliance = -1;
             goalXDist = 144;
             goalX = 144;
-            localizeX = 8;
+            localizeX = 136;
         } else if (isBlue()) {
             alliance = 1;
             goalXDist = 0;
             goalX = 0;
-            localizeX = 136;
+            localizeX = 8;
         } else {
             ActiveOpMode.telemetry().addLine("No direction set");
         }

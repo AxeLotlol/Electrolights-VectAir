@@ -69,7 +69,7 @@ public class Blue24BallSpamLinearPivot extends NextFTCOpMode {
 
     double goalY = 144;
     double goalX = 0; // 144 - 144
-public static double gateX = 11.8   ; // 144                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         - 133.2
+    public static double gateX = 11.8   ; // 144                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         - 133.2
     public static double gateY = 58.85;
 
     public static double gateX2 = 11.2;
@@ -79,14 +79,14 @@ public static double gateX = 11.8   ; // 144                                    
 
     public static double gateX1 = 10.5; // 144 - 133.5
     public static double gateY1 = 58.75;
-    public static double turretHeading1 = -169; // 180 - 60
+    public static double turretHeading1 = -110; // 180 - 60
     public static double turretHeading2 = 125; // 180 - 55
     public static double turretHeading3 = 105; // 180 - 75
     public static double gateHeading1 = 138; // 180 - 42
     private static final double MIN_ANGLE = -224.75;
     private static final double MAX_ANGLE =  224.75;
     private static final double TURRET_RANGE =  449.51;
-    private double currentTurretPos = 90;
+    private double currentTurretPos = 0;
     public static double turretHeading4  = -140;
     private boolean matchStarted = false;
     private boolean autoShoot = false;
@@ -203,6 +203,18 @@ public static double gateX = 11.8   ; // 144                                    
                 .setIsDone(() -> true);
     }
 
+    public boolean shootingCustom = false;
+    public Command toggleCustomShooting(boolean value){
+        return new LambdaCommand()
+                .setStart(()->{if(value){
+                    shootingCustom = true;
+                }
+                if(!value){
+                    shootingCustom = false;
+                }
+                });
+    }
+
     public Command enableGoalTracking() {
         return new LambdaCommand("Enable Goal Tracking")
                 .setStart(() -> {
@@ -231,8 +243,7 @@ public static double gateX = 11.8   ; // 144                                    
         turret2 = ActiveOpMode.hardwareMap().get(ServoImplEx.class,"turretServo2");
         turret1.setPwmRange(new PwmControl.PwmRange(500, 2500));
         turret2.setPwmRange(new PwmControl.PwmRange(500, 2500));
-       isOverridden = true;
-        setTurretHeading(turretHeading1).schedule();
+
         hoodServo = new ServoEx("hoodServo");
         servoStopper = new ServoEx("stopperServo");
         telemetry.addLine("Initialized");
@@ -260,6 +271,7 @@ public static double gateX = 11.8   ; // 144                                    
         return new SequentialGroup(
 
                 setTurretHeading(turretHeading1),
+                new Delay(1.8),
                 new FollowPath(paths.Preload, false, 1.0),
 
                 intakeMotorOn,
@@ -276,10 +288,10 @@ public static double gateX = 11.8   ; // 144                                    
                 new Delay(1.05),
                 //setTurretHeading(-35),
 
-                new FollowPath(paths.Path5, false, 1.0),
+                /*new FollowPath(paths.Path5, false, 1.0),
 
                 new FollowPath(paths.Path6, true, 1.0),
-                new Delay(2.25),
+                new Delay(2.25),*/
                 //setTurretHeading(-25),
 
                 new FollowPath(paths.Path7, false, 1.0),
@@ -331,13 +343,17 @@ public static double gateX = 11.8   ; // 144                                    
 
         flywheelSpeed = results[0];
 
-        if(preload==true){
+        if(preload==true&&!shootingCustom){
             shooter((float) flywheelSpeed+30);
 //            shooter(2500);
         }
-        if(preload==false){
+        else if(preload==false&!shootingCustom){
             turretOffset = -17;
             shooter((float) flywheelSpeed - 38);
+        }
+        else if(shootingCustom){
+            turretOffset = -17;
+            shooter((float) flywheelSpeed +30);
         }
         double hoodAngle = results[1];
         hoodServo.setPosition(hoodAngle);
@@ -483,10 +499,11 @@ public static double gateX = 11.8   ; // 144                                    
 
             Path10 = follower.pathBuilder() // gateintake
                     .addPath(new BezierCurve(
-                            new Pose(49.03304037608623, 83.71111297536585), // 144 - 94.9669...
+                                new Pose(49.03304037608623, 83.71111297536585), // 144 - 94.9669...
                             new Pose(40.981, 63.28),  // 144 - 103.019
                             new Pose(gateX2, gateY2)))
-                    .setLinearHeadingInterpolation(Math.toRadians(195), Math.toRadians(gateHeading)) // 180-0
+                    .setLinearHeadingInterpolation(Math.toRadians(195), Math.toRadians(gateHeading))
+                    .addPoseCallback(new Pose(30.424,64.396),toggleCustomShooting(false),0.7)// 180-0
                     .build();
             /*Pivot2 = follower.pathBuilder()
                     .addPath(new BezierLine(
@@ -524,6 +541,7 @@ public static double gateX = 11.8   ; // 144                                    
                             new Pose(56.19133149606427, 79.2375828716257), // 144 - 87.8086...
                             new Pose(20, 83.8))) // 144 - 121
                     .setLinearHeadingInterpolation(Math.toRadians(195), Math.toRadians(180))
+                    .addPoseCallback(new Pose(44.224,80.162),toggleCustomShooting(true),0.6)
                     .build();
 
             Path15 = follower.pathBuilder()

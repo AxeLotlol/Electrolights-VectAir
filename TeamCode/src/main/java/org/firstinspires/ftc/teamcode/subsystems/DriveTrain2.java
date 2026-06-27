@@ -107,8 +107,6 @@ public class DriveTrain2 implements Subsystem {
     // OPTIMIZATION: Reduce telemetry frequency
     private int telemetryCounter = 0;
     private static final int TELEMETRY_EVERY_N_LOOPS = 5;
-    // OPTIMIZATION: Avoid redundant servo writes
-    private double lastServoPos = -1;
 
     public Supplier<Double> yVCtx;
 
@@ -198,17 +196,12 @@ public class DriveTrain2 implements Subsystem {
 
     private Pose getTurretPose(Pose robotPose) {
         double heading = robotPose.getHeading();
-
-        double cos = Math.cos(heading);
-        double sin = Math.sin(heading);
-
         double turretX = robotPose.getX()
-                + turretForwardOffset * cos
-                - turretStrafeOffset * sin;
-
+                + turretForwardOffset * Math.cos(heading)
+                - turretStrafeOffset * Math.sin(heading);
         double turretY = robotPose.getY()
-                + turretForwardOffset * sin
-                + turretStrafeOffset * cos;
+                + turretForwardOffset * Math.sin(heading)
+                + turretStrafeOffset * Math.cos(heading);
 
         return new Pose(turretX, turretY, heading);
     }
@@ -420,6 +413,7 @@ public class DriveTrain2 implements Subsystem {
     @Override
     public void periodic() {
         for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
             hub.clearBulkCache();
         }
         long currentTime = System.nanoTime();
@@ -464,19 +458,10 @@ public class DriveTrain2 implements Subsystem {
         // }
 
         Pose currPose = follower.getPose();
-        Vector velocity = follower.getVelocity();
-        Vector acceleration = follower.getAcceleration();
-
         Pose turretPose = getTurretPose(currPose);
         double robotHeading = currPose.getHeading();
         Vector robotToGoalVector = getTurretToGoalVector(turretPose);
-
-        Double[] results = calculateShotVectorandUpdateHeading(
-                robotHeading,
-                robotToGoalVector,
-                velocity,
-                acceleration
-        );
+        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity(), follower.getAcceleration());
         Double headingError = results[2];
         double flywheelSpeed = results[0];
         if(abs(currentMotorSpeed-flywheelSpeed)<tolarance) {
@@ -497,32 +482,63 @@ public class DriveTrain2 implements Subsystem {
 
         double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
         servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
-        if (Math.abs(lastServoPos - servoPositionSignal) > 0.002) {
-            turret1.setPosition(servoPositionSignal + servoOffset);
-            turret2.setPosition(servoPositionSignal - servoOffset);
-            lastServoPos = servoPositionSignal;
-        }
-
+        turret1.setPosition(servoPositionSignal + servoOffset);
+        turret2.setPosition(servoPositionSignal - servoOffset);
         currentTurretPos = targetTurretAngle;
 
-        telemetryCounter++;
-
-        if (telemetryCounter >= TELEMETRY_EVERY_N_LOOPS) {
-            telemetryCounter = 0;
-
-            ActiveOpMode.telemetry().addData("launch?", isOverlappingLaunchZone(currPose));
-            ActiveOpMode.telemetry().addData("turret", servoPositionSignal);
-            ActiveOpMode.telemetry().addData("Loop Time (ms)", loopTimeMs);
-            ActiveOpMode.telemetry().addData("alliance", alliance);
-            ActiveOpMode.telemetry().addData("goalX", goalX);
-            ActiveOpMode.telemetry().addData("goalY", goalY);
-            ActiveOpMode.telemetry().addData("RobotX", currPose.getX());
-            ActiveOpMode.telemetry().addData("RobotY", currPose.getY());
-            ActiveOpMode.telemetry().addData("Robot Heading: ", follower.getHeading());
-            ActiveOpMode.telemetry().addData("Turret Offset", turretOffset);
-
-            ActiveOpMode.telemetry().update();
+        ActiveOpMode.telemetry().addData("launch?", isOverlappingLaunchZone(follower.getPose()));
+        ActiveOpMode.telemetry().addData("turret", servoPositionSignal);
+        Pose futurepose = new Pose(follower.getPose().getX()+follower.getVelocity().getXComponent()*0.3, follower.getPose().getY()+follower.getVelocity().getYComponent()*0.3, follower.getHeading());
+        //if((isOverlappingLaunchZone(PedroComponent.follower().getPose())||isOverlappingLaunchZone(futurepose)) && robotToGoalVector.getMagnitude()>40){
+        /*if(((isOverlappingLaunchZone(follower.getPose())||isOverlappingLaunchZone(futurepose)) && robotToGoalVector.getMagnitude()>50) && autoShoot == true){
+            intakeMotor.setPower(1);
+            transfer.setPower(1);
+            openStopper.schedule();
         }
+        else if(shooting == false){
+            intakeMotor.setPower(0);
+            transfer.setPower(0);
+            closeStopper.schedule();
+        }*/
+
+        ActiveOpMode.telemetry().addData("Loop Time (ms)", loopTimeMs);
+        //ActiveOpMode.telemetry().addData("Motor1Speed", s1speed);
+        //ActiveOpMode.telemetry().addData("Motor2Speed", s2speed);
+        //ActiveOpMode.telemetry().addData("far", far);
+        ActiveOpMode.telemetry().addData("alliance", alliance);
+        //ActiveOpMode.telemetry().addData("hoodPos", hoodServo.getPosition());
+        //ActiveOpMode.telemetry().addData("servo2pos", hoodServo2.getPosition());
+
+        //double frontLeftRPM = 28 / 60 * fL.getVelocity();
+        //double frontRightRPM = 28 / 60 * fR.getVelocity();
+        //double backLeftRPM = 28 / 60 * bL.getVelocity();
+        //double backRightRPM = 28 / 60 * bR.getVelocity();
+        //ActiveOpMode.telemetry().addData("frontRightRPM", frontRightRPM);
+        //ActiveOpMode.telemetry().addData("backRightRPM", backRightRPM);
+        //ActiveOpMode.telemetry().addData("frontLeftRPM", frontLeftRPM);
+        //ActiveOpMode.telemetry().addData("backLeftRPM", backLeftRPM);
+
+        ActiveOpMode.telemetry().addData("goalX", goalX);
+        ActiveOpMode.telemetry().addData("goalY", goalY);
+        ActiveOpMode.telemetry().addData("RobotX", currPose.getX());
+        ActiveOpMode.telemetry().addData("RobotY", currPose.getY());
+        //ActiveOpMode.telemetry().addData("TurretX", turretPose.getX());
+        //ActiveOpMode.telemetry().addData("TurretY", turretPose.getY());
+        //ActiveOpMode.telemetry().addData("goalXDist", goalXDist);
+        //ActiveOpMode.telemetry().addData("goalYDist", goalYDist);
+        //ActiveOpMode.telemetry().addData("robotHeading", Math.toDegrees(robotHeading));
+        //ActiveOpMode.telemetry().addData("velocity", follower.getVelocity());
+        //ActiveOpMode.telemetry().addData("headingError", headingError);
+        //ActiveOpMode.telemetry().addData    ("angularFF", feedforwardOffset);
+        //ActiveOpMode.telemetry().addData("distance", distance);
+        //ActiveOpMode.telemetry().addData("yVCtx", visionYawCommand(headingError));
+        ActiveOpMode.telemetry().addData("Robot Heading: ",follower.getHeading());
+        //ActiveOpMode.telemetry().addLine("==== BACKUP CONSTANTS ====");
+        ActiveOpMode.telemetry().addData("Turret Offset", turretOffset);
+        //ActiveOpMode.telemetry().addData("Turret Forward Offset", turretForwardOffset);
+        //ActiveOpMode.telemetry().addData("Turret Strafe Offset", turretStrafeOffset);
+        //ActiveOpMode.telemetry().addData("RPM Vertical Shift", ShooterCalc.verticalShift);
+        ActiveOpMode.telemetry().update();
 
 
 

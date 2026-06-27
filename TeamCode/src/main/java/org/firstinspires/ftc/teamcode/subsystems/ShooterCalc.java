@@ -14,6 +14,12 @@ import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.ftc.ActiveOpMode;
 
 @Configurable
+
+class ShotData {
+    public double flywheel;
+    public double hood;
+    public double heading;
+}
 public class ShooterCalc implements Subsystem {
 
     //public static double farzoneangle = -0.34006585;
@@ -29,6 +35,9 @@ public class ShooterCalc implements Subsystem {
     public static double verticalShiftStep = 50;
 
     public static double accelScalar = 0.015; // Set to 0 to disable
+
+    // OPTIMIZATION: Reuse object to reduce garbage collection
+    private static final ShotData reusableShotData = new ShotData();
 
     /**
      * Shooter calculation mode: 0 = TeleOp (default), 1 = Autonomous

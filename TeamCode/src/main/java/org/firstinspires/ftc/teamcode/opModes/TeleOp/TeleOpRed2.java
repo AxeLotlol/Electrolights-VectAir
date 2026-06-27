@@ -41,13 +41,20 @@ public class TeleOpRed2 extends NextFTCOpMode {
         red=true;
         intakeMotor = new MotorEx("intakeMotor");
         transfer = new MotorEx("transferMotor");
-        Gamepads.gamepad1().leftTrigger().greaterThan(0.3).whenBecomesTrue(()-> intakeMotor.setPower(1))
-                .whenBecomesFalse(() -> intakeMotor.setPower(0));
-        Gamepads.gamepad1().leftTrigger().greaterThan(0.3).whenBecomesTrue(()-> transfer.setPower(1))
-                .whenBecomesFalse(() -> transfer.setPower(0));
+        // OPTIMIZATION: Single trigger binding for both motors
+        Gamepads.gamepad1().leftTrigger().greaterThan(0.3)
+                .whenBecomesTrue(() -> {
+                    intakeMotor.setPower(1);
+                    transfer.setPower(1);
+                })
+                .whenBecomesFalse(() -> {
+                    intakeMotor.setPower(0);
+                    transfer.setPower(0);
+                });
         Gamepads.gamepad1().x().whenBecomesTrue(()->follower.setPose(new Pose(79.967,9.271,Math.toRadians(90))));
 
         // Backup Controls
+        // These only fire on edge transitions, so loop impact is minimal
         Gamepads.gamepad2().leftTrigger().greaterThan(0.5).whenBecomesTrue(() -> DriveTrain2.turretOffset -= DriveTrain2.turretOffsetStep);
         Gamepads.gamepad2().rightTrigger().greaterThan(0.5).whenBecomesTrue(() -> DriveTrain2.turretOffset += DriveTrain2.turretOffsetStep);
         Gamepads.gamepad2().rightBumper().whenBecomesTrue(()->DriveTrain2.turretOffset-= 1);

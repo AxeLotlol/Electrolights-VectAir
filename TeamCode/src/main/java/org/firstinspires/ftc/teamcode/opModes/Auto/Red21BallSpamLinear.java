@@ -20,8 +20,7 @@ import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
-import org.firstinspires.ftc.teamcode.subsystems.TurretMath;
+import org.firstinspires.ftc.teamcode.subsystems.AutoShooterCalc;
 import org.firstinspires.ftc.teamcode.subsystems.Storage;
 
 import java.util.List;
@@ -138,14 +137,28 @@ public class Red21BallSpamLinear extends NextFTCOpMode {
         while (degrees <= -180.0) {
             degrees += 360.0;
         }
-return degrees;
+        return degrees;
     }
 
-    // OPTIMIZATION: Replaced with TurretMath.getTurretPose()
-    // private Pose getTurretPose(Pose robotPose) { ... }
-    
-    // OPTIMIZATION: Replaced with TurretMath.getTurretToGoalVector()
-    // private Vector getTurretToGoalVector(Pose turretPose) { ... }
+    private Pose getTurretPose(Pose robotPose) {
+        double heading = robotPose.getHeading();
+        double turretX = robotPose.getX()
+                + turretForwardOffset * Math.cos(heading)
+                - turretStrafeOffset * Math.sin(heading);
+        double turretY = robotPose.getY()
+                + turretForwardOffset * Math.sin(heading)
+                + turretStrafeOffset * Math.cos(heading);
+
+        return new Pose(turretX, turretY, heading);
+    }
+
+    private Vector getTurretToGoalVector(Pose turretPose) {
+        return new Vector(
+                turretPose.distanceFrom(new Pose(goalX, goalY)),
+                Math.atan2(goalY - turretPose.getY(), goalX - turretPose.getX())
+        );
+    }
+
 
 
     double targetTurretAngle;
@@ -301,10 +314,10 @@ return degrees;
         if (!matchStarted) return;
 
         Pose currPose = follower.getPose();
-        Pose turretPose = TurretMath.getTurretPose(currPose, turretForwardOffset, turretStrafeOffset);
+        Pose turretPose = getTurretPose(currPose);
         double robotHeading = follower.getPose().getHeading();
-        Vector robotToGoalVector = TurretMath.getTurretToGoalVector(turretPose, goalX, goalY);
-        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity().times(1), follower.getAcceleration());
+        Vector robotToGoalVector = getTurretToGoalVector(turretPose);
+        Double[] results = AutoShooterCalc.calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity().times(1), follower.getAcceleration());
 
         flywheelSpeed = results[0];
 

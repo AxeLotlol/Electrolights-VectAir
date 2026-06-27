@@ -5,7 +5,7 @@ import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpRed2.isRed;
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 import static org.firstinspires.ftc.teamcode.subsystems.LaunchDetector.isOverlappingLaunchZone;
-import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
+import static org.firstinspires.ftc.teamcode.subsystems.AutoShooterCalc.calculateShotVectorandUpdateHeading;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
@@ -98,11 +98,6 @@ public class DriveTrain2 implements Subsystem {
     private double loopTimeMs = 0;
     public Pose currPose;
 
-    // OPTIMIZATION: Cache LynxModules to avoid allocation every loop
-    private List<LynxModule> allHubs;
-    // OPTIMIZATION: Reduce telemetry frequency
-    private int telemetryCounter = 0;
-    private static final int TELEMETRY_EVERY_N_LOOPS = 5;
 
     public Supplier<Double> yVCtx;
 
@@ -243,13 +238,6 @@ public class DriveTrain2 implements Subsystem {
         follower = PedroComponent.follower();
         intakeMotor = new MotorEx("intakeMotor");
         transfer = new MotorEx("transferMotor");
-        
-        // OPTIMIZATION: Cache LynxModules once during initialization
-        allHubs = ActiveOpMode.hardwareMap().getAll(LynxModule.class);
-        for (LynxModule hub : allHubs) {
-            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
-        }
-        
         closeStopper.schedule();
         configureAllianceTarget();
         imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
@@ -276,9 +264,6 @@ public class DriveTrain2 implements Subsystem {
         turret2.setPwmRange(new PwmControl.PwmRange(500, 2500));
         follower.update();
 
-        // OPTIMIZATION: Move hardware init from periodic() to initialize()
-        transfer1 = new MotorEx("transferMotor");
-        
         // Limelight + Kalman Filter initialization (commented out until mount is ready)
         // limelight = new Limelight(ActiveOpMode.hardwareMap());
         // limelight.initialize();
@@ -408,8 +393,11 @@ public class DriveTrain2 implements Subsystem {
 
     @Override
     public void periodic() {
+        List<LynxModule> allHubs = ActiveOpMode.hardwareMap().getAll(LynxModule.class);
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
+        for (LynxModule hub : allHubs) {
             hub.clearBulkCache();
         }
         long currentTime = System.nanoTime();
@@ -425,6 +413,9 @@ public class DriveTrain2 implements Subsystem {
             //Gamepads.gamepad1().leftBumper().whenBecomesTrue(toggleAutoShoot);
             Gamepads.gamepad1().rightTrigger().greaterThan(0.3).whenBecomesTrue(shooterer);
             //Gamepads.gamepad1().square().whenBecomesTrue(() -> farAngle());
+            MotorEx intakeMotor = new MotorEx("intakeMotor");
+            transfer1 = new MotorEx("transferMotor");
+            //transfer2 = new ServoEx("transferServo1");
             firsttime = false;
 
 

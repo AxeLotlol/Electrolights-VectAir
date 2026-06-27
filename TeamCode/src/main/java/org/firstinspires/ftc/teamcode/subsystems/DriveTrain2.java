@@ -7,6 +7,8 @@ import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 import static org.firstinspires.ftc.teamcode.subsystems.LaunchDetector.isOverlappingLaunchZone;
 import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
 
+import static java.lang.Math.abs;
+
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.paths.PathChain;
@@ -65,6 +67,8 @@ public class DriveTrain2 implements Subsystem {
     public static final MotorEx bR = new MotorEx("backRight").brakeMode();
 
     private IMUEx imu;
+    public static double tolarance = 10;
+    public double currentMotorSpeed = 0;
 
     public boolean firsttime = true;
 
@@ -460,7 +464,10 @@ public class DriveTrain2 implements Subsystem {
         Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity(), follower.getAcceleration());
         Double headingError = results[2];
         double flywheelSpeed = results[0];
-        shooter((float) flywheelSpeed);
+        if(abs(currentMotorSpeed-flywheelSpeed)<tolarance) {
+            shooter((float) flywheelSpeed);
+        }
+        currentMotorSpeed = flywheelSpeed;
         double hoodAngle = results[1];
         hoodServo.setPosition(hoodAngle);
         double robotAngularVelocityRads = follower.getAngularVelocity();

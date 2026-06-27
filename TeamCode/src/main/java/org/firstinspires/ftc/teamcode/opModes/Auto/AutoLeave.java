@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.opModes.Auto;
 
-import static org.firstinspires.ftc.teamcode.subsystems.AutoShooterCalc.calculateShotVectorandUpdateHeading;
+import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
 import static org.firstinspires.ftc.teamcode.subsystems.DriveTrain2.closeStopperPos;
 import static org.firstinspires.ftc.teamcode.subsystems.DriveTrain2.openStopperPos;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
@@ -19,6 +19,7 @@ import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.subsystems.TurretMath;
 import org.firstinspires.ftc.teamcode.subsystems.Storage;
 
 import java.util.List;
@@ -135,24 +136,11 @@ public class AutoLeave extends NextFTCOpMode {
         return degrees;
     }
 
-    private Pose getTurretPose(Pose robotPose) {
-        double heading = robotPose.getHeading();
-        double turretX = robotPose.getX()
-                + turretForwardOffset * Math.cos(heading)
-                - turretStrafeOffset * Math.sin(heading);
-        double turretY = robotPose.getY()
-                + turretForwardOffset * Math.sin(heading)
-                + turretStrafeOffset * Math.cos(heading);
-
-        return new Pose(turretX, turretY, heading);
-    }
-
-    private Vector getTurretToGoalVector(Pose turretPose) {
-        return new Vector(
-                turretPose.distanceFrom(new Pose(goalX, goalY)),
-                Math.atan2(goalY - turretPose.getY(), goalX - turretPose.getX())
-        );
-    }
+    // OPTIMIZATION: Replaced with TurretMath.getTurretPose()
+    // private Pose getTurretPose(Pose robotPose) { ... }
+    
+    // OPTIMIZATION: Replaced with TurretMath.getTurretToGoalVector()
+    // private Vector getTurretToGoalVector(Pose turretPose) { ... }
 
     //public SequentialGroup shoot = new SequentialGroup(
     //servoOpen,
@@ -278,9 +266,9 @@ public class AutoLeave extends NextFTCOpMode {
         if (!matchStarted) return;
 
         Pose currPose = follower.getPose();
-        Pose turretPose = getTurretPose(currPose);
+        Pose turretPose = TurretMath.getTurretPose(currPose, turretForwardOffset, turretStrafeOffset);
         double robotHeading = follower.getPose().getHeading();
-        Vector robotToGoalVector = getTurretToGoalVector(turretPose);
+        Vector robotToGoalVector = TurretMath.getTurretToGoalVector(turretPose, goalX, goalY);
         Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity().times(1), follower.getAcceleration());
 
         flywheelSpeed = results[0];

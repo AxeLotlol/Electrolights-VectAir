@@ -54,6 +54,9 @@ public class Tuning extends SelectableOpMode {
     @IgnoreConfigurable
     static ArrayList<String> changes = new ArrayList<>();
 
+    // OPTIMIZATION: Constant to avoid Math.pow(10.0, 9) in hot loops
+    public static final double NANO_TO_SEC = 1e9;
+
     public Tuning() {
         super("Select a Tuning OpMode", s -> {
             s.folder("Localization", l -> {
@@ -361,7 +364,8 @@ class TurnTuner extends OpMode {
  * @version 1.0, 3/13/2024
  */
 class ForwardVelocityTuner extends OpMode {
-    private final ArrayList<Double> velocities = new ArrayList<>();
+    // OPTIMIZATION: RingBuffer replaces ArrayList to avoid O(n) remove(0) and allocations
+    private final RingBuffer velocities = new RingBuffer((int) RECORD_NUMBER);
     public static double DISTANCE = 48;
     public static double RECORD_NUMBER = 10;
 
@@ -389,9 +393,6 @@ class ForwardVelocityTuner extends OpMode {
     /** This starts the OpMode by setting the drive motors to run forward at full power. */
     @Override
     public void start() {
-        for (int i = 0; i < RECORD_NUMBER; i++) {
-            velocities.add(0.0);
-        }
         follower.startTeleopDrive(true);
         follower.update();
         end = false;
@@ -422,16 +423,12 @@ class ForwardVelocityTuner extends OpMode {
                 follower.setTeleOpDrive(1,0,0,true);
                 //double currentVelocity = Math.abs(follower.getVelocity().getXComponent());
                 double currentVelocity = Math.abs(follower.poseTracker.getLocalizer().getVelocity().getX());
+                // OPTIMIZATION: RingBuffer.add() is O(1) vs ArrayList.add+remove(0) O(n)
                 velocities.add(currentVelocity);
-                velocities.remove(0);
             }
         } else {
             stopRobot();
-            double average = 0;
-            for (double velocity : velocities) {
-                average += velocity;
-            }
-            average /= velocities.size();
+            double average = velocities.average();
             telemetryM.debug("Forward Velocity: " + average);
             telemetryM.debug("\n");
             telemetryM.debug("Press A to set the Forward Velocity temporarily (while robot remains on).");
@@ -468,7 +465,8 @@ class ForwardVelocityTuner extends OpMode {
  * @version 1.0, 3/13/2024
  */
 class LateralVelocityTuner extends OpMode {
-    private final ArrayList<Double> velocities = new ArrayList<>();
+    // OPTIMIZATION: RingBuffer replaces ArrayList to avoid O(n) remove(0) and allocations
+    private final RingBuffer velocities = new RingBuffer((int) RECORD_NUMBER);
 
     public static double DISTANCE = 48;
     public static double RECORD_NUMBER = 10;
@@ -499,9 +497,6 @@ class LateralVelocityTuner extends OpMode {
     /** This starts the OpMode by setting the drive motors to run right at full power. */
     @Override
     public void start() {
-        for (int i = 0; i < RECORD_NUMBER; i++) {
-            velocities.add(0.0);
-        }
         follower.startTeleopDrive(true);
         follower.update();
     }
@@ -529,16 +524,12 @@ class LateralVelocityTuner extends OpMode {
             } else {
                 follower.setTeleOpDrive(0,1,0,true);
                 double currentVelocity = Math.abs(follower.getVelocity().dot(new Vector(1, Math.PI / 2)));
+                // OPTIMIZATION: RingBuffer.add() is O(1)
                 velocities.add(currentVelocity);
-                velocities.remove(0);
             }
         } else {
             stopRobot();
-            double average = 0;
-            for (double velocity : velocities) {
-                average += velocity;
-            }
-            average /= velocities.size();
+            double average = velocities.average();
 
             telemetryM.debug("Strafe Velocity: " + average);
             telemetryM.debug("\n");
@@ -570,7 +561,8 @@ class LateralVelocityTuner extends OpMode {
  * @version 1.0, 3/13/2024
  */
 class ForwardZeroPowerAccelerationTuner extends OpMode {
-    private final ArrayList<Double> accelerations = new ArrayList<>();
+    // OPTIMIZATION: RingBuffer replaces ArrayList - avoids allocations in hot loop
+    private final RingBuffer accelerations = new RingBuffer(100); // max ~100 samples during deceleration
     public static double VELOCITY = 30;
 
     private double previousVelocity;
@@ -632,7 +624,8 @@ class ForwardZeroPowerAccelerationTuner extends OpMode {
                 }
             } else {
                 double currentVelocity = follower.getVelocity().dot(heading);
-                accelerations.add((currentVelocity - previousVelocity) / ((System.nanoTime() - previousTimeNano) / Math.pow(10.0, 9)));
+                // OPTIMIZATION: RingBuffer + NANO_TO_SEC constant
+                accelerations.add((currentVelocity - previousVelocity) / ((System.nanoTime() - previousTimeNano) / Tuning.NANO_TO_SEC));
                 previousVelocity = currentVelocity;
                 previousTimeNano = System.nanoTime();
                 if (currentVelocity < follower.getConstraints().getVelocityConstraint()) {
@@ -640,11 +633,7 @@ class ForwardZeroPowerAccelerationTuner extends OpMode {
                 }
             }
         } else {
-            double average = 0;
-            for (double acceleration : accelerations) {
-                average += acceleration;
-            }
-            average /= accelerations.size();
+            double average = accelerations.average();
 
             telemetryM.debug("Forward Zero Power Acceleration (Deceleration): " + average);
             telemetryM.debug("\n");
@@ -676,7 +665,8 @@ class ForwardZeroPowerAccelerationTuner extends OpMode {
  * @version 1.0, 3/13/2024
  */
 class LateralZeroPowerAccelerationTuner extends OpMode {
-    private final ArrayList<Double> accelerations = new ArrayList<>();
+    // OPTIMIZATION: RingBuffer replaces ArrayList - avoids allocations in hot loop
+    private final RingBuffer accelerations = new RingBuffer(100); // max ~100 samples during deceleration
     public static double VELOCITY = 30;
     private double previousVelocity;
     private long previousTimeNano;
@@ -734,9 +724,10 @@ class LateralZeroPowerAccelerationTuner extends OpMode {
                     stopping = true;
                     follower.setTeleOpDrive(0,0,0,true);
                 }
-            } else {
+} else {
                 double currentVelocity = Math.abs(follower.getVelocity().dot(heading));
-                accelerations.add((currentVelocity - previousVelocity) / ((System.nanoTime() - previousTimeNano) / Math.pow(10.0, 9)));
+                // OPTIMIZATION: RingBuffer + NANO_TO_SEC constant
+                accelerations.add((currentVelocity - previousVelocity) / ((System.nanoTime() - previousTimeNano) / Tuning.NANO_TO_SEC));
                 previousVelocity = currentVelocity;
                 previousTimeNano = System.nanoTime();
                 if (currentVelocity < follower.getConstraints().getVelocityConstraint()) {
@@ -744,11 +735,7 @@ class LateralZeroPowerAccelerationTuner extends OpMode {
                 }
             }
         } else {
-            double average = 0;
-            for (double acceleration : accelerations) {
-                average += acceleration;
-            }
-            average /= accelerations.size();
+            double average = accelerations.average();
 
             telemetryM.debug("Lateral Zero Power Acceleration (Deceleration): " + average);
             telemetryM.debug("\n");

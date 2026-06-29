@@ -484,9 +484,7 @@ public class DriveTrain2 implements Subsystem {
         );
         Double headingError = results[2];
         double flywheelSpeed = results[0];
-        if(abs(currentMotorSpeed-flywheelSpeed)<tolarance) {
             shooter((float) flywheelSpeed);
-        }
         currentMotorSpeed = flywheelSpeed;
         double hoodAngle = results[1];
         hoodServo.setPosition(hoodAngle);

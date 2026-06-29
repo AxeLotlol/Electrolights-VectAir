@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.teamcode.subsystems.ShooterConstants.SCORE_ANGLE_CLOSER;
 import static org.firstinspires.ftc.teamcode.subsystems.ShooterConstants.SCORE_HEIGHT;
+import static org.firstinspires.ftc.teamcode.subsystems.ShooterConstants.SCORE_HEIGHT_CLOSER;
 import static java.lang.Double.isNaN;
 
 import com.bylazar.configurables.annotations.Configurable;
@@ -27,21 +29,22 @@ public class ShooterCalc implements Subsystem {
     public static double requiredTPS = (28*requiredRPM)/60;
     public static double verticalShift = 0;
     public static double verticalShiftStep = 50;
+    public static double sotmFactor = 1;
 
     public static double accelScalar = 0.015; // Set to 0 to disable
 
-    public static Double[] calculateShotVectorandUpdateHeading(double robotHeading, Vector robotToGoalVector, Vector robotVel, double sotmFactor){
+    public static Double[] calculateShotVectorandUpdateHeading(double robotHeading, Vector robotToGoalVector, Vector robotVel, double sotmFactorr){
         double g = 32.174*12;
         double x = robotToGoalVector.getMagnitude()-ShooterConstants.PASS_THROUGH_POINT_RADIUS;
         double temp = x/39.37;
         //double y = -4.5745*temp*temp*temp + 25.978*temp*temp - 48.395*temp + 58.675;
         //double y = SCORE_HEIGHT;
         //double a = ShooterConstants.SCORE_ANGLE;
-        double y = SCORE_HEIGHT + 2;
-        double a = Math.toRadians(-33);
-        if(x<50){
-            a=Math.toRadians(-45);
-            y=SCORE_HEIGHT + 4;
+        double y = SCORE_HEIGHT;
+        double a = ShooterConstants.SCORE_ANGLE;
+        if(x<60){
+            a=SCORE_ANGLE_CLOSER;
+            y=SCORE_HEIGHT_CLOSER;
         }
         double hoodAngle = MathFunctions.clamp(Math.atan(2 * y / x - Math.tan(a)), Math.toRadians(40),
                 Math.toRadians(75));
@@ -50,14 +53,8 @@ public class ShooterCalc implements Subsystem {
             hoodAngle=Math.toRadians(75);
         }
         double flywheelSpeed = Math.sqrt(g * x * x / (2 * Math.pow(Math.cos(hoodAngle), 2) * (x * Math. tan(hoodAngle) - y)));
-        if(x<50){
-            a=Math.toRadians(-45);
-            y=SCORE_HEIGHT + 2;
-        }
-        Vector robotVelocity = new Vector(robotVel.getMagnitude(), robotVel.getTheta());
-        if (robotVelocity.getMagnitude() < 5.0) {
-            robotVelocity = new Vector(0, 0);
-        }
+
+        Vector robotVelocity = robotVel;
 
         double coordinateTheta = robotVelocity.getTheta() - robotToGoalVector.getTheta();
 

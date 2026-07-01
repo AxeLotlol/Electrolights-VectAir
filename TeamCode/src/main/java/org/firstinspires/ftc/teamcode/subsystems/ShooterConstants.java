@@ -7,13 +7,13 @@ import com.pedropathing.geometry.Pose;
 public class ShooterConstants {
     public static Pose GOAL_POS_RED = new Pose(144, 144);
     public static Pose GOAL_POS_BLUE = GOAL_POS_RED.mirror();
-    public static double SCORE_HEIGHT = 31; //inches
+    public static double SCORE_HEIGHT = 33; //inches
     public static double SCORE_HEIGHT_CLOSER = 34; //inches
 
-    public static double SCORE_ANGLE = Math.toRadians(-24);
-    public static double SCORE_ANGLE_CLOSER = Math.toRadians(-50);
+    public static double SCORE_ANGLE = -17;
+    public static double SCORE_ANGLE_CLOSER = -50;
 
-    public static double PASS_THROUGH_POINT_RADIUS = 4; //inches
+    public static double PASS_THROUGH_POINT_RADIUS = 0; //inches change to 4 if goon
 
     public static double RAISE_TIME = 0.15;
 

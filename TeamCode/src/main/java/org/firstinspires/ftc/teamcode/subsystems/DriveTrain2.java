@@ -74,7 +74,7 @@ public class DriveTrain2 implements Subsystem {
 
     public boolean firsttime = true;
 
-    public static double servoOffset = 0.05;
+    public static double servoOffset = 0.02;
 
     public int alliance;
     public boolean far;
@@ -87,8 +87,8 @@ public class DriveTrain2 implements Subsystem {
     private ServoImplEx turret1;
     private ServoImplEx turret2;
 
-    public static double turretOffset = -18  ;
-    public static double turretOffset2 = -22;
+    public static double turretOffset = -27  ;
+    public static double turretOffset2 = -10;
     public static double turretOffsetStep = -5;
     // Inches from the Pinpoint/Pedro robot pose origin to the turret pivot.
     public static double turretForwardOffset = -0.52588;
@@ -225,13 +225,13 @@ public class DriveTrain2 implements Subsystem {
     private void configureAllianceTarget() {
         if (isRed()) {
             alliance = -1;
-            goalXDist = 144;
-            goalX = 144;
+            goalXDist = 141;
+            goalX = 141;
             localizeX = 136;
         } else if (isBlue()) {
             alliance = 1;
-            goalXDist = 0;
-            goalX = 0;
+            goalXDist = 3;
+            goalX = 3;
             localizeX = 8;
         } else {
             ActiveOpMode.telemetry().addLine("No direction set");
@@ -325,11 +325,11 @@ public class DriveTrain2 implements Subsystem {
     private static MotorEx transfer1;
     private static ServoEx transfer2;
 
-    double goalY = 144;
-    double goalX = 144;
+    double goalY = 141;
+    double goalX = 141;
 
     static double localizeX;
-    double goalXDist = 144;
+    double goalXDist = 141;
 
 
     static boolean shooting = false;
@@ -458,6 +458,7 @@ public class DriveTrain2 implements Subsystem {
         //
         //     if (limelight.canSeeTarget()) {
         //         double dist = limelight.getDistanceInches();
+        //         Pose visionPose = limelight.getPose(odomPose.getHeading());
         //         Pose visionPose = limelight.getPose(odomPose.getHeading());
         //         if (visionPose != null) {
         //             kalmanFilter.correct(visionPose, dist);

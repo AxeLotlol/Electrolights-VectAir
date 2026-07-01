@@ -157,7 +157,7 @@ public class TeleOpRed extends NextFTCOpMode {
     }
 
     public boolean shoot;
-
+ 
     @Override
     public void onStartButtonPressed() {
 

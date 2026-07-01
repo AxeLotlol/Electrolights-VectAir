@@ -29,7 +29,7 @@ public class ShooterCalc implements Subsystem {
     public static double requiredTPS = (28*requiredRPM)/60;
     public static double verticalShift = 0;
     public static double verticalShiftStep = 50;
-    public static double sotmFactor = 1;
+    public static double sotmFactor = 1.1;
 
     public static double accelScalar = 0.015; // Set to 0 to disable
 
@@ -41,9 +41,9 @@ public class ShooterCalc implements Subsystem {
         //double y = SCORE_HEIGHT;
         //double a = ShooterConstants.SCORE_ANGLE;
         double y = SCORE_HEIGHT;
-        double a = ShooterConstants.SCORE_ANGLE;
+        double a = Math.toRadians(ShooterConstants.SCORE_ANGLE);
         if(x<60){
-            a=SCORE_ANGLE_CLOSER;
+            a=Math.toRadians(SCORE_ANGLE_CLOSER);
             y=SCORE_HEIGHT_CLOSER;
         }
         double hoodAngle = MathFunctions.clamp(Math.atan(2 * y / x - Math.tan(a)), Math.toRadians(40),
@@ -89,6 +89,9 @@ public class ShooterCalc implements Subsystem {
 
         requiredTPS = (-16.19*Math.pow(flywheelSpeed, 2)+ 449.11*flywheelSpeed- 964.9) + verticalShift;
         double what = Math.toDegrees(hoodAngle);
+        if(robotVelocity.getMagnitude()>10){
+            requiredTPS=requiredTPS+50;
+        }
 
         //double c1 = (double) -13 /376;
 

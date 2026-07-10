@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opModes.Auto;
 
+import static org.firstinspires.ftc.teamcode.subsystems.DriveTrain2.servoOffset;
 import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
 import static org.firstinspires.ftc.teamcode.subsystems.DriveTrain2.closeStopperPos;
 import static org.firstinspires.ftc.teamcode.subsystems.DriveTrain2.openStopperPos;
@@ -66,19 +67,19 @@ public class Red24Ball extends NextFTCOpMode {
     double goalY = 140;
     double goalX = 141;
 
-    public static double gateX = 130.2; // 142 - 11.8
-    public static double gateY = 60;
+    public static double gateX = 131.2; // 142 - 11.8
+    public static double gateY = 61;
 
-    public static double gateX2 = 130.8; // 142 - 11.2
-    public static double gateY2 = 60;
+    public static double gateX2 = 131.5; // 142 - 11.2
+    public static double gateY2 = 61;
 
-    public static double gateHeading = 40;
+    public static double gateHeading = 26;
 
     public static double gateX1 = 131.5; // 142 - 10.5
     public static double gateY1 = 59;
 
 
-    public static double gateHeading1 = 40;
+    public static double gateHeading1 = 26;
 
     private static final double MIN_ANGLE = -224.75;
     private static final double MAX_ANGLE = 224.75;
@@ -100,7 +101,7 @@ public class Red24Ball extends NextFTCOpMode {
     private ServoImplEx turret1;
     private ServoImplEx turret2;
 
-    public static double turretOffset = -27;
+    public static double turretOffset = -20;
     public static double turretOffsetStep = -5;
 
     // Inches from the Pinpoint/Pedro robot pose origin to the turret pivot.
@@ -185,7 +186,7 @@ public class Red24Ball extends NextFTCOpMode {
                 .setStart(()->autoShoot = true);
     }
     // --- Custom Override Tracking Commands ---
-    /*public Command setTurretHeading(double degrees) {
+    public Command setTurretHeading(double degrees) {
         return new LambdaCommand("Set Turret Heading: " + degrees)
                 .setStart(() -> {
                     isOverridden = true;
@@ -194,7 +195,7 @@ public class Red24Ball extends NextFTCOpMode {
                 .setIsDone(() -> true);
     }
 
-    public Command enableGoalTracking() {
+    /*public Command enableGoalTracking() {
         return new LambdaCommand("Enable Goal Tracking")
                 .setStart(() -> {
                     isOverridden = false;
@@ -240,6 +241,35 @@ public class Red24Ball extends NextFTCOpMode {
         turret2.setPwmRange(new PwmControl.PwmRange(500, 2500));
 
         isOverridden = true;
+        preload = true;
+
+
+
+        overriddenTurretAngle = getClosestValidTurretAngle(150);
+
+        double robotAngularVelocityRads = follower.getAngularVelocity();
+        double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
+        double feedforwardOffset = 0;
+
+        targetTurretAngle = getClosestValidTurretAngle(overriddenTurretAngle-27 - feedforwardOffset);
+        double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
+        servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
+
+        turret1.setPosition(servoPositionSignal + servoOffset);
+        turret2.setPosition(servoPositionSignal - servoOffset);
+        double lastServoPos = servoPositionSignal;
+
+
+        currentTurretPos = targetTurretAngle;
+        //enableGoalTracking();
+
+
+        hoodServo = new ServoEx("hoodServo");
+
+        servoStopper = new ServoEx("stopperServo");
+
+        telemetry.addLine("Initialized");
+        telemetry.update();
 
         //setTurretHeading(turretHeading1).schedule();
 
@@ -258,6 +288,14 @@ public class Red24Ball extends NextFTCOpMode {
             .setStart(() -> {
                 servoStopper.setPosition(openStopperPos); // open
             }).setIsDone(() -> true);
+    public Command enableGoalTracking() {
+        return new LambdaCommand("Enable Goal Tracking")
+                .setStart(() -> {
+                    isOverridden = false;
+                })
+                .setIsDone(() -> true);
+    }
+
 
     public Command Auto() {
         return new SequentialGroup(
@@ -266,6 +304,8 @@ public class Red24Ball extends NextFTCOpMode {
                 new Delay(0.3),
 
                 new FollowPath(paths.Preload, false, 1.0),
+                enableGoalTracking(),
+                disablePreload,
 
                 intakeMotorOn,
 
@@ -280,7 +320,7 @@ public class Red24Ball extends NextFTCOpMode {
                 //setTurretHeading(-30),
                 new FollowPath(paths.launcgSpike3, false, 1.0),
                 new FollowPath(paths.gateIntake1, true, 1.0),
-                new FollowPath(paths.Path16,true,1.0),
+                //new FollowPath(paths.Path16,true,1.0),
                 new Delay(1.05),
                 new FollowPath(paths.Path5, false, 1.0),
 
@@ -315,6 +355,9 @@ public class Red24Ball extends NextFTCOpMode {
         Auto().schedule();
     }
     private boolean preload = true;
+
+    public Command disablePreload = new LambdaCommand()
+            .setStart(()->preload=false);
     private double flywheelSpeed;
 
 
@@ -347,18 +390,18 @@ public class Red24Ball extends NextFTCOpMode {
 
         flywheelSpeed = results[0];
 
-        /*if (preload == true) {
+        if (preload == true) {
 
-            shooter((float) flywheelSpeed + 50);
+            shooter((float) flywheelSpeed + 30);
 
         }
 
-        if (preload == false) {*/
+        if (preload == false) {
 
             //turretOffset = 17;
 
-            shooter((float) flywheelSpeed);
-        //}
+            shooter((float) flywheelSpeed-10);
+        }
 
         double hoodAngle = results[1];
 
@@ -376,8 +419,13 @@ public class Red24Ball extends NextFTCOpMode {
 
         double targetTurretAngle;
 
-        targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset - feedforwardOffset);
+        if(!isOverridden) {
 
+            targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset - feedforwardOffset);
+        }
+        else{
+            targetTurretAngle = getClosestValidTurretAngle(overriddenTurretAngle+turretOffset - feedforwardOffset);
+        }
         double servoPositionSignal =
                 0.05
                         + ((targetTurretAngle - MIN_ANGLE)
@@ -427,7 +475,6 @@ public class Red24Ball extends NextFTCOpMode {
     }
 
     public class Paths {
-//ayush loves anjana and moksh is less chopped than deb am i right? yes im always right heehheheheheheheeheheheheh lwk mithun is angy at me hes kinda mean lol
 
 
         //dih
@@ -485,35 +532,35 @@ public class Red24Ball extends NextFTCOpMode {
                     .build();
 
             gateIntake1 = follower.pathBuilder()
-                    .addPath(new BezierLine(
+                    .addPath(new BezierCurve(
                             new Pose(78.354, 69.703),
-                            new Pose(127.5, 61.5)))
-                    .setLinearHeadingInterpolation(
-                            Math.toRadians(0),Math.toRadians(5))
+                            new Pose(114.5,52),
+                            new Pose(124, 64)))
+                    .setTangentHeadingInterpolation()
                     .build();
 
-            Path16 = follower.pathBuilder()
+            /*Path16 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(127.5, 61.5),
-                            new Pose(127.3, 61.3)))
+                            new Pose(127.5, 60.5),
+                            new Pose(127.3, 60.3)))
                     .setLinearHeadingInterpolation(
                             Math.toRadians(5),
                             Math.toRadians(gateHeading1))
-                    .build();
+                    .build();*/
 
             Path5 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(131.2, 61.3),
+                            new Pose(129.7, 60.5),
                             new Pose(79.558, 73.32)))
                     .setLinearHeadingInterpolation(
-                            Math.toRadians(gateHeading),
+                            Math.toRadians(37),
                             Math.toRadians(345))
                     .build();
 
             Path6 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(80.058, 73.32),
-                            new Pose(gateX, gateY-0.5)))
+                            new Pose(79.558, 73.32),
+                            new Pose(gateX+0.5, gateY-1)))
                     .setLinearHeadingInterpolation(
                             Math.toRadians(345),
                             Math.toRadians(gateHeading))
@@ -521,7 +568,7 @@ public class Red24Ball extends NextFTCOpMode {
 
             Path7 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(gateX, gateY-0.5),
+                            new Pose(gateX+0.5, gateY-1),
                             new Pose(79.558, 75)))
                     .setLinearHeadingInterpolation(
                             Math.toRadians(gateHeading),
@@ -531,7 +578,7 @@ public class Red24Ball extends NextFTCOpMode {
             Path8 = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(79.558, 75),
-                            new Pose(gateX, gateY)))
+                            new Pose(gateX+0.5, gateY-1)))
                     .setLinearHeadingInterpolation(
                             Math.toRadians(345),
                             Math.toRadians(gateHeading))
@@ -539,7 +586,7 @@ public class Red24Ball extends NextFTCOpMode {
 
             Path9 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(gateX, gateY),
+                            new Pose(gateX+0.5, gateY-1),
                             new Pose(79.558, 75)))
                     .setLinearHeadingInterpolation(
                             Math.toRadians(gateHeading),
@@ -550,7 +597,7 @@ public class Red24Ball extends NextFTCOpMode {
                     .addPath(new BezierCurve(
                             new Pose(92.4669596239, 83.71111297536585),
                             new Pose(100.519, 63.28),
-                            new Pose(gateX2, gateY2)))
+                            new Pose(gateX2+0.5, gateY2-1)))
                     .setLinearHeadingInterpolation(
                             Math.toRadians(345),
                             Math.toRadians(gateHeading))
@@ -558,19 +605,19 @@ public class Red24Ball extends NextFTCOpMode {
 
             Path11 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(gateX2, gateY2),
+                            new Pose(gateX2+0.5, gateY2-1),
                             new Pose(93.31, 92)))
                     .setLinearHeadingInterpolation(
                             Math.toRadians(gateHeading),
                             Math.toRadians(35))
-                            //toRed(215))
+                    //toRed(215))
                     .build();
 
             Path12 = follower.pathBuilder()
                     .addPath(new BezierCurve(
                             new Pose(93.31, 92),
                             new Pose(106.414, 66.749),
-                            new Pose(gateX2, gateY2)))
+                            new Pose(gateX2+0.5, gateY2-1)))
                     .setLinearHeadingInterpolation(
                             Math.toRadians(35),
                             Math.toRadians(gateHeading))
@@ -578,7 +625,7 @@ public class Red24Ball extends NextFTCOpMode {
 
             Path13 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(gateX2, gateY2),
+                            new Pose(gateX2+0.5, gateY2-1),
                             new Pose(81.5, 104.0)))
                     .setLinearHeadingInterpolation(
                             Math.toRadians(gateHeading),

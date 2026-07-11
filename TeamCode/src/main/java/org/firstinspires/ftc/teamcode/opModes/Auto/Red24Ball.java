@@ -67,13 +67,24 @@ public class Red24Ball extends NextFTCOpMode {
     double goalY = 140;
     double goalX = 141;
 
-    public static double gateX = 131.2; // 142 - 11.8
-    public static double gateY = 61;
+    public static double gateX = 130; // 142 - 11.8
+    public static double gateY = 60;
 
     public static double gateX2 = 131.5; // 142 - 11.2
     public static double gateY2 = 61;
 
-    public static double gateHeading = 26;
+    public static double PivotPoseX = 110;
+
+    public static double PivotPoseY = 70;
+
+    public static double controlX = 7;
+
+    public static double controlY = -4.5;
+
+    public static double launchX = 80.7613;
+    public static double launchY = 87.9072;
+
+    public static double gateHeading = 38;
 
     public static double gateX1 = 131.5; // 142 - 10.5
     public static double gateY1 = 59;
@@ -288,6 +299,11 @@ public class Red24Ball extends NextFTCOpMode {
             .setStart(() -> {
                 servoStopper.setPosition(openStopperPos); // open
             }).setIsDone(() -> true);
+
+    public Command Pivot = new LambdaCommand()
+            .setStart(()->{
+                follower.turnTo(Math.toRadians(40));
+            }).setIsDone(()->true);
     public Command enableGoalTracking() {
         return new LambdaCommand("Enable Goal Tracking")
                 .setStart(() -> {
@@ -301,7 +317,7 @@ public class Red24Ball extends NextFTCOpMode {
         return new SequentialGroup(
 
                 //setTurretHeading(turretHeading1),
-                new Delay(0.3),
+                (Command) new Delay(0.3),
 
                 new FollowPath(paths.Preload, false, 1.0),
                 enableGoalTracking(),
@@ -319,10 +335,15 @@ public class Red24Ball extends NextFTCOpMode {
                 new FollowPath(paths.Spike2, false, 1.0),
                 //setTurretHeading(-30),
                 new FollowPath(paths.launcgSpike3, false, 1.0),
-                new FollowPath(paths.gateIntake1, true, 1.0),
-                //new FollowPath(paths.Path16,true,1.0),
+                new FollowPath(paths.gateIntakeTest, false, 1.0),
+                //Pivot,
+                //new FollowPath(paths.PivotPath,false,1.0),
                 new Delay(1.05),
-                new FollowPath(paths.Path5, false, 1.0),
+                new FollowPath(paths.Path5, false, 1.0)
+                //new FollowPath(paths.gateIntake1, true, 1.0),
+                //new Delay(2.25),
+                /*new FollowPath(paths.Path5, false, 1.0)/*,
+
 
                 new FollowPath(paths.Path6, true, 1.0),
                 new Delay(2.25),
@@ -344,7 +365,7 @@ public class Red24Ball extends NextFTCOpMode {
                 new FollowPath(paths.Path11, false, 1.0),
                 new FollowPath(paths.Path12, true, 1.0),
                 new Delay(2.25),
-                new FollowPath(paths.Path13, false, 1.0)
+                new FollowPath(paths.Path13, false, 1.0)*/
         );
     }
 
@@ -483,6 +504,8 @@ public class Red24Ball extends NextFTCOpMode {
         public PathChain launcgSpike3;
         public PathChain gateIntake1;
 
+        public PathChain gateIntakeTest;
+
         public PathChain Path5;
         public PathChain Path6;
         public PathChain Path7;
@@ -496,7 +519,7 @@ public class Red24Ball extends NextFTCOpMode {
         public PathChain Path13;
         public PathChain Path14;
         public PathChain Path15;
-        public PathChain Path16;
+        public PathChain PivotPath;
 
         public Paths(Follower follower) {
 
@@ -520,41 +543,48 @@ public class Red24Ball extends NextFTCOpMode {
                     .build();
 
             launcgSpike3 = follower.pathBuilder().addPath(
-                            new BezierLine(
+                            new BezierCurve(
                                     new Pose(123, 59.5),
-                                    new Pose(78.354, 69.703)
+                                    new Pose(119.95007385524372, 53.966543574593786),
+                                    new Pose(launchX, launchY)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(20), Math.toRadians(0))
+                    ).setTangentHeadingInterpolation()
+                    .setReversed()
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
 
 
                     .build();
 
-            gateIntake1 = follower.pathBuilder()
+            /*gateIntake1 = follower.pathBuilder()
                     .addPath(new BezierCurve(
-                            new Pose(78.354, 69.703),
-                            new Pose(114.5,52),
-                            new Pose(124, 64)))
+                            new Pose(launchX, launchY),
+                            new Pose(118.5+gateXtranslation+controlX,52+gateYtranslation+controlY),
+                            new Pose(129.7+gateXtranslation, 60.5+gateYtranslation)))
                     .setTangentHeadingInterpolation()
-                    .build();
-
-            /*Path16 = follower.pathBuilder()
-                    .addPath(new BezierLine(
-                            new Pose(127.5, 60.5),
-                            new Pose(127.3, 60.3)))
-                    .setLinearHeadingInterpolation(
-                            Math.toRadians(5),
-                            Math.toRadians(gateHeading1))
                     .build();*/
+
+            gateIntakeTest = follower.pathBuilder()
+                    .addPath(new BezierLine(
+                            new Pose(launchX, launchY),
+                            new Pose(PivotPoseX, PivotPoseY)))
+                    .setTangentHeadingInterpolation()
+                    .setVelocityConstraint(1.0)
+                    .setTValueConstraint(0.8)
+                    .addPath(new BezierLine(
+                            new Pose(PivotPoseX, PivotPoseY),
+                            new Pose(gateX, gateY)))
+                    .setConstantHeadingInterpolation(
+                            Math.toRadians(gateHeading))
+                    .build();
 
             Path5 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(129.7, 60.5),
-                            new Pose(79.558, 73.32)))
-                    .setLinearHeadingInterpolation(
-                            Math.toRadians(37),
-                            Math.toRadians(345))
+                            new Pose(gateX, gateY),
+                            //new Pose(118.5+gateXtranslation+controlX,52+gateYtranslation+controlY),
+                            new Pose(launchX, launchY)))
+                    .setTangentHeadingInterpolation()
+                    .setReversed()
                     .build();
 
             Path6 = follower.pathBuilder()

@@ -315,57 +315,41 @@ public class Red24Ball extends NextFTCOpMode {
 
     public Command Auto() {
         return new SequentialGroup(
-
-                //setTurretHeading(turretHeading1),
                 (Command) new Delay(0.3),
-
                 new FollowPath(paths.Preload, false, 1.0),
                 enableGoalTracking(),
                 disablePreload,
-
                 intakeMotorOn,
-
                 openStopper,
                 new Delay(0.2),
                 closeStopper,
-
-                //enableGoalTracking(),
-                //autoShootEnable(),
-
                 new FollowPath(paths.Spike2, false, 1.0),
-                //setTurretHeading(-30),
-                new FollowPath(paths.launcgSpike3, false, 1.0),
-                new FollowPath(paths.gateIntakeTest, false, 1.0),
-                //Pivot,
-                //new FollowPath(paths.PivotPath,false,1.0),
+                new FollowPath(paths.launchSpike2, false, 1.0),
+                //6 balls scored, spike 2 + preloads
+                new FollowPath(paths.gateIntake, false, 1.0),
                 new Delay(1.05),
-                new FollowPath(paths.Path5, false, 1.0)
-                //new FollowPath(paths.gateIntake1, true, 1.0),
-                //new Delay(2.25),
-                /*new FollowPath(paths.Path5, false, 1.0)/*,
-
-
-                new FollowPath(paths.Path6, true, 1.0),
+                new FollowPath(paths.launchFromGate, false, 1.0),
+                //9 balls scored
+                new FollowPath(paths.gateIntake, false, 1.0),
                 new Delay(2.25),
-                new FollowPath(paths.Path7, false, 1.0),
-
-                new FollowPath(paths.Path8, true, 1.0),
-
+                new FollowPath(paths.launchFromGate, false, 1.0),
+                //12 balls scored
+                new FollowPath(paths.gateIntake, false, 1.0),
                 new Delay(2.25),
-
-                new FollowPath(paths.Path9, false, 1.0),
-
-                new FollowPath(paths.Path14, false, 1.0),
+                new FollowPath(paths.launchFromGate, false, 1.0),
+                //15 balls scored
+                new FollowPath(paths.intakeSpike1, false, 1.0),
                 intakeMotorOff,
-                new FollowPath(paths.Path15, false, 1.0),
-                intakeMotorOn,
-                new FollowPath(paths.Path10, true, 1.0),
-                //new FollowPath(paths.Pivot2,false,1.0),
+                new FollowPath(paths.launchSpike1, false, 1.0),
+                //18 balls scored
+                new FollowPath(paths.gateIntake, false, 1.0),
                 new Delay(1.05),
-                new FollowPath(paths.Path11, false, 1.0),
-                new FollowPath(paths.Path12, true, 1.0),
+                new FollowPath(paths.launchFromGate, false, 1.0),
+                //21 balls scored
+                new FollowPath(paths.gateIntake, false, 1.0),
                 new Delay(2.25),
-                new FollowPath(paths.Path13, false, 1.0)*/
+                new FollowPath(paths.launchFromGate, false, 1.0)
+                //24 balls scored
         );
     }
 
@@ -501,12 +485,16 @@ public class Red24Ball extends NextFTCOpMode {
         //dih
         public PathChain Preload;
         public PathChain Spike2;
-        public PathChain launcgSpike3;
+        public PathChain launchSpike2;
         public PathChain gateIntake1;
 
-        public PathChain gateIntakeTest;
+        public PathChain gateIntake;
 
-        public PathChain Path5;
+        public PathChain intakeSpike1;
+
+        public PathChain launchSpike1;
+
+        public PathChain launchFromGate;
         public PathChain Path6;
         public PathChain Path7;
         public PathChain Path8;
@@ -542,7 +530,7 @@ public class Red24Ball extends NextFTCOpMode {
                             Math.toRadians(20))
                     .build();
 
-            launcgSpike3 = follower.pathBuilder().addPath(
+            launchSpike2 = follower.pathBuilder().addPath(
                             new BezierCurve(
                                     new Pose(123, 59.5),
                                     new Pose(119.95007385524372, 53.966543574593786),
@@ -564,7 +552,7 @@ public class Red24Ball extends NextFTCOpMode {
                     .setTangentHeadingInterpolation()
                     .build();*/
 
-            gateIntakeTest = follower.pathBuilder()
+            gateIntake = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(launchX, launchY),
                             new Pose(PivotPoseX, PivotPoseY)))
@@ -578,10 +566,27 @@ public class Red24Ball extends NextFTCOpMode {
                             Math.toRadians(gateHeading))
                     .build();
 
-            Path5 = follower.pathBuilder()
+            launchFromGate = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(gateX, gateY),
                             //new Pose(118.5+gateXtranslation+controlX,52+gateYtranslation+controlY),
+                            new Pose(launchX, launchY)))
+                    .setTangentHeadingInterpolation()
+                    .setReversed()
+                    .build();
+
+            intakeSpike1 = follower.pathBuilder()
+                    .addPath(new BezierCurve(
+                            new Pose(launchX, launchY),
+                            new Pose(102.95903256,79.415),
+                            new Pose(121.5, 83.8)))
+                    .setTangentHeadingInterpolation()
+                    .build();
+
+            launchSpike1 = follower.pathBuilder()
+                    .addPath(new BezierCurve(
+                            new Pose(121.5, 83.8),
+                            new Pose(103.0568,78.6283415),
                             new Pose(launchX, launchY)))
                     .setTangentHeadingInterpolation()
                     .setReversed()

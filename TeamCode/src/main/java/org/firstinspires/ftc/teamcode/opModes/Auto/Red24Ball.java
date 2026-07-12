@@ -486,7 +486,6 @@ public class Red24Ball extends NextFTCOpMode {
         public PathChain Preload;
         public PathChain Spike2;
         public PathChain launchSpike2;
-        public PathChain gateIntake1;
 
         public PathChain gateIntake;
 
@@ -500,14 +499,11 @@ public class Red24Ball extends NextFTCOpMode {
         public PathChain Path8;
         public PathChain Path9;
         public PathChain Path10;
-
-        public PathChain Pivot2;
         public PathChain Path11;
         public PathChain Path12;
         public PathChain Path13;
         public PathChain Path14;
         public PathChain Path15;
-        public PathChain PivotPath;
 
         public Paths(Follower follower) {
 

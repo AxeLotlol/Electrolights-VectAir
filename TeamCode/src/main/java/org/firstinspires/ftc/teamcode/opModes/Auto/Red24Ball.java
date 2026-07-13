@@ -517,7 +517,7 @@ public class Red24Ball extends NextFTCOpMode {
             launchSpike1 = follower.pathBuilder()
                     .addPath(new BezierCurve(
                             new Pose(121.5, 83.8),
-                        new Pose(103.0568,78.6283415),
+                            new Pose(103.0568,78.6283415),
                             new Pose(launchX, launchY)))
                     .setTangentHeadingInterpolation()
                     .setReversed()

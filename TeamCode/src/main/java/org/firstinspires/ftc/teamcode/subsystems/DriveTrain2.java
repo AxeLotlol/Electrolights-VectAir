@@ -74,7 +74,7 @@ public class DriveTrain2 implements Subsystem {
 
     public boolean firsttime = true;
 
-    public static double servoOffset = 0.03;
+    public static double servoOffset = 0.05;
 
     public int alliance;
     public boolean far;

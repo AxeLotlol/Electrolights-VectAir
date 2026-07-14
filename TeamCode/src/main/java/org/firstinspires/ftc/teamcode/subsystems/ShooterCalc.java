@@ -114,8 +114,8 @@ public class ShooterCalc implements Subsystem {
 
         double hoodTime = (0.01625 * what) - 0.6;
 
-        ActiveOpMode.telemetry().addData("distance", x);
-        ActiveOpMode.telemetry().addData("height", y);
+        ActiveOpMode.telemetry().addData("distance: ", x);
+        ActiveOpMode.telemetry().addData("height: ", y);
         ActiveOpMode.telemetry().addData("headingAngle", headingAngle);
 
         Double[] returnvalue = {requiredTPS, hoodTime, headingAngle};

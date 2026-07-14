@@ -28,7 +28,7 @@ public class ShooterCalc implements Subsystem {
     public static double requiredTPS = (28*requiredRPM)/60;
     public static double verticalShift = 0;
     public static double verticalShiftStep = 50;
-    public static double sotmFactor = 1.3;
+    public static double sotmFactor = 1.25; //shld be 1.3
     public static double sotmOffset = 15;
 
     public static double accelScalar = 0.015; // Set to 0 to disable
@@ -116,6 +116,7 @@ public class ShooterCalc implements Subsystem {
 
         ActiveOpMode.telemetry().addData("distance", x);
         ActiveOpMode.telemetry().addData("height", y);
+        ActiveOpMode.telemetry().addData("headingAngle", headingAngle);
 
         Double[] returnvalue = {requiredTPS, hoodTime, headingAngle};
         return returnvalue;

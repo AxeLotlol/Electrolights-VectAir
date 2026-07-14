@@ -91,7 +91,6 @@ public class DriveTrain2 implements Subsystem {
     public static double turretOffset2 = 2;
     public static double turretOffsetStep = -5;
     // Inches from the Pinpoint/Pedro robot pose origin to the turret pivot.
-    // Inches from the Pinpoint/Pedro robot pose origin to the turret pivot.
     public static double turretForwardOffset = -0.52588;
     public static double turretStrafeOffset = 0;
 
@@ -226,8 +225,8 @@ public class DriveTrain2 implements Subsystem {
     private void configureAllianceTarget() {
         if (isRed()) {
             alliance = -1;
-            goalXDist = 141;
-            goalX = 141;
+            goalXDist = 140;
+            goalX = 140;
             localizeX = 136;
         } else if (isBlue()) {
             alliance = 1;
@@ -257,13 +256,13 @@ public class DriveTrain2 implements Subsystem {
         follower = PedroComponent.follower();
         intakeMotor = new MotorEx("intakeMotor");
         transfer = new MotorEx("transferMotor");
-        
+
         // OPTIMIZATION: Cache LynxModules once during initialization
         allHubs = ActiveOpMode.hardwareMap().getAll(LynxModule.class);
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
-        
+
         closeStopper.schedule();
         configureAllianceTarget();
         imu = new IMUEx("imu", Direction.LEFT, Direction.BACKWARD).zeroed();
@@ -327,10 +326,10 @@ public class DriveTrain2 implements Subsystem {
     private static ServoEx transfer2;
 
     double goalY = 140;
-    double goalX = 141;
+    double goalX = 140;
 
     static double localizeX;
-    double goalXDist = 141;
+    double goalXDist = 140;
 
 
     static boolean shooting = false;
@@ -408,8 +407,8 @@ public class DriveTrain2 implements Subsystem {
     public static void shoot() {
         if (shooting == false) {
             shooting = true;
-        SequentialGroup shoot = new SequentialGroup(openStopper, intakeMotorOn, new Delay(0.3), intakeMotorOff, closeStopper, shootFalse);
-        shoot.schedule();
+            SequentialGroup shoot = new SequentialGroup(openStopper, intakeMotorOn, new Delay(0.3), intakeMotorOff, closeStopper, shootFalse);
+            shoot.schedule();
         }
     }
 
@@ -486,26 +485,26 @@ public class DriveTrain2 implements Subsystem {
         );
         Double headingError = results[2];
         double flywheelSpeed = results[0];
-            shooter((float) flywheelSpeed);
+        shooter((float) flywheelSpeed);
         currentMotorSpeed = flywheelSpeed;
         double hoodAngle = results[1];
         hoodServo.setPosition(hoodAngle);
         double robotAngularVelocityRads = follower.getAngularVelocity();
         double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
-        double feedforwardOffset = robotAngularVelocityDegs * 0.2;
-        /*if(alliance == -1) {
+        double feedforwardOffset = robotAngularVelocityDegs * 0.175;
+        if(alliance == -1) {
             targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset - feedforwardOffset);
         }
         else{
             targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset2 - feedforwardOffset);
-        }*/
+        }
 
         double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
         servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
 
-            turret1.setPosition(/*servoPositionSignal + servoOffset*/ 0.5);
-            turret2.setPosition(/*servoPositionSignal - servoOffset*/0.5);
-            lastServoPos = servoPositionSignal;
+        turret1.setPosition(servoPositionSignal + servoOffset);
+        turret2.setPosition(servoPositionSignal - servoOffset);
+        lastServoPos = servoPositionSignal;
 
 
         currentTurretPos = targetTurretAngle;

@@ -104,7 +104,7 @@ public class Red24Ball extends NextFTCOpMode {
     private boolean autoShoot = false;
     private boolean useAutoGoalTracking = true;
 
-    // --- Goal Tracking Override Flags ---
+
     private boolean isOverridden = false;
     private double overriddenTurretAngle = 0.0;
 
@@ -256,7 +256,7 @@ public class Red24Ball extends NextFTCOpMode {
 
 
 
-        overriddenTurretAngle = getClosestValidTurretAngle(150);
+        overriddenTurretAngle = getClosestValidTurretAngle(-170);
 
         double robotAngularVelocityRads = follower.getAngularVelocity();
         double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
@@ -315,43 +315,53 @@ public class Red24Ball extends NextFTCOpMode {
 
     public Command Auto() {
         return new SequentialGroup(
-                (Command) new Delay(0.3),
+
+                //setTurretHeading(turretHeading1),
+                new Delay(0.3),
+
                 new FollowPath(paths.Preload, false, 1.0),
-                enableGoalTracking(),
-                disablePreload,
+
                 intakeMotorOn,
+
                 openStopper,
                 new Delay(0.2),
                 closeStopper,
+
+                //enableGoalTracking(),
+                //autoShootEnable(),
+
                 new FollowPath(paths.Spike2, false, 1.0),
-                new FollowPath(paths.launchSpike2, false, 1.0),
-                //6 balls scored, spike 2 + preloads
-                new FollowPath(paths.gateIntake, false, 1.0),
+                //setTurretHeading(-30),
+                new FollowPath(paths.launcgSpike3, false, 1.0),
+                new FollowPath(paths.gateIntake1, true, 1.0),
+                new FollowPath(paths.Path16,true,1.0),
                 new Delay(1.05),
-                new FollowPath(paths.launchFromGate, false, 1.0),
-                //9 balls scored
-                new FollowPath(paths.gateIntake, false, 1.0),
+                new FollowPath(paths.Path5, false, 1.0),
+
+                new FollowPath(paths.Path6, true, 1.0),
                 new Delay(2.25),
-                new FollowPath(paths.launchFromGate, false, 1.0),
-                //12 balls scored
-                new FollowPath(paths.gateIntake, false, 1.0),
+                new FollowPath(paths.Path7, false, 1.0),
+
+                new FollowPath(paths.Path8, true, 1.0),
+
                 new Delay(2.25),
-                new FollowPath(paths.launchFromGate, false, 1.0),
-                //15 balls scored
-                new FollowPath(paths.intakeSpike1, false, 1.0),
+
+                new FollowPath(paths.Path9, false, 1.0),
+
+                new FollowPath(paths.Path14, false, 1.0),
                 intakeMotorOff,
-                new FollowPath(paths.launchSpike1, false, 1.0),
-                //18 balls scored
-                new FollowPath(paths.gateIntake, false, 1.0),
+                new FollowPath(paths.Path15, false, 1.0),
+                intakeMotorOn,
+                new FollowPath(paths.Path10, true, 1.0),
+                //new FollowPath(paths.Pivot2,false,1.0),
                 new Delay(1.05),
-                new FollowPath(paths.launchFromGate, false, 1.0),
-                //21 balls scored
-                new FollowPath(paths.gateIntake, false, 1.0),
+                new FollowPath(paths.Path11, false, 1.0),
+                new FollowPath(paths.Path12, true, 1.0),
                 new Delay(2.25),
-                new FollowPath(paths.launchFromGate, false, 1.0)
-                //24 balls scored
+                new FollowPath(paths.Path13, false, 1.0)
         );
     }
+
 
     public void onStartButtonPressed() {
         opmodeTimer.resetTimer();
@@ -436,17 +446,29 @@ public class Red24Ball extends NextFTCOpMode {
     }
 
     public class Paths {
+//ayush loves anjana and moksh is less chopped than deb am i right? yes im always right heehheheheheheheeheheheheh lwk mithun is angy at me hes kinda mean lol
+
+
+        //dih
         public PathChain Preload;
         public PathChain Spike2;
-        public PathChain launchSpike2;
+        public PathChain launcgSpike3;
+        public PathChain gateIntake1;
 
-        public PathChain gateIntake;
+        public PathChain Path5;
+        public PathChain Path6;
+        public PathChain Path7;
+        public PathChain Path8;
+        public PathChain Path9;
+        public PathChain Path10;
 
-        public PathChain intakeSpike1;
-
-        public PathChain launchSpike1;
-
-        public PathChain launchFromGate;
+        public PathChain Pivot2;
+        public PathChain Path11;
+        public PathChain Path12;
+        public PathChain Path13;
+        public PathChain Path14;
+        public PathChain Path15;
+        public PathChain Path16;
 
         public Paths(Follower follower) {
 
@@ -469,58 +491,135 @@ public class Red24Ball extends NextFTCOpMode {
                             Math.toRadians(20))
                     .build();
 
-            launchSpike2 = follower.pathBuilder().addPath(
-                            new BezierCurve(
+            launcgSpike3 = follower.pathBuilder().addPath(
+                            new BezierLine(
                                     new Pose(123, 59.5),
-                                    new Pose(119.95007385524372, 53.966543574593786),
-                                    new Pose(launchX, launchY)
+                                    new Pose(78.354, 69.703)
                             )
-                    ).setTangentHeadingInterpolation()
-                    .setReversed()
+                    ).setLinearHeadingInterpolation(Math.toRadians(20), Math.toRadians(0))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
 
 
                     .build();
 
-            gateIntake = follower.pathBuilder()
+            gateIntake1 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(launchX, launchY),
-                            new Pose(PivotPoseX, PivotPoseY)))
-                    .setTangentHeadingInterpolation()
-                    .setVelocityConstraint(1.0)
-                    .setTValueConstraint(0.8)
+                            new Pose(78.354, 69.703),
+                            new Pose(127.5, 61.5)))
+                    .setLinearHeadingInterpolation(
+                            Math.toRadians(0),Math.toRadians(5))
+                    .build();
+
+            Path16 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(PivotPoseX, PivotPoseY),
-                            new Pose(gateX, gateY)))
-                    .setConstantHeadingInterpolation(
+                            new Pose(127.5, 61.5),
+                            new Pose(127.3, 61.3)))
+                    .setLinearHeadingInterpolation(
+                            Math.toRadians(5),
+                            Math.toRadians(gateHeading1))
+                    .build();
+
+            Path5 = follower.pathBuilder()
+                    .addPath(new BezierLine(
+                            new Pose(131.2, 61.3),
+                            new Pose(79.558, 73.32)))
+                    .setLinearHeadingInterpolation(
+                            Math.toRadians(gateHeading),
+                            Math.toRadians(345))
+                    .build();
+
+            Path6 = follower.pathBuilder()
+                    .addPath(new BezierLine(
+                            new Pose(80.058, 73.32),
+                            new Pose(gateX, gateY-0.5)))
+                    .setLinearHeadingInterpolation(
+                            Math.toRadians(345),
                             Math.toRadians(gateHeading))
                     .build();
 
-            launchFromGate = follower.pathBuilder()
+            Path7 = follower.pathBuilder()
+                    .addPath(new BezierLine(
+                            new Pose(gateX, gateY-0.5),
+                            new Pose(79.558, 75)))
+                    .setLinearHeadingInterpolation(
+                            Math.toRadians(gateHeading),
+                            Math.toRadians(345))
+                    .build();
+
+            Path8 = follower.pathBuilder()
+                    .addPath(new BezierLine(
+                            new Pose(79.558, 75),
+                            new Pose(gateX, gateY)))
+                    .setLinearHeadingInterpolation(
+                            Math.toRadians(345),
+                            Math.toRadians(gateHeading))
+                    .build();
+
+            Path9 = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(gateX, gateY),
-                            //new Pose(118.5+gateXtranslation+controlX,52+gateYtranslation+controlY),
-                            new Pose(launchX, launchY)))
-                    .setTangentHeadingInterpolation()
-                    .setReversed()
+                            new Pose(79.558, 75)))
+                    .setLinearHeadingInterpolation(
+                            Math.toRadians(gateHeading),
+                            Math.toRadians(345))
                     .build();
 
-            intakeSpike1 = follower.pathBuilder()
+            Path10 = follower.pathBuilder()
                     .addPath(new BezierCurve(
-                            new Pose(launchX, launchY),
-                            new Pose(102.95903256,79.415),
+                            new Pose(92.4669596239, 83.71111297536585),
+                            new Pose(100.519, 63.28),
+                            new Pose(gateX2, gateY2)))
+                    .setLinearHeadingInterpolation(
+                            Math.toRadians(345),
+                            Math.toRadians(gateHeading))
+                    .build();
+
+            Path11 = follower.pathBuilder()
+                    .addPath(new BezierLine(
+                            new Pose(gateX2, gateY2),
+                            new Pose(93.31, 92)))
+                    .setLinearHeadingInterpolation(
+                            Math.toRadians(gateHeading),
+                            Math.toRadians(35))
+                    //toRed(215))
+                    .build();
+
+            Path12 = follower.pathBuilder()
+                    .addPath(new BezierCurve(
+                            new Pose(93.31, 92),
+                            new Pose(106.414, 66.749),
+                            new Pose(gateX2, gateY2)))
+                    .setLinearHeadingInterpolation(
+                            Math.toRadians(35),
+                            Math.toRadians(gateHeading))
+                    .build();
+
+            Path13 = follower.pathBuilder()
+                    .addPath(new BezierLine(
+                            new Pose(gateX2, gateY2),
+                            new Pose(81.5, 104.0)))
+                    .setLinearHeadingInterpolation(
+                            Math.toRadians(gateHeading),
+                            Math.toRadians(90))
+                    .build();
+
+            Path14 = follower.pathBuilder()
+                    .addPath(new BezierCurve(
+                            new Pose(79.558, 75),
+                            new Pose(85.3086685039, 79.2375828716257),
                             new Pose(121.5, 83.8)))
-                    .setTangentHeadingInterpolation()
+                    .setLinearHeadingInterpolation(
+                            Math.toRadians(345),
+                            Math.toRadians(0))
                     .build();
 
-            launchSpike1 = follower.pathBuilder()
-                    .addPath(new BezierCurve(
-                            new Pose(121.5, 83.8),
-                            new Pose(103.0568,78.6283415),
-                            new Pose(launchX, launchY)))
-                    .setTangentHeadingInterpolation()
-                    .setReversed()
+            Path15 = follower.pathBuilder()
+                    .addPath(new BezierLine(
+                            new Pose(118.5, 83.8),
+                            new Pose(92.4669596239, 83.71111297536585)))
+                    .setConstantHeadingInterpolation(
+                            Math.toRadians(0))
                     .build();
         }
     }

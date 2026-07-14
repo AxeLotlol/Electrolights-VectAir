@@ -87,7 +87,7 @@ public class DriveTrain2 implements Subsystem {
     private ServoImplEx turret1;
     private ServoImplEx turret2;
 
-    public static double turretOffset = 15;
+    public static double turretOffset = 10;
     public static double turretOffset2 = 2;
     public static double turretOffsetStep = -5;
     // Inches from the Pinpoint/Pedro robot pose origin to the turret pivot.
@@ -325,7 +325,7 @@ public class DriveTrain2 implements Subsystem {
     private static MotorEx transfer1;
     private static ServoEx transfer2;
 
-    double goalY = 140;
+    double goalY = 140.5;
     double goalX = 140;
 
     static double localizeX;
@@ -491,7 +491,7 @@ public class DriveTrain2 implements Subsystem {
         hoodServo.setPosition(hoodAngle);
         double robotAngularVelocityRads = follower.getAngularVelocity();
         double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
-        double feedforwardOffset = robotAngularVelocityDegs * 0.175;
+        double feedforwardOffset = robotAngularVelocityDegs * 0.2;
         if(alliance == -1) {
             targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset - feedforwardOffset);
         }
@@ -509,11 +509,6 @@ public class DriveTrain2 implements Subsystem {
 
         currentTurretPos = targetTurretAngle;
 
-        telemetryCounter++;
-
-        if (telemetryCounter%TELEMETRY_EVERY_N_LOOPS==0) {
-            //TODO fix avg
-            avgLoopTime/=telemetryCounter;
             ActiveOpMode.telemetry().addData("hoodAngle", hoodAngle);
             ActiveOpMode.telemetry().addData("ballVelocity", flywheelSpeed);
             ActiveOpMode.telemetry().addData("flywheelSpeed", requiredTPS);
@@ -530,7 +525,7 @@ public class DriveTrain2 implements Subsystem {
             ActiveOpMode.telemetry().addData("Turret Offset", turretOffset);
 
             ActiveOpMode.telemetry().update();
-        }
+
 
 
 

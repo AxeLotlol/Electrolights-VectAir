@@ -112,7 +112,8 @@ public class Red24Ball extends NextFTCOpMode {
     private ServoImplEx turret1;
     private ServoImplEx turret2;
 
-    public static double turretOffset = -20;
+    public static double turretOffset = 10;
+    public static double turretOffset2 = 2;
     public static double turretOffsetStep = -5;
 
     // Inches from the Pinpoint/Pedro robot pose origin to the turret pivot.
@@ -262,7 +263,7 @@ public class Red24Ball extends NextFTCOpMode {
         double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
         double feedforwardOffset = 0;
 
-        targetTurretAngle = getClosestValidTurretAngle(overriddenTurretAngle-27 - feedforwardOffset);
+        targetTurretAngle = getClosestValidTurretAngle(overriddenTurretAngle-turretOffset - feedforwardOffset);
         double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
         servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
 

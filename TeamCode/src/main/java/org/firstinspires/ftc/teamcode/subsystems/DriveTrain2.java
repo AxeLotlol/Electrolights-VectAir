@@ -87,9 +87,10 @@ public class DriveTrain2 implements Subsystem {
     private ServoImplEx turret1;
     private ServoImplEx turret2;
 
-    public static double turretOffset = -20;
+    public static double turretOffset = 15;
     public static double turretOffset2 = 2;
     public static double turretOffsetStep = -5;
+    // Inches from the Pinpoint/Pedro robot pose origin to the turret pivot.
     // Inches from the Pinpoint/Pedro robot pose origin to the turret pivot.
     public static double turretForwardOffset = -0.52588;
     public static double turretStrafeOffset = 0;
@@ -492,18 +493,18 @@ public class DriveTrain2 implements Subsystem {
         double robotAngularVelocityRads = follower.getAngularVelocity();
         double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
         double feedforwardOffset = robotAngularVelocityDegs * 0.2;
-        if(alliance == -1) {
+        /*if(alliance == -1) {
             targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset - feedforwardOffset);
         }
         else{
             targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset2 - feedforwardOffset);
-        }
+        }*/
 
         double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
         servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
 
-            turret1.setPosition(servoPositionSignal + servoOffset);
-            turret2.setPosition(servoPositionSignal - servoOffset);
+            turret1.setPosition(/*servoPositionSignal + servoOffset*/ 0.5);
+            turret2.setPosition(/*servoPositionSignal - servoOffset*/0.5);
             lastServoPos = servoPositionSignal;
 
 

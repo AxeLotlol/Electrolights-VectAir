@@ -1,6 +1,7 @@
-package org.firstinspires.ftc.teamcode.opModes.Auto;
+package org.firstinspires.ftc.teamcode.opModes.Auto.TRASH;
 
-import static org.firstinspires.ftc.teamcode.subsystems.AutoShooterCalc.calculateShotVectorandUpdateHeading;
+import static org.firstinspires.ftc.teamcode.subsystems.DriveTrain2.servoOffset;
+import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
 import static org.firstinspires.ftc.teamcode.subsystems.DriveTrain2.closeStopperPos;
 import static org.firstinspires.ftc.teamcode.subsystems.DriveTrain2.openStopperPos;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
@@ -16,6 +17,7 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
@@ -29,22 +31,20 @@ import dev.nextftc.core.commands.delays.Delay;
 import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.components.BindingsComponent;
-import dev.nextftc.core.units.Angle;
 import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.extensions.pedro.PedroComponent;
-import dev.nextftc.extensions.pedro.TurnBy;
-import dev.nextftc.extensions.pedro.TurnTo;
 import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
 
+@Disabled
 @Autonomous
 @Configurable
-public class Red24BallSpamLinear extends NextFTCOpMode {
+public class Red24Ball extends NextFTCOpMode {
 
-    public Red24BallSpamLinear() {
+    public Red24Ball() {
         addComponents(
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE,
@@ -57,44 +57,67 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
     private Timer opmodeTimer;
     private Paths paths;
 
+    public static double startX = 107.17; // 142 - 33.83
+    public static double startY = 134.4;
+
     public Pose start = new Pose(startX, startY, Math.toRadians(270));
 
     // --- Turret tracking ---
     private ServoEx servoStopper;
     private ServoEx hoodServo;
-    public static double startX = 110.17;
-    public static double startY = 134.4;
 
-    private MotorEx intakeMotor;
-    private boolean isOverridden = false;
-    private double overriddenTurretAngle = 0.0;
-    double goalY = 144;
-    double goalX = 144;
-    public static double gateX = 135;
-    public static double gateY = 59.25;
+    double goalY = 140;
+    double goalX = 141;
 
-    public static double gateHeading = 41.25;
+    public static double gateX = 130; // 142 - 11.8
+    public static double gateY = 60;
 
-    public static double gateX1 = 133.5;
-    public static double gateY1 = 58.75;
-    public static double turretHeading1=60;
-    public static double turretHeading2=55;
-    public static double turretHeading3=75;
-    public static double gateHeading1 = 42;
+    public static double gateX2 = 131.5; // 142 - 11.2
+    public static double gateY2 = 61;
+
+    public static double PivotPoseX = 110;
+
+    public static double PivotPoseY = 70;
+
+    public static double controlX = 7;
+
+    public static double controlY = -4.5;
+
+    public static double launchX = 80.7613;
+    public static double launchY = 87.9072;
+
+    public static double gateHeading = 38;
+
+    public static double gateX1 = 131.5; // 142 - 10.5
+    public static double gateY1 = 59;
+
+
+    public static double gateHeading1 = 26;
+
     private static final double MIN_ANGLE = -224.75;
-    private static final double MAX_ANGLE =  224.75;
-    private static final double TURRET_RANGE =  449.51;
-    private double currentTurretPos = 180.0;
+    private static final double MAX_ANGLE = 224.75;
+    private static final double TURRET_RANGE = 449.51;
+
+    private double currentTurretPos = 90;
+
+    public static double turretHeading4 = -140;
 
     private boolean matchStarted = false;
     private boolean autoShoot = false;
     private boolean useAutoGoalTracking = true;
 
+
+    private boolean isOverridden = false;
+    private double overriddenTurretAngle = 0.0;
+
+    private MotorEx intakeMotor;
     private ServoImplEx turret1;
     private ServoImplEx turret2;
 
-    public static double turretOffset = 6;
+    public static double turretOffset = 8;
+    public static double turretOffset2 = 2;
     public static double turretOffsetStep = -5;
+
     // Inches from the Pinpoint/Pedro robot pose origin to the turret pivot.
     public static double turretForwardOffset = -0.52588;
     public static double turretStrafeOffset = 0;
@@ -112,15 +135,6 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
                 transfer.setPower(0);
             });
 
-    public Command servoOpen = new LambdaCommand()
-            .setStart(() -> {
-                servoStopper.setPosition(0.96);
-            });
-
-    public Command servoClose = new LambdaCommand()
-            .setStart(() -> {
-                servoStopper.setPosition(0.86);
-            });
     private List<LynxModule> allHubs;
     public Pose currPose;
 
@@ -141,12 +155,17 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
 
     private Pose getTurretPose(Pose robotPose) {
         double heading = robotPose.getHeading();
+
+        double cos = Math.cos(heading);
+        double sin = Math.sin(heading);
+
         double turretX = robotPose.getX()
-                + turretForwardOffset * Math.cos(heading)
-                - turretStrafeOffset * Math.sin(heading);
+                + turretForwardOffset * cos
+                - turretStrafeOffset * sin;
+
         double turretY = robotPose.getY()
-                + turretForwardOffset * Math.sin(heading)
-                + turretStrafeOffset * Math.cos(heading);
+                + turretForwardOffset * sin
+                + turretStrafeOffset * cos;
 
         return new Pose(turretX, turretY, heading);
     }
@@ -158,24 +177,28 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
         );
     }
 
+    //public SequentialGroup shoot = new SequentialGroup(
+    //servoOpen,
+    //new Delay(0.3)
+    //servoClose
+    //);
 
     double targetTurretAngle;
 
+
+
+
     public boolean manualTPS = true;
+
+
+
+
+
 
     public Command autoShootEnable(){
         return new LambdaCommand()
                 .setStart(()->autoShoot = true);
     }
-    public Command turnOffManualtps(){
-        return new LambdaCommand()
-                .setStart(()->manualTPS=false);
-    }
-    public Command turnOffPreload(){
-        return new LambdaCommand()
-                .setStart(()->preload=false);
-    }
-
     // --- Custom Override Tracking Commands ---
     public Command setTurretHeading(double degrees) {
         return new LambdaCommand("Set Turret Heading: " + degrees)
@@ -186,6 +209,104 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
                 .setIsDone(() -> true);
     }
 
+    /*public Command enableGoalTracking() {
+        return new LambdaCommand("Enable Goal Tracking")
+                .setStart(() -> {
+                    isOverridden = false;
+                })
+                .setIsDone(() -> true);
+    }*/
+
+    public static MotorEx flywheel = new MotorEx("launchingmotor");
+
+    public static MotorEx flywheel2 = new MotorEx("launchingmotor2");
+
+    // ----------------------
+
+    @Override
+    public void onInit() {
+
+        allHubs = ActiveOpMode.hardwareMap().getAll(LynxModule.class);
+
+        for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
+
+        follower = PedroComponent.follower();
+
+        follower.setStartingPose(start);
+
+        paths = new Paths(follower);
+
+        opmodeTimer = new Timer();
+
+        intakeMotor = new MotorEx("intakeMotor");
+        transfer = new MotorEx("transferMotor");
+
+        turret1 = ActiveOpMode.hardwareMap().get(
+                ServoImplEx.class,
+                "turretServo1");
+
+        turret2 = ActiveOpMode.hardwareMap().get(
+                ServoImplEx.class,
+                "turretServo2");
+
+        turret1.setPwmRange(new PwmControl.PwmRange(500, 2500));
+        turret2.setPwmRange(new PwmControl.PwmRange(500, 2500));
+
+        isOverridden = true;
+        preload = true;
+
+
+
+        overriddenTurretAngle = getClosestValidTurretAngle(10);
+
+        double robotAngularVelocityRads = follower.getAngularVelocity();
+        double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
+        double feedforwardOffset = 0;
+
+        targetTurretAngle = getClosestValidTurretAngle(overriddenTurretAngle-turretOffset - feedforwardOffset);
+        double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
+        servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
+
+        turret1.setPosition(servoPositionSignal + servoOffset);
+        turret2.setPosition(servoPositionSignal - servoOffset);
+        double lastServoPos = servoPositionSignal;
+
+
+        currentTurretPos = targetTurretAngle;
+        //enableGoalTracking();
+
+
+        hoodServo = new ServoEx("hoodServo");
+
+        servoStopper = new ServoEx("stopperServo");
+
+        telemetry.addLine("Initialized");
+        telemetry.update();
+
+        //setTurretHeading(turretHeading1).schedule();
+
+        hoodServo = new ServoEx("hoodServo");
+
+        servoStopper = new ServoEx("stopperServo");
+
+        telemetry.addLine("Initialized");
+        telemetry.update();
+    }
+    public Command closeStopper = new LambdaCommand()
+            .setStart(() -> {
+                servoStopper.setPosition(closeStopperPos); // close
+            }).setIsDone(() -> true);
+    public Command openStopper = new LambdaCommand()
+            .setStart(() -> {
+                servoStopper.setPosition(openStopperPos); // open
+            }).setIsDone(() -> true);
+
+    public Command Pivot = new LambdaCommand()
+            .setStart(()->{
+                follower.turnTo(Math.toRadians(40));
+            }).setIsDone(()->true);
     public Command enableGoalTracking() {
         return new LambdaCommand("Enable Goal Tracking")
                 .setStart(() -> {
@@ -194,72 +315,38 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
                 .setIsDone(() -> true);
     }
 
-    public static MotorEx flywheel = new MotorEx("launchingmotor");
-
-    public static MotorEx flywheel2 = new MotorEx("launchingmotor2");
-
-    // ----------------------
-
-    public void onInit() {
-        allHubs = ActiveOpMode.hardwareMap().getAll(LynxModule.class);
-        for (LynxModule hub : allHubs) {
-            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
-        }
-        follower = PedroComponent.follower();
-        follower.setStartingPose(start);
-        paths = new Paths(follower);
-        opmodeTimer = new Timer();
-        intakeMotor = new MotorEx("intakeMotor");
-        transfer = new MotorEx("transferMotor");
-        turret1 = ActiveOpMode.hardwareMap().get(ServoImplEx.class, "turretServo1");
-        turret2 = ActiveOpMode.hardwareMap().get(ServoImplEx.class,"turretServo2");
-        turret1.setPwmRange(new PwmControl.PwmRange(500, 2500));
-        turret2.setPwmRange(new PwmControl.PwmRange(500, 2500));
-        hoodServo = new ServoEx("hoodServo");
-        servoStopper = new ServoEx("stopperServo");
-        telemetry.addLine("Initialized");
-        telemetry.update();
-    }
-    public Command turnTo(Pose targetPose, double timeoutSeconds) {
-        return new LambdaCommand("Turn to " + targetPose.getHeading())
-                .setStart(() -> follower.holdPoint(targetPose))
-                .setIsDone(() -> false)
-                .raceWith(new Delay(timeoutSeconds));
-    }
-    private boolean manualShooting = true;
-
-    public Command closeStopper = new LambdaCommand()
-            .setStart(() -> {
-                servoStopper.setPosition(closeStopperPos); // close
-            }).setIsDone(() -> true);
-//    public Command openStopper = new LambdaCommand()
-//            .setStart(() -> {
-//                servoStopper.setPosition(openStopperPos); // open
-//            }).setIsDone(() -> true);
 
     public Command Auto() {
         return new SequentialGroup(
-                setTurretHeading(165),
 
-                new FollowPath(paths.Path1, false, 1.0),
+                //setTurretHeading(turretHeading1),
+                new Delay(0.3),
+
+                new FollowPath(paths.Preload, false, 1.0),
 
                 intakeMotorOn,
-                new FollowPath(paths.Path2, false, 1.0),
-                setTurretHeading(30),
-                new FollowPath(paths.Path3, false, 1.0),
-                new FollowPath(paths.Path4, true, 1.0),
+
+                openStopper,
+                new Delay(0.2),
+                closeStopper,
+
+                //enableGoalTracking(),
+                //autoShootEnable(),
+
+                new FollowPath(paths.Spike2, false, 1.0),
+                //setTurretHeading(-30),
+                new FollowPath(paths.launcgSpike3, false, 1.0),
+                new FollowPath(paths.gateIntake1, true, 1.0),
                 new FollowPath(paths.Path16,true,1.0),
                 new Delay(1.05),
-                setTurretHeading(35),
                 new FollowPath(paths.Path5, false, 1.0),
-                setTurretHeading(40),
+
                 new FollowPath(paths.Path6, true, 1.0),
                 new Delay(2.25),
-                setTurretHeading(25),
                 new FollowPath(paths.Path7, false, 1.0),
-                //shoot,
-                setTurretHeading(40),
+
                 new FollowPath(paths.Path8, true, 1.0),
+
                 new Delay(2.25),
 
                 new FollowPath(paths.Path9, false, 1.0),
@@ -267,89 +354,91 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
                 new FollowPath(paths.Path14, false, 1.0),
                 intakeMotorOff,
                 new FollowPath(paths.Path15, false, 1.0),
-                //shoot,
-                setTurretHeading(40),
-
                 intakeMotorOn,
                 new FollowPath(paths.Path10, true, 1.0),
-                new Delay(1.25),
+                //new FollowPath(paths.Pivot2,false,1.0),
+                new Delay(1.05),
                 new FollowPath(paths.Path11, false, 1.0),
-                //shoot,
-                setTurretHeading(40),
-
                 new FollowPath(paths.Path12, true, 1.0),
                 new Delay(2.25),
                 new FollowPath(paths.Path13, false, 1.0)
         );
     }
 
+
     public void onStartButtonPressed() {
         opmodeTimer.resetTimer();
         matchStarted = true;
-        shooter(2500);
         Auto().schedule();
     }
     private boolean preload = true;
+
+    public Command disablePreload = new LambdaCommand()
+            .setStart(()->preload=false);
     private double flywheelSpeed;
+
 
     @Override
     public void onUpdate() {
+
         for (LynxModule hub : allHubs) {
             hub.clearBulkCache();
         }
+
         follower.update();
+
         Storage.currentPose = follower.getPose();
 
         if (!matchStarted) return;
 
         Pose currPose = follower.getPose();
+
         Pose turretPose = getTurretPose(currPose);
+
         double robotHeading = follower.getPose().getHeading();
+
         Vector robotToGoalVector = getTurretToGoalVector(turretPose);
-        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity().times(1), follower.getAcceleration());
+
+        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity().times(1.0), 1.25);
 
         flywheelSpeed = results[0];
 
-        if(preload==true){
-            shooter(2500);
+        if (preload == true) {
+            shooter((float) flywheelSpeed + 30);
         }
-        if(preload==false){
-            shooter((float) flywheelSpeed - 38);
+
+        if (preload == false) {
+            shooter((float) flywheelSpeed);
         }
+
         double hoodAngle = results[1];
         hoodServo.setPosition(hoodAngle);
-
         double headingError = results[2];
         double robotAngularVelocityRads = follower.getAngularVelocity();
         double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
         double feedforwardOffset = robotAngularVelocityDegs * 0.225;
-
-        // --- Intercepted for Heading Overrides ---
         double targetTurretAngle;
-        if (isOverridden) {
-            // Evaluates target angle directly based on user's manual call while preserving feedforward stabilization
-            targetTurretAngle = getClosestValidTurretAngle(overriddenTurretAngle - feedforwardOffset);
-        } else {
-            // Default Vector Math Goal Tracking
-            targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset - feedforwardOffset);
-        }
-
+        targetTurretAngle = getClosestValidTurretAngle(overriddenTurretAngle+turretOffset - feedforwardOffset);
         double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
         servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
+
         turret1.setPosition(servoPositionSignal);
         turret2.setPosition(servoPositionSignal);
-        currentTurretPos = targetTurretAngle;
-        Pose futurepose = new Pose(follower.getPose().getX()+follower.getVelocity().getXComponent()*0.5, follower.getPose().getY()+follower.getVelocity().getYComponent()*0.3, follower.getHeading());
 
-        if(isOverlappingLaunchZone(futurepose) && robotToGoalVector.getMagnitude()>45&&autoShoot){
+        currentTurretPos = targetTurretAngle;
+
+        Pose futurepose = new Pose(follower.getPose().getX() + (follower.getVelocity().getXComponent() * 0.25), follower.getPose().getY() + (follower.getVelocity().getYComponent() * 0.25), follower.getHeading());
+
+        if (isOverlappingLaunchZone(futurepose) && robotToGoalVector.getMagnitude() > 45) {
             intakeMotor.setPower(1);
             transfer.setPower(1);
-
-        }
-        else{
+            openStopper.schedule();
+        } else {
             closeStopper.schedule();
         }
+
         Storage.currentPose = follower.getPose();
+
         Storage.setPose = true;
     }
 
@@ -360,16 +449,23 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
     }
 
     public class Paths {
-        public PathChain Path1;
-        public PathChain Path2;
-        public PathChain Path3;
-        public PathChain Path4;
+//ayush loves anjana and moksh is less chopped than deb am i right? yes im always right heehheheheheheheeheheheheh lwk mithun is angy at me hes kinda mean lol
+
+
+        //dih
+        public PathChain Preload;
+        public PathChain Spike2;
+        public PathChain launcgSpike3;
+        public PathChain gateIntake1;
+
         public PathChain Path5;
         public PathChain Path6;
         public PathChain Path7;
         public PathChain Path8;
         public PathChain Path9;
         public PathChain Path10;
+
+        public PathChain Pivot2;
         public PathChain Path11;
         public PathChain Path12;
         public PathChain Path13;
@@ -378,124 +474,156 @@ public class Red24BallSpamLinear extends NextFTCOpMode {
         public PathChain Path16;
 
         public Paths(Follower follower) {
-            Path1 = follower.pathBuilder()
+
+            Preload = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(startX, startY),
-                            new Pose(95.005, 94.650)))
-                    .setLinearHeadingInterpolation(Math.toRadians(270), Math.toRadians(240))
-                    //.addPoseCallback(new Pose(103.524,103.524), autoShootEnable(),0.8 )
+                            new Pose(92.505, 94.650)))
+                    .setLinearHeadingInterpolation(
+                            Math.toRadians(270),
+                            Math.toRadians(240))
                     .build();
 
-            Path2 = follower.pathBuilder()
+            Spike2 = follower.pathBuilder()
                     .addPath(new BezierCurve(
-                            new Pose(95.005, 94.650),
-                            new Pose(89.2, 59.7),
-                            new Pose(125.5, 59.5)))
-                    .setLinearHeadingInterpolation(Math.toRadians(240), Math.toRadians(20))
-                    .addPoseCallback(new Pose(97.491,71.544),turnOffPreload(),0.78)
+                            new Pose(92.505, 94.650),
+                            new Pose(90.98, 59.7),
+                            new Pose(123, 59.5)))
+                    .setLinearHeadingInterpolation(
+                            Math.toRadians(240),
+                            Math.toRadians(20))
                     .build();
 
-            Path3 = follower.pathBuilder()
-                    .addPath(new BezierLine(
-                            new Pose(125.5, 59.5),
-                            new Pose(80.854, 69.703)))
-                    .setLinearHeadingInterpolation(Math.toRadians(20),Math.toRadians(0))
+            launcgSpike3 = follower.pathBuilder().addPath(
+                            new BezierLine(
+                                    new Pose(123, 59.5),
+                                    new Pose(78.354, 69.703)
+                            )
+                    ).setLinearHeadingInterpolation(Math.toRadians(20), Math.toRadians(0))
+                    .setVelocityConstraint(1.0)
+                    .setTValueConstraint(0.8)
+
+
                     .build();
 
-            Path4 = follower.pathBuilder()
+            gateIntake1 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(80.854, 69.703),
-                            new Pose(129.2, 61.15)))
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(5))
-                    //.addPoseCallback(new Pose(121.354,62.215),new TurnTo(Angle.fromDeg(41)),0.76)
+                            new Pose(78.354, 69.703),
+                            new Pose(127.5, 61.5)))
+                    .setLinearHeadingInterpolation(
+                            Math.toRadians(0),Math.toRadians(5))
                     .build();
+
             Path16 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(129.2,61.115),
-                            new Pose(132.8,61)))
-                    .setLinearHeadingInterpolation(Math.toRadians(5),Math.toRadians(37))
+                            new Pose(127.5, 61.5),
+                            new Pose(127.3, 61.3)))
+                    .setLinearHeadingInterpolation(
+                            Math.toRadians(5),
+                            Math.toRadians(gateHeading1))
                     .build();
 
             Path5 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(132.8, 61.15),
-                            new Pose(82.058, 73.32)))
-                    .setLinearHeadingInterpolation(Math.toRadians(gateHeading1), Math.toRadians(-15))
+                            new Pose(131.2, 61.3),
+                            new Pose(79.558, 73.32)))
+                    .setLinearHeadingInterpolation(
+                            Math.toRadians(gateHeading),
+                            Math.toRadians(345))
                     .build();
 
             Path6 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(82.058, 73.32),
-                            new Pose(gateX, gateY)))
-                    .setLinearHeadingInterpolation(Math.toRadians(-15), Math.toRadians(gateHeading))
+                            new Pose(80.058, 73.32),
+                            new Pose(gateX, gateY-0.5)))
+                    .setLinearHeadingInterpolation(
+                            Math.toRadians(345),
+                            Math.toRadians(gateHeading))
                     .build();
 
             Path7 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(gateX, gateY),
-                            new Pose(82.100, 73.328)))
-                    .setLinearHeadingInterpolation(Math.toRadians(gateHeading), Math.toRadians(-15))
+                            new Pose(gateX, gateY-0.5),
+                            new Pose(79.558, 75)))
+                    .setLinearHeadingInterpolation(
+                            Math.toRadians(gateHeading),
+                            Math.toRadians(345))
                     .build();
 
             Path8 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(82.100, 73.328),
+                            new Pose(79.558, 75),
                             new Pose(gateX, gateY)))
-                    .setLinearHeadingInterpolation(Math.toRadians(-15), Math.toRadians(gateHeading))
+                    .setLinearHeadingInterpolation(
+                            Math.toRadians(345),
+                            Math.toRadians(gateHeading))
                     .build();
 
             Path9 = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(gateX, gateY),
-                            new Pose(82.100, 73.328)))
-                    .setLinearHeadingInterpolation(Math.toRadians(gateHeading), Math.toRadians(-15))
+                            new Pose(79.558, 75)))
+                    .setLinearHeadingInterpolation(
+                            Math.toRadians(gateHeading),
+                            Math.toRadians(345))
                     .build();
 
             Path10 = follower.pathBuilder()
                     .addPath(new BezierCurve(
-                            new Pose(94.96695962391377, 83.71111297536585),
-                            new Pose(103.019,63.28),
-                            new Pose(gateX, gateY)))
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(gateHeading))
+                            new Pose(92.4669596239, 83.71111297536585),
+                            new Pose(100.519, 63.28),
+                            new Pose(gateX2, gateY2)))
+                    .setLinearHeadingInterpolation(
+                            Math.toRadians(345),
+                            Math.toRadians(gateHeading))
                     .build();
 
             Path11 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(gateX, gateY),
-                            new Pose(95.81, 91.6)))
-                    .setLinearHeadingInterpolation(Math.toRadians(gateHeading), Math.toRadians(-35))
+                            new Pose(gateX2, gateY2),
+                            new Pose(93.31, 92)))
+                    .setLinearHeadingInterpolation(
+                            Math.toRadians(gateHeading),
+                            Math.toRadians(35))
+                    //toRed(215))
                     .build();
 
             Path12 = follower.pathBuilder()
                     .addPath(new BezierCurve(
-                            new Pose(95.81, 91.6),
-                            new Pose(108.914,66.749),
-                            new Pose(gateX,gateY)))
-                    .setLinearHeadingInterpolation(Math.toRadians(-35), Math.toRadians(gateHeading))
+                            new Pose(93.31, 92),
+                            new Pose(106.414, 66.749),
+                            new Pose(gateX2, gateY2)))
+                    .setLinearHeadingInterpolation(
+                            Math.toRadians(35),
+                            Math.toRadians(gateHeading))
                     .build();
 
             Path13 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(gateX,gateY),
-                            new Pose(84, 104)))
-                    .setLinearHeadingInterpolation(Math.toRadians(gateHeading), Math.toRadians(90))
+                            new Pose(gateX2, gateY2),
+                            new Pose(81.5, 104.0)))
+                    .setLinearHeadingInterpolation(
+                            Math.toRadians(gateHeading),
+                            Math.toRadians(90))
                     .build();
 
             Path14 = follower.pathBuilder()
                     .addPath(new BezierCurve(
-                            new Pose(82.100, 73.328),
-                            new Pose(87.80866850393573, 79.2375828716257),
-                            new Pose(121, 81.1828200643779)))
-                    .setLinearHeadingInterpolation(Math.toRadians(-15), Math.toRadians(0))
+                            new Pose(79.558, 75),
+                            new Pose(85.3086685039, 79.2375828716257),
+                            new Pose(121.5, 83.8)))
+                    .setLinearHeadingInterpolation(
+                            Math.toRadians(345),
+                            Math.toRadians(0))
                     .build();
 
             Path15 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(121, 81.1828200643779),
-                            new Pose(94.96695962391377, 83.71111297536585)))
-                    .setConstantHeadingInterpolation(Math.toRadians(0))
+                            new Pose(118.5, 83.8),
+                            new Pose(92.4669596239, 83.71111297536585)))
+                    .setConstantHeadingInterpolation(
+                            Math.toRadians(0))
                     .build();
-
         }
     }
 }

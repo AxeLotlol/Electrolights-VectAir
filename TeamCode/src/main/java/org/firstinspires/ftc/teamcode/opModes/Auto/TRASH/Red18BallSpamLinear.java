@@ -1,4 +1,4 @@
-        package org.firstinspires.ftc.teamcode.opModes.Auto;
+        package org.firstinspires.ftc.teamcode.opModes.Auto.TRASH;
 
 
         import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
@@ -14,6 +14,7 @@
         import com.pedropathing.util.Timer;
         import com.qualcomm.hardware.limelightvision.Limelight3A;
         import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+        import com.qualcomm.robotcore.eventloop.opmode.Disabled;
         import com.qualcomm.robotcore.hardware.Servo;
 
         import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
@@ -39,7 +40,7 @@
         import dev.nextftc.hardware.impl.ServoEx;
         import dev.nextftc.hardware.positionable.SetPosition;
 
-
+        @Disabled
         @Autonomous
         @Configurable
         public class Red18BallSpamLinear extends NextFTCOpMode {

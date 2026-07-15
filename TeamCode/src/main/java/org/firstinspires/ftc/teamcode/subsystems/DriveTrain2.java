@@ -507,7 +507,7 @@ public class DriveTrain2 implements Subsystem {
         lastServoPos = servoPositionSignal;
 
 
-        currentTurretPos = targetTurretAngle;
+            currentTurretPos = targetTurretAngle;
 
             ActiveOpMode.telemetry().addData("hoodAngle", hoodAngle);
             ActiveOpMode.telemetry().addData("ballVelocity", flywheelSpeed);

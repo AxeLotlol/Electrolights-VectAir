@@ -74,7 +74,7 @@ public class DriveTrain2 implements Subsystem {
 
     public boolean firsttime = true;
 
-    public static double servoOffset = 0.05;
+    public static double servoOffset = 0.02;
 
     public int alliance;
     public boolean far;
@@ -87,15 +87,15 @@ public class DriveTrain2 implements Subsystem {
     private ServoImplEx turret1;
     private ServoImplEx turret2;
 
-    public static double turretOffset = 8;
-    public static double turretOffset2 = 2;
+    public static double turretOffset = 0;
+    public static double turretOffset2 = 0;
     public static double turretOffsetStep = -5;
     // Inches from the Pinpoint/Pedro robot pose origin to the turret pivot.
     public static double turretForwardOffset = -0.52588;
     public static double turretStrafeOffset = 0;
 
-    public static double openStopperPos = 0;
-    public static double closeStopperPos = 0.05;
+    public static double openStopperPos = 0.58;
+    public static double closeStopperPos = 0.67;
     public Command driveToGate = new LambdaCommand()
             .setStart(() -> dToGate = true);
     public static boolean dToGate = false;

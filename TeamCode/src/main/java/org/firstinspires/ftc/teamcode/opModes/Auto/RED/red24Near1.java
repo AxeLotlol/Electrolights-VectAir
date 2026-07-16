@@ -39,7 +39,7 @@ import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
 
 
-@Autonomous(name = "Red Near 24 V1")
+@Autonomous(name = "Red Near 24 V25")
 @Configurable
 public class red24Near1 extends NextFTCOpMode {
 
@@ -56,7 +56,7 @@ public class red24Near1 extends NextFTCOpMode {
     private Timer opmodeTimer;
     private Paths paths;
 
-    public static double startX = 107.17; // 142 - 33.83
+    public static double startX = 107.17;
     public static double startY = 134.4;
 
     public Pose start = new Pose(startX, startY, Math.toRadians(270));
@@ -113,7 +113,7 @@ public class red24Near1 extends NextFTCOpMode {
     private ServoImplEx turret1;
     private ServoImplEx turret2;
 
-    public static double turretOffset = -20;
+    public static double turretOffset = 8;
     public static double turretOffset2 = 2;
     public static double turretOffsetStep = -5;
 
@@ -252,14 +252,19 @@ public class red24Near1 extends NextFTCOpMode {
 
         turret1.setPwmRange(new PwmControl.PwmRange(500, 2500));
         turret2.setPwmRange(new PwmControl.PwmRange(500, 2500));
+        hoodServo = new ServoEx("hoodServo");
+
+        servoStopper = new ServoEx("stopperServo");
 
         isOverridden = true;
         preload = true;
 
 
 
-        overriddenTurretAngle = getClosestValidTurretAngle(-170);
-
+        overriddenTurretAngle = getClosestValidTurretAngle(160);
+        double hoodAngle = 0.4;
+        hoodServo.setPosition(hoodAngle);
+        servoStopper.setPosition(closeStopperPos);
         double robotAngularVelocityRads = follower.getAngularVelocity();
         double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
         double feedforwardOffset = 0;
@@ -277,18 +282,14 @@ public class red24Near1 extends NextFTCOpMode {
         //enableGoalTracking();
 
 
-        hoodServo = new ServoEx("hoodServo");
 
-        servoStopper = new ServoEx("stopperServo");
 
         telemetry.addLine("Initialized");
         telemetry.update();
 
         //setTurretHeading(turretHeading1).schedule();
 
-        hoodServo = new ServoEx("hoodServo");
 
-        servoStopper = new ServoEx("stopperServo");
 
         telemetry.addLine("Initialized");
         telemetry.update();
@@ -324,17 +325,14 @@ public class red24Near1 extends NextFTCOpMode {
                 new FollowPath(paths.Preload, false, 1.0),
 
                 intakeMotorOn,
-
                 openStopper,
                 new Delay(0.2),
                 closeStopper,
                 disablePreload,
 
-
                 //autoShootEnable(),
 
                 new FollowPath(paths.Spike2, false, 1.0),
-                setTurretHeading(-40),
                 new FollowPath(paths.launchspike2, false, 1.0),
                 new FollowPath(paths.gateIntake1, true, 1.0),
                 new FollowPath(paths.Pivot,true,1.0),
@@ -361,7 +359,7 @@ public class red24Near1 extends NextFTCOpMode {
                 new FollowPath(paths.Path11, false, 1.0),
                 new FollowPath(paths.Path12, true, 1.0),
                 new Delay(2.25),
-                new FollowPath(paths.Path13, false, 1.0)
+                new FollowPath(paths.Path13, false, 1.0) //prk
         );
     }
 
@@ -399,32 +397,54 @@ public class red24Near1 extends NextFTCOpMode {
 
         Vector robotToGoalVector = getTurretToGoalVector(turretPose);
 
-        Double[] results = calculateShotVectorandUpdateHeading(robotHeading, robotToGoalVector, follower.getVelocity().times(1.0), 1.25);
+        Double[] results = calculateShotVectorandUpdateHeading(
+                robotHeading,
+                robotToGoalVector,
+                follower.getVelocity().times(1.0), 1.25);
 
         flywheelSpeed = results[0];
 
         if (preload == true) {
+            double hoodAngle = results[1];
+            hoodServo.setPosition(hoodAngle);
             shooter((float) flywheelSpeed + 30);
+            double robotAngularVelocityRads = follower.getAngularVelocity();
+            double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
+            double feedforwardOffset = 0;
+
+            targetTurretAngle = getClosestValidTurretAngle(overriddenTurretAngle-turretOffset - feedforwardOffset);
+            double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
+            servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
+
+            turret1.setPosition(servoPositionSignal + servoOffset);
+            turret2.setPosition(servoPositionSignal - servoOffset);
+            double lastServoPos = servoPositionSignal;
+
+
+            currentTurretPos = targetTurretAngle;
+
+
         }
 
         if (preload == false) {
             shooter((float) flywheelSpeed);
+            double hoodAngle = results[1];
+            hoodServo.setPosition(hoodAngle);
+            double headingError = results[2];
+            double robotAngularVelocityRads = follower.getAngularVelocity();
+            double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
+            double feedforwardOffset = robotAngularVelocityDegs * 0.225;
+            targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset - feedforwardOffset);
+            double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
+            servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
+
+            turret1.setPosition(servoPositionSignal + servoOffset);
+            turret2.setPosition(servoPositionSignal- servoOffset);
+
+            currentTurretPos = targetTurretAngle;
         }
 
-        double hoodAngle = results[1];
-        hoodServo.setPosition(hoodAngle);
-        double headingError = results[2];
-        double robotAngularVelocityRads = follower.getAngularVelocity();
-        double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
-        double feedforwardOffset = robotAngularVelocityDegs * 0.225;
-        targetTurretAngle = getClosestValidTurretAngle(overriddenTurretAngle + turretOffset - feedforwardOffset);
-        double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
-        servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
 
-        turret1.setPosition(servoPositionSignal + servoOffset);
-        turret2.setPosition(servoPositionSignal- servoOffset);
-
-        currentTurretPos = targetTurretAngle;
 
         Pose futurepose = new Pose(follower.getPose().getX() + (follower.getVelocity().getXComponent() * 0.25), follower.getPose().getY() + (follower.getVelocity().getYComponent() * 0.25), follower.getHeading());
 
@@ -571,18 +591,18 @@ public class red24Near1 extends NextFTCOpMode {
                     .addPath(new BezierCurve(
                             new Pose(92.4669596239, 83.71111297536585),
                             new Pose(100.519, 63.28),
-                            new Pose(gateX2, gateY2)))
+                            new Pose(gateX2-2, gateY2)))
                     .setLinearHeadingInterpolation(
                             Math.toRadians(345),
-                            Math.toRadians(gateHeading))
+                            Math.toRadians(gateHeading - 5))
                     .build();
 
             Path11 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(gateX2, gateY2),
-                            new Pose(93.31, 92)))
+                            new Pose(gateX2 -2, gateY2),
+                            new Pose(81.5, 104.0)))
                     .setLinearHeadingInterpolation(
-                            Math.toRadians(gateHeading),
+                            Math.toRadians(gateHeading - 5),
                             Math.toRadians(35))
                     //toRed(215))
                     .build();
@@ -591,19 +611,19 @@ public class red24Near1 extends NextFTCOpMode {
                     .addPath(new BezierCurve(
                             new Pose(93.31, 92),
                             new Pose(106.414, 66.749),
-                            new Pose(gateX2, gateY2-1)))
+                            new Pose(gateX2-2, gateY2)))
                     .setLinearHeadingInterpolation(
                             Math.toRadians(35),
-                            Math.toRadians(gateHeading))
+                            Math.toRadians(gateHeading -5))
                     .build();
 
             Path13 = follower.pathBuilder()
                     .addPath(new BezierCurve(
-                            new Pose(gateX2, gateY2),
+                            new Pose(gateX2-2, gateY2),
                             new Pose(119,52),
                             new Pose(81.5, 104.0)))
                     .setLinearHeadingInterpolation(
-                            Math.toRadians(gateHeading),
+                            Math.toRadians(gateHeading -5),
                             Math.toRadians(90))
                     .build();
 

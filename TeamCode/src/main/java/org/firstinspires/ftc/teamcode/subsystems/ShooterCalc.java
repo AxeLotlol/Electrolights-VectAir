@@ -39,7 +39,7 @@ public class ShooterCalc implements Subsystem {
         //double y = -4.5745*temp*temp*temp + 25.978*temp*temp - 48.395*temp + 58.675;
         //double y = SCORE_HEIGHT;
         //double a = ShooterConstants.SCORE_ANGLE;
-        double y = 0.0032*Math.pow(x,2)-0.6653*x+66.888;
+        double y = 0.0032*Math.pow(x,2)-0.6653*x+66.888+4;
         double a = Math.toRadians(SCORE_ANGLE);
         if(x<66.29){
             a = Math.toRadians(0.6106*x-57.478);
@@ -58,20 +58,20 @@ public class ShooterCalc implements Subsystem {
         }
         double flywheelSpeed = Math.sqrt(g * x * x / (2 * Math.pow(Math.cos(hoodAngle), 2) * (x * Math. tan(hoodAngle) - y)));
 
-        Vector robotVelocity = robotVel.times(1.25);
+        Vector robotVelocity = robotVel;
 
-        double coordinateTheta = robotVelocity.getTuheta() - robotToGoalVector.getTheta();
+        double coordinateTheta = robotVelocity.getTheta() - robotToGoalVector.getTheta();
 
         double parallelComponent = Math.cos(coordinateTheta) * robotVelocity.getMagnitude();
         double perpendicularComponent = Math.sin(coordinateTheta) * robotVelocity.getMagnitude();
 
         double vz = flywheelSpeed * Math.sin(hoodAngle);
-        double time = (x / (flywheelSpeed * Math.cos(hoodAngle))); //maybe try 1.25 SIDENOTE revert back to 1.2 if accel change does NOT work, then multiply the speed itself by 1.2
+        double time = 1.25*(x / (flywheelSpeed * Math.cos(hoodAngle))); //maybe try 1.25 SIDENOTE revert back to 1.2 if accel change does NOT work, then multiply the speed itself by 1.2
         double ivr = x / time - parallelComponent;
         double nvr = Math.sqrt(ivr * ivr + perpendicularComponent * perpendicularComponent);
         double ndr = nvr * time;
 
-        y = 0.0032*Math.pow(ndr,2)-0.6653*ndr+66.888;
+        y = 0.0032*Math.pow(ndr,2)-0.6653*ndr+66.888+4;
         if(ndr<66.29){
             a = Math.toRadians(0.6106*ndr-57.478);
         } //closezone regression cuz regression is weird and cant do spline thingy

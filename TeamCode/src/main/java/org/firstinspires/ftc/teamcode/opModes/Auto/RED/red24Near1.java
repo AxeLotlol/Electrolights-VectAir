@@ -39,7 +39,7 @@ import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
 
 
-@Autonomous(name = "Red Near 24 V25")
+@Autonomous(name = "Red Near 24 V26")
 @Configurable
 public class red24Near1 extends NextFTCOpMode {
 
@@ -68,10 +68,10 @@ public class red24Near1 extends NextFTCOpMode {
     double goalY = 140;
     double goalX = 141;
 
-    public static double gateX = 130; // 142 - 11.8
+    public static double gateX = 130.5; // 142 - 11.8
     public static double gateY = 60;
 
-    public static double gateX2 = 131.5; // 142 - 11.2
+    public static double gateX2 = 130.5; // 142 - 11.2
     public static double gateY2 = 61;
 
     public static double PivotPoseX = 110;
@@ -85,13 +85,13 @@ public class red24Near1 extends NextFTCOpMode {
     public static double launchX = 80.7613;
     public static double launchY = 87.9072;
 
-    public static double gateHeading = 26;
+    public static double gateHeading = 29;
 
     public static double gateX1 = 131.5; // 142 - 10.5
     public static double gateY1 = 59;
 
 
-    public static double gateHeading1 = 26;
+    public static double gateHeading1 = 29;
 
     private static final double MIN_ANGLE = -224.75;
     private static final double MAX_ANGLE = 224.75;
@@ -113,7 +113,7 @@ public class red24Near1 extends NextFTCOpMode {
     private ServoImplEx turret1;
     private ServoImplEx turret2;
 
-    public static double turretOffset = 10;
+    public static double turretOffset = 8;
     public static double turretOffset2 = 2;
     public static double turretOffsetStep = -5;
 
@@ -536,7 +536,7 @@ public class red24Near1 extends NextFTCOpMode {
             Pivot = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(127.5, 61.5),
-                            new Pose(127.8, 61.5)))
+                            new Pose(127.3, 61.3)))
                     .setLinearHeadingInterpolation(
                             Math.toRadians(5),
                             Math.toRadians(gateHeading1))
@@ -554,7 +554,7 @@ public class red24Near1 extends NextFTCOpMode {
             Path6 = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(80.058, 73.32),
-                            new Pose(gateX, gateY-0.5)))
+                            new Pose(gateX, gateY-3)))
                     .setLinearHeadingInterpolation(
                             Math.toRadians(345),
                             Math.toRadians(gateHeading))
@@ -562,7 +562,7 @@ public class red24Near1 extends NextFTCOpMode {
 
             Path7 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(gateX, gateY-0.5),
+                            new Pose(gateX, gateY-3),
                             new Pose(79.558, 75)))
                     .setLinearHeadingInterpolation(
                             Math.toRadians(gateHeading),
@@ -572,7 +572,7 @@ public class red24Near1 extends NextFTCOpMode {
             Path8 = follower.pathBuilder()
                     .addPath(new BezierLine(
                             new Pose(79.558, 75),
-                            new Pose(gateX, gateY)))
+                            new Pose(gateX, gateY-3)))
                     .setLinearHeadingInterpolation(
                             Math.toRadians(345),
                             Math.toRadians(gateHeading))
@@ -580,7 +580,7 @@ public class red24Near1 extends NextFTCOpMode {
 
             Path9 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(gateX, gateY),
+                            new Pose(gateX, gateY-3),
                             new Pose(79.558, 75)))
                     .setLinearHeadingInterpolation(
                             Math.toRadians(gateHeading),
@@ -591,18 +591,18 @@ public class red24Near1 extends NextFTCOpMode {
                     .addPath(new BezierCurve(
                             new Pose(92.4669596239, 83.71111297536585),
                             new Pose(100.519, 63.28),
-                            new Pose(gateX2-1, gateY2-1)))
+                            new Pose(gateX2-2, gateY2-3)))
                     .setLinearHeadingInterpolation(
                             Math.toRadians(345),
-                            Math.toRadians(gateHeading - 5))
+                            Math.toRadians(gateHeading ))
                     .build();
 
             Path11 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(gateX2 -1, gateY2-1),
+                            new Pose(gateX2 -2, gateY2-3),
                             new Pose(81.5, 104.0)))
                     .setLinearHeadingInterpolation(
-                            Math.toRadians(gateHeading - 5),
+                            Math.toRadians(gateHeading ),
                             Math.toRadians(35))
                     //toRed(215))
                     .build();
@@ -611,15 +611,15 @@ public class red24Near1 extends NextFTCOpMode {
                     .addPath(new BezierCurve(
                             new Pose(93.31, 92),
                             new Pose(106.414, 66.749),
-                            new Pose(gateX2-2, gateY2)))
+                            new Pose(gateX2-2, gateY2-3)))
                     .setLinearHeadingInterpolation(
                             Math.toRadians(35),
-                            Math.toRadians(gateHeading -5))
+                            Math.toRadians(gateHeading))
                     .build();
 
             Path13 = follower.pathBuilder()
                     .addPath(new BezierCurve(
-                            new Pose(gateX2-2, gateY2),
+                            new Pose(gateX2-2, gateY2-3),
                             new Pose(119,52),
                             new Pose(81.5, 104.0)))
                     .setLinearHeadingInterpolation(

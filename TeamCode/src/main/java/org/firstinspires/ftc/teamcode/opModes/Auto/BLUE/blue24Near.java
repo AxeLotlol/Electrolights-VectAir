@@ -162,6 +162,7 @@ public class blue24Near extends NextFTCOpMode {
                 + turretForwardOffset * cos
                 - turretStrafeOffset * sin;
 
+
         double turretY = robotPose.getY()
                 + turretForwardOffset * sin
                 + turretStrafeOffset * cos;

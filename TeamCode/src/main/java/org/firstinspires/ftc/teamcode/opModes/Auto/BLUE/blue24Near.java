@@ -39,7 +39,7 @@ import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
 
 
-@Autonomous
+@Autonomous(name = "Blue Near 24 V1")
 @Configurable
 public class blue24Near extends NextFTCOpMode {
 

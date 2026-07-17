@@ -28,8 +28,8 @@ public class ShooterCalc implements Subsystem {
     public static double requiredTPS = (28*requiredRPM)/60;
     public static double verticalShift = 0;
     public static double verticalShiftStep = 50;
-    public static double sotmFactor = 1.3; //shld be 1.3
-    public static double sotmOffset = 15;
+    public static double sotmFactor = 1; //shld be 1.3
+    public static double sotmOffset = 1;
 
     public static double accelScalar = 0.015; // Set to 0 to disable
 
@@ -58,9 +58,9 @@ public class ShooterCalc implements Subsystem {
         }
         double flywheelSpeed = Math.sqrt(g * x * x / (2 * Math.pow(Math.cos(hoodAngle), 2) * (x * Math. tan(hoodAngle) - y)));
 
-        Vector robotVelocity = robotVel;
+        Vector robotVelocity = robotVel.times(1.25);
 
-        double coordinateTheta = robotVelocity.getTheta() - robotToGoalVector.getTheta();
+        double coordinateTheta = robotVelocity.getTuheta() - robotToGoalVector.getTheta();
 
         double parallelComponent = Math.cos(coordinateTheta) * robotVelocity.getMagnitude();
         double perpendicularComponent = Math.sin(coordinateTheta) * robotVelocity.getMagnitude();

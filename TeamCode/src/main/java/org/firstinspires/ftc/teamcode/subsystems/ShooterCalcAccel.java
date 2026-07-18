@@ -1,21 +1,17 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.subsystems.ShooterConstants.SCORE_ANGLE;
-import static org.firstinspires.ftc.teamcode.subsystems.ShooterConstants.SCORE_HEIGHT;
 import static java.lang.Double.isNaN;
 
 import com.bylazar.configurables.annotations.Configurable;
-import com.pedropathing.geometry.TVector;
 import com.pedropathing.math.MathFunctions;
 import com.pedropathing.math.Vector;
-
-import java.lang.Math;
 
 import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.ftc.ActiveOpMode;
 
 @Configurable
-public class ShooterCalc implements Subsystem {
+public class ShooterCalcAccel implements Subsystem {
 
     //public static double farzoneangle = -0.34006585;
 
@@ -31,9 +27,9 @@ public class ShooterCalc implements Subsystem {
     public static double sotmFactor = 1; //shld be 1.3
     public static double sotmOffset = 1;
 
-    public static double accelScalar = 0.015; // Set to 0 to disable
+    public static double accelScalar = 0.1; // Set to 0 to disable
 
-    public static Double[] calculateShotVectorandUpdateHeading(double robotHeading, Vector robotToGoalVector, Vector robotVel, double sotmFactorr){
+    public static Double[] calculateShotVectorandUpdateHeading(double robotHeading, Vector robotToGoalVector, Vector robotVel, Vector robotAccel){
         double g = 32.174*12;
         double x = robotToGoalVector.getMagnitude()-ShooterConstants.PASS_THROUGH_POINT_RADIUS;
         //double y = -4.5745*temp*temp*temp + 25.978*temp*temp - 48.395*temp + 58.675;
@@ -45,8 +41,8 @@ public class ShooterCalc implements Subsystem {
             a = Math.toRadians(0.6106*x-57.478);
         } //closezone regression cuz regression is weird and cant do spline thingy
         else if(x>136){
-            a = Math.toRadians(-33);
-            y= 38;
+            a = Math.toRadians(-30);
+            y= 37;
         } //farzone toggle cuz i lazy
 
 
@@ -58,9 +54,12 @@ public class ShooterCalc implements Subsystem {
         }
         double flywheelSpeed = Math.sqrt(g * x * x / (2 * Math.pow(Math.cos(hoodAngle), 2) * (x * Math. tan(hoodAngle) - y)));
 
-        Vector robotVelocity = robotVel.times(1.1);
-        robotVelocity = new Vector(robotVel.getMagnitude(), robotVel.getTheta());
-        if (robotVelocity.getMagnitude() < 5.0) {
+        Vector robotVelocity = robotVel.times(1);
+        //robotVelocity = new Vector(robotVel.getMagnitude(), robotVel.getTheta());
+        if(robotAccel.getMagnitude() < 0) {
+            robotVelocity.setMagnitude(robotVelocity.getMagnitude() + (robotAccel.getMagnitude() * accelScalar));
+        }
+        if (robotVelocity.getMagnitude() < 10.0 && robotAccel.getMagnitude()< -10) {
             robotVelocity = new Vector(0, 0);
         }
 
@@ -76,13 +75,13 @@ public class ShooterCalc implements Subsystem {
         double nvr = Math.sqrt(ivr * ivr + perpendicularComponent * perpendicularComponent);
         double ndr = nvr * time;
 
-        y = 0.0032*Math.pow(ndr,2)-0.6653*ndr+66.888+4;
+        y = 0.0032*Math.pow(ndr,2)-0.6653*ndr+66.888+3;
         if(ndr<66.29){
             a = Math.toRadians(0.6106*ndr-57.478);
         } //closezone regression cuz regression is weird and cant do spline thingy
         else if(ndr>136){
             a = Math.toRadians(-33);
-            y= 38;
+            y= 36;
         }
 
         hoodAngle = MathFunctions.clamp(Math.atan(vz / nvr), Math.toRadians(40),

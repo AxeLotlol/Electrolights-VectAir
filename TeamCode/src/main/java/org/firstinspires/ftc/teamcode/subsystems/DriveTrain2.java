@@ -6,8 +6,8 @@ import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpRed2.isRed;
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 import static org.firstinspires.ftc.teamcode.subsystems.LaunchDetector.isOverlappingLaunchZone;
-import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
-import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.requiredTPS;
+import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalcAccel.calculateShotVectorandUpdateHeading;
+import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalcAccel.requiredTPS;
 
 import static java.lang.Math.abs;
 
@@ -480,7 +480,7 @@ public class DriveTrain2 implements Subsystem {
                 robotHeading,
                 robotToGoalVector,
                 velocity,
-                1.5
+                follower.getAcceleration()
 
         );
         Double headingError = results[2];
@@ -491,7 +491,7 @@ public class DriveTrain2 implements Subsystem {
         hoodServo.setPosition(hoodAngle);
         double robotAngularVelocityRads = follower.getAngularVelocity();
         double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
-        double feedforwardOffset = robotAngularVelocityDegs * 0.2;
+        double feedforwardOffset = robotAngularVelocityDegs * 0.115;
         if(alliance == -1) {
             targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset - feedforwardOffset);
         }
@@ -502,8 +502,10 @@ public class DriveTrain2 implements Subsystem {
         double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
         servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
 
-        turret1.setPosition(servoPositionSignal + servoOffset);
-        turret2.setPosition(servoPositionSignal - servoOffset);
+        turret1.setPosition(1*(servoPositionSignal + servoOffset));
+        turret2.setPosition(1*(servoPositionSignal - servoOffset));
+        //turret1.setPosition(0.5);
+        //turret2.setPosition(0.5);
         lastServoPos = servoPositionSignal;
 
 

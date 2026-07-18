@@ -39,7 +39,7 @@ import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
 
 
-@Autonomous(name = "Red Close 24 Fusion")
+@Autonomous(name = "Red Close 21 Near V23")
 @Configurable
 public class redNearFusion extends NextFTCOpMode {
 
@@ -65,8 +65,6 @@ public class redNearFusion extends NextFTCOpMode {
     private ServoEx servoStopper;
     private ServoEx hoodServo;
 
-    // NOT mirrored — out of scope for this pass (only the path poses were mirrored).
-    // If red's physical goal is the mirrored location, this would be goalX = 143.
     double goalY = 140.5;
     double goalX = 140;
 
@@ -162,11 +160,6 @@ public class redNearFusion extends NextFTCOpMode {
                 .setIsDone(() -> true);
     }
 
-    // NOTE: no static MotorEx flywheel/flywheel2 fields here on purpose — static hardware
-    // fields construct at class-load time (OpMode discovery), before any OpMode is active
-    // or hardwareMap exists, which is a known cause of an instant crash on init in NextFTC.
-
-    // ----------------------
 
     @Override
     public void onInit() {
@@ -411,23 +404,13 @@ public class redNearFusion extends NextFTCOpMode {
 
         // Every pose below is the mirror() of the corresponding blue pose in
         // Close24AutoPathsMTI: x' = 144 - x, y' = y, heading' = normalizeAngle(pi - heading).
-        // Blue values are noted in each comment for traceability.
-        Pose PRELOADS_SHOOT              = new Pose(112, 98, Math.toRadians(-90));   // blue (32, 98, 270)
-        Pose FIRST_SPIKE_1_CONTROL       = new Pose(120, 98);                          // blue (24, 98)
-        Pose FIRST_SPIKE_1               = new Pose(120, 94, Math.toRadians(-90));   // blue (24, 94, 270)
-        Pose FIRST_SPIKE_2               = new Pose(120, 87, Math.toRadians(-90));   // blue (24, 87, 270)
-        Pose FIRST_SPIKE_SHOOT           = new Pose(98, 84, Math.toRadians(-90));    // blue (46, 84, 270)
-        Pose SECOND_SPIKE_1              = new Pose(98, 53, Math.toRadians(-10));    // blue (46, 53, 190)
-        Pose SECOND_SPIKE_2              = new Pose(104, 58, Math.toRadians(0));     // blue (40, 58, 180)
-        Pose SECOND_SPIKE_3              = new Pose(125.5, 57, Math.toRadians(0));   // blue (18.5, 57, 180)
-        Pose SECOND_SPIKE_SHOOT_CONTROL  = new Pose(107, 66);                          // blue (37, 66)
-        Pose SECOND_SPIKE_SHOOT          = new Pose(88, 80, Math.toRadians(-29));    // blue (56, 80, 209)
-        Pose GATE_1                      = new Pose(105, 70, Math.toRadians(-29));   // blue (39, 70, 209)
-        Pose GATE_2                      = new Pose(115, 63, Math.toRadians(29));    // blue (29, 63, 151)
-        Pose GATE_3                      = new Pose(132.85, 58.5, Math.toRadians(36.5)); // blue (11.5, 57.5, 151)
-        Pose GATE_SHOOT_1                = new Pose(108, 59, Math.toRadians(-29));   // blue (36, 59, 209)
-        Pose GATE_SHOOT_2                = new Pose(88, 79, Math.toRadians(-29));    // blue (56, 79, 209)
-        Pose PARK_POSE                   = new Pose(95, 71);                           // blue (49, 71)
+
+        Pose GATE_1                      = new Pose(105, 70, Math.toRadians(-29));
+        Pose GATE_2                      = new Pose(115, 63, Math.toRadians(29));
+        Pose GATE_3                      = new Pose(132.85, 58.5, Math.toRadians(36.5));
+        Pose GATE_SHOOT_1                = new Pose(108, 59, Math.toRadians(-29));
+        Pose GATE_SHOOT_2                = new Pose(88, 79, Math.toRadians(-29));
+        Pose PARK_POSE                   = new Pose(95, 71);
 
         public Paths(Follower follower) {
             shootPreloads = follower.pathBuilder()
@@ -480,9 +463,7 @@ public class redNearFusion extends NextFTCOpMode {
 
 
 
-            // Close24AutoPathsMTI builds gateIntake/gateShoot the same way all 5 times —
-            // no per-cycle variation exists in the source, so repeating them here is a
-            // faithful copy, not a simplification.
+
             gateIntake1 = buildGateIntake(follower);
             gateShoot1 = buildGateShoot(follower);
 

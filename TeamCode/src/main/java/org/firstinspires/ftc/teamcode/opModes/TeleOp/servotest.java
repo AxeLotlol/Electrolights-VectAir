@@ -21,6 +21,7 @@ import dev.nextftc.ftc.components.BulkReadComponent;
 import dev.nextftc.hardware.impl.MotorEx;
 
 
+
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "servotest")
 public class servotest extends NextFTCOpMode {
     public MotorEx intakeMotor;
@@ -43,8 +44,7 @@ public class servotest extends NextFTCOpMode {
         turret2 = ActiveOpMode.hardwareMap().get(ServoImplEx.class,"turretServo1");
         turret1.setPwmRange(new PwmControl.PwmRange(500, 2500));
         turret2.setPwmRange(new PwmControl.PwmRange(500, 2500));
-        turret1.setPosition(0.5);
-        turret2.setPosition(0.5);
+        telemetry.addLine("WARNING: Ensure White Turret Gear is Removed");
 
     }
 
@@ -58,6 +58,8 @@ public class servotest extends NextFTCOpMode {
     @Override
     public void onStartButtonPressed() {
 
+        turret1.setPosition(0.5);
+        turret2.setPosition(0.5);
     }
 
 

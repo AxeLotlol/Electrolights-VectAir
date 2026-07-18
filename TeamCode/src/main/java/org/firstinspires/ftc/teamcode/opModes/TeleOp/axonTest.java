@@ -98,6 +98,9 @@ public class axonTest extends NextFTCOpMode {
         testServo2 = ActiveOpMode.hardwareMap().get(ServoImplEx.class, "turretServo2");
         testServo1.setPwmRange(new PwmControl.PwmRange(500, 2500));
         testServo2.setPwmRange(new PwmControl.PwmRange(500, 2500));
+        telemetry.addLine("WARNING! Ensure White Turret Gears are Removed");
+        telemetry.addLine("Initialized");
+        telemetry.update();
 
     }
     @Override

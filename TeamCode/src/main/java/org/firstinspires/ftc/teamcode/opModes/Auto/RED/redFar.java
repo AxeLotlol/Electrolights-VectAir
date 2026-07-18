@@ -379,7 +379,7 @@ public class redFar extends NextFTCOpMode {
             double headingError = results[2];
             double robotAngularVelocityRads = follower.getAngularVelocity();
             double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
-            double feedforwardOffset = robotAngularVelocityDegs * 0.225;
+            double feedforwardOffset = robotAngularVelocityDegs * 115;
             targetTurretAngle = getClosestValidTurretAngle(headingError - turretOffset - feedforwardOffset);
             double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
             servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));

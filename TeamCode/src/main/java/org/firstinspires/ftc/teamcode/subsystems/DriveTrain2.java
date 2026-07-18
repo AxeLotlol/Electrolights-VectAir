@@ -525,7 +525,6 @@ public class DriveTrain2 implements Subsystem {
             ActiveOpMode.telemetry().addData("RobotY", currPose.getY());
             ActiveOpMode.telemetry().addData("Robot Heading: ", follower.getHeading());
             ActiveOpMode.telemetry().addData("Turret Offset", turretOffset);
-
             ActiveOpMode.telemetry().update();
 
 

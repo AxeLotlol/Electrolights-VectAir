@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.opModes.Auto.RED;
+package org.firstinspires.ftc.teamcode.opModes.Auto.BLUE;
 
-import static org.firstinspires.ftc.teamcode.subsystems.DriveTrain2.servoOffset;
-import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
 import static org.firstinspires.ftc.teamcode.subsystems.DriveTrain2.closeStopperPos;
 import static org.firstinspires.ftc.teamcode.subsystems.DriveTrain2.openStopperPos;
+import static org.firstinspires.ftc.teamcode.subsystems.DriveTrain2.servoOffset;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 import static org.firstinspires.ftc.teamcode.subsystems.LaunchDetector.isOverlappingLaunchZone;
+import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalc.calculateShotVectorandUpdateHeading;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
@@ -39,11 +39,11 @@ import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
 
 
-@Autonomous(name = "Red Near 24 V26")
+@Autonomous(name = "Red Near 21 V1")
 @Configurable
-public class red24Near1 extends NextFTCOpMode {
+public class blue21Near1 extends NextFTCOpMode {
 
-    public red24Near1() {
+    public blue21Near1() {
         addComponents(
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE,
@@ -66,7 +66,7 @@ public class red24Near1 extends NextFTCOpMode {
     private ServoEx hoodServo;
 
     double goalY = 140;
-    double goalX = 141;
+    double goalX = 1;
 
     public static double gateX = 130.5; // 142 - 11.8
     public static double gateY = 60;
@@ -261,7 +261,7 @@ public class red24Near1 extends NextFTCOpMode {
 
 
 
-        overriddenTurretAngle = getClosestValidTurretAngle(160);
+        overriddenTurretAngle = getClosestValidTurretAngle(0);
         double hoodAngle = 0.4;
         hoodServo.setPosition(hoodAngle);
         servoStopper.setPosition(closeStopperPos);
@@ -273,8 +273,8 @@ public class red24Near1 extends NextFTCOpMode {
         double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
         servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
 
-        turret1.setPosition(servoPositionSignal + servoOffset);
-        turret2.setPosition(servoPositionSignal - servoOffset);
+        turret1.setPosition(/*servoPositionSignal + servoOffset*/0.5+servoOffset);
+        turret2.setPosition(/*servoPositionSignal - servoOffset*/0.5-servoOffset);
         double lastServoPos = servoPositionSignal;
 
 
@@ -319,8 +319,9 @@ public class red24Near1 extends NextFTCOpMode {
     public Command Auto() {
         return new SequentialGroup(
 
-                setTurretHeading(overriddenTurretAngle),
-                new Delay(0.3),
+
+
+                new Delay(1.2),
 
                 new FollowPath(paths.Preload, false, 1.0),
 
@@ -339,9 +340,7 @@ public class red24Near1 extends NextFTCOpMode {
                 new Delay(1.05),
                 new FollowPath(paths.gateIntake1Launch, false, 1.0),
 
-                new FollowPath(paths.Path6, true, 1.0),
-                new Delay(2.25),
-                new FollowPath(paths.Path7, false, 1.0),
+
 
                 new FollowPath(paths.Path8, true, 1.0),
 
@@ -416,8 +415,8 @@ public class red24Near1 extends NextFTCOpMode {
             double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
             servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
 
-            turret1.setPosition(servoPositionSignal + servoOffset);
-            turret2.setPosition(servoPositionSignal - servoOffset);
+            turret1.setPosition(/*servoPositionSignal + servoOffset*/0.5+servoOffset);
+            turret2.setPosition(/*servoPositionSignal - servoOffset*/0.5-servoOffset);
             double lastServoPos = servoPositionSignal;
 
 
@@ -518,7 +517,7 @@ public class red24Near1 extends NextFTCOpMode {
                                     new Pose(123, 59.5),
                                     new Pose(78.354, 69.703)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(20), Math.toRadians(0))
+                    ).setLinearHeadingInterpolation(Math.toRadians(20), Math.toRadians(46))
                     .setVelocityConstraint(1.0)
                     .setTValueConstraint(0.8)
 
@@ -548,7 +547,7 @@ public class red24Near1 extends NextFTCOpMode {
                             new Pose(79.558, 73.32)))
                     .setLinearHeadingInterpolation(
                             Math.toRadians(gateHeading),
-                            Math.toRadians(345))
+                            Math.toRadians(46))
                     .build();
 
             Path6 = follower.pathBuilder()
@@ -556,7 +555,7 @@ public class red24Near1 extends NextFTCOpMode {
                             new Pose(80.058, 73.32),
                             new Pose(gateX, gateY-3)))
                     .setLinearHeadingInterpolation(
-                            Math.toRadians(345),
+                            Math.toRadians(46),
                             Math.toRadians(gateHeading))
                     .build();
 
@@ -566,15 +565,15 @@ public class red24Near1 extends NextFTCOpMode {
                             new Pose(79.558, 75)))
                     .setLinearHeadingInterpolation(
                             Math.toRadians(gateHeading),
-                            Math.toRadians(345))
+                            Math.toRadians(46))
                     .build();
 
             Path8 = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(79.558, 75),
+                            new Pose(79.558, 73.32),
                             new Pose(gateX, gateY-3)))
                     .setLinearHeadingInterpolation(
-                            Math.toRadians(345),
+                            Math.toRadians(46),
                             Math.toRadians(gateHeading))
                     .build();
 
@@ -584,7 +583,7 @@ public class red24Near1 extends NextFTCOpMode {
                             new Pose(79.558, 75)))
                     .setLinearHeadingInterpolation(
                             Math.toRadians(gateHeading),
-                            Math.toRadians(345))
+                            Math.toRadians(46))
                     .build();
 
             Path10 = follower.pathBuilder()
@@ -593,7 +592,7 @@ public class red24Near1 extends NextFTCOpMode {
                             new Pose(100.519, 63.28),
                             new Pose(gateX2-2, gateY2-3)))
                     .setLinearHeadingInterpolation(
-                            Math.toRadians(345),
+                            Math.toRadians(46),
                             Math.toRadians(gateHeading ))
                     .build();
 
@@ -633,7 +632,7 @@ public class red24Near1 extends NextFTCOpMode {
                             new Pose(85.3086685039, 79.2375828716257),
                             new Pose(121.5, 83.8)))
                     .setLinearHeadingInterpolation(
-                            Math.toRadians(345),
+                            Math.toRadians(46),
                             Math.toRadians(0))
                     .build();
 
@@ -642,7 +641,7 @@ public class red24Near1 extends NextFTCOpMode {
                             new Pose(118.5, 83.8),
                             new Pose(92.4669596239, 83.71111297536585)))
                     .setConstantHeadingInterpolation(
-                            Math.toRadians(0))
+                            Math.toRadians(46))
                     .build();
         }
     }

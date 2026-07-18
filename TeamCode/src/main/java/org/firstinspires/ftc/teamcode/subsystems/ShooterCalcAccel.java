@@ -25,9 +25,9 @@ public class ShooterCalcAccel implements Subsystem {
     public static double verticalShift = 0;
     public static double verticalShiftStep = 50;
     public static double sotmFactor = 1; //shld be 1.3
-    public static double sotmOffset = 1;
+    public static double sotmOffset = 0;
 
-    public static double accelScalar = 0.1; // Set to 0 to disable
+    public static double accelScalar = 0.175; // Set to 0 to disable
 
     public static Double[] calculateShotVectorandUpdateHeading(double robotHeading, Vector robotToGoalVector, Vector robotVel, Vector robotAccel){
         double g = 32.174*12;
@@ -35,7 +35,7 @@ public class ShooterCalcAccel implements Subsystem {
         //double y = -4.5745*temp*temp*temp + 25.978*temp*temp - 48.395*temp + 58.675;
         //double y = SCORE_HEIGHT;
         //double a = ShooterConstants.SCORE_ANGLE;
-        double y = 0.0032*Math.pow(x,2)-0.6653*x+66.888+4;
+        double y = 0.0032*Math.pow(x,2)-0.6653*x+66.888+1;
         double a = Math.toRadians(SCORE_ANGLE);
         if(x<66.29){
             a = Math.toRadians(0.6106*x-57.478);
@@ -59,7 +59,7 @@ public class ShooterCalcAccel implements Subsystem {
         if(robotAccel.getMagnitude() < 0) {
             robotVelocity.setMagnitude(robotVelocity.getMagnitude() + (robotAccel.getMagnitude() * accelScalar));
         }
-        if (robotVelocity.getMagnitude() < 10.0 && robotAccel.getMagnitude()< -10) {
+        if (robotVelocity.getMagnitude() < 10.0 || robotAccel.getMagnitude()< -10) {
             robotVelocity = new Vector(0, 0);
         }
 
@@ -70,17 +70,17 @@ public class ShooterCalcAccel implements Subsystem {
         double perpendicularComponent = Math.sin(coordinateTheta) * robotVelocity.getMagnitude();
 
         double vz = flywheelSpeed * Math.sin(hoodAngle);
-        double time = 1*(x / (flywheelSpeed * Math.cos(hoodAngle))); //maybe try 1.25 SIDENOTE revert back to 1.2 if accel change does NOT work, then multiply the speed itself by 1.2
+        double time = 1.175*(x / (flywheelSpeed * Math.cos(hoodAngle))); //maybe try 1.25 SIDENOTE revert back to 1.2 if accel change does NOT work, then multiply the speed itself by 1.2
         double ivr = x / time - parallelComponent;
         double nvr = Math.sqrt(ivr * ivr + perpendicularComponent * perpendicularComponent);
         double ndr = nvr * time;
 
-        y = 0.0032*Math.pow(ndr,2)-0.6653*ndr+66.888+3;
+        y = 0.0032*Math.pow(ndr,2)-0.6653*ndr+66.888+1;
         if(ndr<66.29){
             a = Math.toRadians(0.6106*ndr-57.478);
         } //closezone regression cuz regression is weird and cant do spline thingy
         else if(ndr>136){
-            a = Math.toRadians(-33);
+            a = Math.toRadians(-30);
             y= 36;
         }
 
@@ -107,7 +107,7 @@ public class ShooterCalcAccel implements Subsystem {
         requiredTPS = (-16.19*Math.pow(flywheelSpeed, 2)+ 449.11*flywheelSpeed- 964.9) + verticalShift;
         double what = Math.toDegrees(hoodAngle);
         if(robotVelocity.getMagnitude()>10){
-            requiredTPS=requiredTPS+sotmOffset;
+            requiredTPS=requiredTPS-sotmOffset;
         }
 
         //double c1 = (double) -13 /376;

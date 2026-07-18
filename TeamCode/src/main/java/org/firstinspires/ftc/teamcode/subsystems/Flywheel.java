@@ -31,7 +31,7 @@ public class Flywheel implements Subsystem {
 
     public static double kS = 0.2;
     public static double kF = 0.000449;
-    public static double kP = 0.01;
+    public static double kP = 0.009;
 
     public static double configvelocity = 1400; //far zone - ~1500. near zone - ~1200-1300
 

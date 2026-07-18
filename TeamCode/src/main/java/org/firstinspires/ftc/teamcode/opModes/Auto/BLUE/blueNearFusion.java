@@ -336,43 +336,29 @@ public class blueNearFusion extends NextFTCOpMode {
 
         if (preload == true) {
             shooter(6000);
-            turretOffset = 11;
-            overriddenTurretAngle = getClosestValidTurretAngle(160);
-            double hoodAngle = results[1];
-            hoodServo.setPosition(hoodAngle);
-            double headingError = results[2];
-            double robotAngularVelocityRads = follower.getAngularVelocity();
-            double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
-            double feedforwardOffset = robotAngularVelocityDegs * 0.115;
-            targetTurretAngle = getClosestValidTurretAngle(overriddenTurretAngle - turretOffset - feedforwardOffset);
-            double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
-            servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
-
-            turret1.setPosition(servoPositionSignal + servoOffset);
-            turret2.setPosition(servoPositionSignal - servoOffset);
-
-            currentTurretPos = targetTurretAngle;
+            turretOffset = 0;
 
         }
 
         if (preload == false) {
             shooter((float) flywheelSpeed);
-            turretOffset = 12;
-            double hoodAngle = results[1];
-            hoodServo.setPosition(hoodAngle);
-            double headingError = results[2];
-            double robotAngularVelocityRads = follower.getAngularVelocity();
-            double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
-            double feedforwardOffset = robotAngularVelocityDegs * 0.115;
-            targetTurretAngle = getClosestValidTurretAngle(headingError - turretOffset - feedforwardOffset);
-            double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
-            servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
+            turretOffset = 0;
 
-            turret1.setPosition(servoPositionSignal + servoOffset);
-            turret2.setPosition(servoPositionSignal - servoOffset);
-
-            currentTurretPos = targetTurretAngle;
         }
+        double hoodAngle = results[1];
+        hoodServo.setPosition(hoodAngle);
+        double headingError = results[2];
+        double robotAngularVelocityRads = follower.getAngularVelocity();
+        double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
+        double feedforwardOffset = robotAngularVelocityDegs * 0.115;
+        targetTurretAngle = getClosestValidTurretAngle(headingError - turretOffset - feedforwardOffset);
+        double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
+        servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
+
+        turret1.setPosition(servoPositionSignal + servoOffset);
+        turret2.setPosition(servoPositionSignal - servoOffset);
+
+        currentTurretPos = targetTurretAngle;
 
 
         Pose futurepose = new Pose(follower.getPose().getX() + (follower.getVelocity().getXComponent() * 0.2), follower.getPose().getY() + (follower.getVelocity().getYComponent() * 0.2), follower.getHeading());
@@ -422,7 +408,7 @@ public class blueNearFusion extends NextFTCOpMode {
 
         Pose GATE_1                      = new Pose(39, 70, Math.toRadians(-151));
         Pose GATE_2                      = new Pose(29, 63, Math.toRadians(151));
-        Pose GATE_3                      = new Pose(11.15, 58.5, Math.toRadians(143.5));
+        Pose GATE_3                      = new Pose(10.9, 57.75, Math.toRadians(144));
         Pose GATE_SHOOT_1                = new Pose(36, 59, Math.toRadians(-151));
         Pose GATE_SHOOT_2                = new Pose(56, 79, Math.toRadians(-151));
         Pose PARK_POSE                   = new Pose(49, 71);

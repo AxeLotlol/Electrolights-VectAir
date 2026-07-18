@@ -54,8 +54,8 @@ public class FarShooterCalc implements Subsystem {
         }
         double flywheelSpeed = Math.sqrt(g * x * x / (2 * Math.pow(Math.cos(hoodAngle), 2) * (x * Math. tan(hoodAngle) - y)));
 
-        Vector robotVelocity = robotVel.times(0);
-        //robotVelocity = new Vector(robotVel.getMagnitude(), robotVel.getTheta());
+        Vector robotVelocity;
+        robotVelocity = new Vector(robotVel.getMagnitude(), robotVel.getTheta());
 
 
         double coordinateTheta = robotVelocity.getTheta() - robotToGoalVector.getTheta();
@@ -92,7 +92,7 @@ public class FarShooterCalc implements Subsystem {
 
         double safeIvr = Math.max(ivr, 50.0);
         double headingVelCompOffset = sotmFactor * Math.atan(perpendicularComponent / safeIvr);
-        double headingAngle = Math.toDegrees(robotToGoalVector.getTheta() - robotHeading - headingVelCompOffset);
+        double headingAngle = Math.toDegrees(robotToGoalVector.getTheta() - robotHeading - headingVelCompOffset*0);
 
         //requiredRPM = (1.4286* Math.pow(flywheelSpeed, 3) - 39.264*Math.pow(flywheelSpeed, 2) + 863.57*flywheelSpeed-1373.9 + rpmoffset);
         //requiredTPS = (28 * requiredRPM) / 60;
@@ -100,9 +100,6 @@ public class FarShooterCalc implements Subsystem {
 
         requiredTPS = (-16.19*Math.pow(flywheelSpeed, 2)+ 449.11*flywheelSpeed- 964.9) + verticalShift;
         double what = Math.toDegrees(hoodAngle);
-        if(robotVelocity.getMagnitude()>10){
-            requiredTPS=requiredTPS+sotmOffset;
-        }
 
         //double c1 = (double) -13 /376;
 

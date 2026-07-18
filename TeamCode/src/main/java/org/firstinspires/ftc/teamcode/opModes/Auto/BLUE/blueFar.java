@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.opModes.Auto.BLUE;
 
 import static org.firstinspires.ftc.teamcode.subsystems.DriveTrain2.servoOffset;
-import static org.firstinspires.ftc.teamcode.subsystems.FarShooterCalc.calculateShotVectorandUpdateHeading;
+import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalcAccel.calculateShotVectorandUpdateHeading;
 import static org.firstinspires.ftc.teamcode.subsystems.DriveTrain2.closeStopperPos;
 import static org.firstinspires.ftc.teamcode.subsystems.DriveTrain2.openStopperPos;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
@@ -86,7 +86,7 @@ public class blueFar extends NextFTCOpMode {
     private ServoImplEx turret1;
     private ServoImplEx turret2;
 
-    public static double turretOffset = 0.5;
+    public static double turretOffset = -1;
     public static double turretOffset2 = 2;
     public static double turretOffsetStep = -5;
 

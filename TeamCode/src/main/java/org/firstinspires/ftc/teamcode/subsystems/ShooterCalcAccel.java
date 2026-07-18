@@ -42,7 +42,7 @@ public class ShooterCalcAccel implements Subsystem {
         } //closezone regression cuz regression is weird and cant do spline thingy
         else if(x>136){
             a = Math.toRadians(-30);
-            y= 37;
+            y= 36;
         } //farzone toggle cuz i lazy
 
 

@@ -88,7 +88,7 @@ public class redFar extends NextFTCOpMode {
     private ServoImplEx turret1;
     private ServoImplEx turret2;
 
-    public static double turretOffset = -0.5;
+    public static double turretOffset = -3.5;
     public static double turretOffset2 = 2;
     public static double turretOffsetStep = -5;
 
@@ -104,8 +104,8 @@ public class redFar extends NextFTCOpMode {
             });
     private Command farTransfer = new LambdaCommand()
             .setStart(() -> {
-                intakeMotor.setPower(0.9);
-                transfer.setPower(0.9);
+                intakeMotor.setPower(0.8);
+                transfer.setPower(0.8);
             });
 
     private Command intakeMotorOff = new LambdaCommand()
@@ -263,7 +263,7 @@ public class redFar extends NextFTCOpMode {
     public Command Auto() {
         return new SequentialGroup(
                 disablePreload,
-                new Delay(1.8),
+                new Delay(1.0),
                 shoot,
                 intakeMotorOn,
                 // --- Spike 1 cycle ---
@@ -438,18 +438,18 @@ public class redFar extends NextFTCOpMode {
         // for those.
 
         //====Change these only para paths egg=================
-        Pose FIRST_SPIKE = new Pose(120.5, 30, Math.toRadians(90));
-        Pose FIRST_SPIKE_CONTROL = new Pose(120.5, 16);
-        Pose FIRST_SHOOT = new Pose(98, 11.5);
+        Pose FIRST_SPIKE = new Pose(120, 30, Math.toRadians(90));
+        Pose FIRST_SPIKE_CONTROL = new Pose(120.5, 17.5);
+        Pose FIRST_SHOOT = new Pose(98, 14);
         Pose FIRST_SHOOT_CONTROL = new Pose(120.5, 16);
-        Pose SECOND_SPIKE = new Pose(132.5, 12, Math.toRadians(0));
+        Pose SECOND_SPIKE = new Pose(133, 12, Math.toRadians(0));
         Pose SECOND_SHOOT = new Pose(96.5, 14);
         Pose SWEEP_1 = new Pose(132.5, 10, Math.toRadians(0));
         Pose SWEEP_2 = new Pose(132, 14.5, Math.toRadians(60));
         Pose SWEEP_2_CONTROL = new Pose(127.3, 11.8);
         Pose SWEEP_3 = new Pose(132, 34.5, Math.toRadians(60));
         Pose SWEEP_SHOOT = new Pose(86.5, 17.5);
-        Pose PARK_POSE = new Pose(94.5, 20.5);
+        Pose PARK_POSE = new Pose(97.5, 22.5);
 
         public Paths(Follower follower) {
 
@@ -472,6 +472,7 @@ public class redFar extends NextFTCOpMode {
             shootSpike2 = follower.pathBuilder()
                     .addPath(new BezierLine(SECOND_SPIKE, SECOND_SHOOT))
                     .setConstantHeadingInterpolation(SECOND_SPIKE.getHeading())
+                    .addTemporalCallback(150, intakeMotorOff)
                     .build();
 
             //js goon cycle sweep
@@ -512,6 +513,7 @@ public class redFar extends NextFTCOpMode {
             return follower.pathBuilder()
                     .addPath(new BezierLine(SWEEP_1, SECOND_SHOOT))
                     .setConstantHeadingInterpolation(SECOND_SPIKE.getHeading())
+                    .addTemporalCallback(150, intakeMotorOff)
                     .build();
         }
 

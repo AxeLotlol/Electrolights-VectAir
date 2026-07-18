@@ -448,7 +448,7 @@ public class blueFar extends NextFTCOpMode {
         Pose SWEEP_2_CONTROL = new Pose(16.7, 11.8);
         Pose SWEEP_3 = new Pose(12, 34.5, Math.toRadians(120));
         Pose SWEEP_SHOOT = new Pose(57.5, 17.5);
-        Pose PARK_POSE = new Pose(49.5, 20.5);
+        Pose PARK_POSE = new Pose(48, 21);
 
         public Paths(Follower follower) {
 
@@ -471,6 +471,7 @@ public class blueFar extends NextFTCOpMode {
             shootSpike2 = follower.pathBuilder()
                     .addPath(new BezierLine(SECOND_SPIKE, SECOND_SHOOT))
                     .setConstantHeadingInterpolation(SECOND_SPIKE.getHeading())
+                    .addTemporalCallback(150, intakeMotorOff)
                     .build();
 
            //js goon cycle sweep
@@ -511,6 +512,7 @@ public class blueFar extends NextFTCOpMode {
             return follower.pathBuilder()
                     .addPath(new BezierLine(SWEEP_1, SECOND_SHOOT))
                     .setConstantHeadingInterpolation(SECOND_SPIKE.getHeading())
+                    .addTemporalCallback(150, intakeMotorOff)
                     .build();
         }
 

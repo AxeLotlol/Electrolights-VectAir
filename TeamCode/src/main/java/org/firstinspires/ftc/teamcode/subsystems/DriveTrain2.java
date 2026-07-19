@@ -227,12 +227,10 @@ public class DriveTrain2 implements Subsystem {
             alliance = -1;
             goalXDist = 140;
             goalX = 140;
-            localizeX = 136;
         } else if (isBlue()) {
             alliance = 1;
             goalXDist = 3;
             goalX = 3;
-            localizeX = 8;
         } else {
             ActiveOpMode.telemetry().addLine("No direction set");
         }
@@ -273,16 +271,16 @@ public class DriveTrain2 implements Subsystem {
         }
         follower.setStartingPose(startingpose);
 
-//        if (alliance == -1) {
-//            localize = new LambdaCommand()
-//                    .setStart(() -> follower.setPose(new Pose(129, 90, Math.toRadians(90))));
-//
-//        }
-//        if (alliance == 1) {
-//            localize = new LambdaCommand()
-//                    .setStart(() -> follower.setPose(new Pose(15, 90, Math.toRadians(90))));
-//
-//        }
+        if (alliance == -1) {
+            localize = new LambdaCommand()
+                    .setStart(() -> follower.setPose(new Pose(128, 86, Math.toRadians(90))));
+
+        }
+        if (alliance == 1) {
+            localize = new LambdaCommand()
+                    .setStart(() -> follower.setPose(new Pose(16, 86, Math.toRadians(90))));
+
+        }
         turret1 = ActiveOpMode.hardwareMap().get(ServoImplEx.class, "turretServo1");
         turret2 = ActiveOpMode.hardwareMap().get(ServoImplEx.class,"turretServo2");
         turret1.setPwmRange(new PwmControl.PwmRange(500, 2500));
@@ -435,7 +433,7 @@ public class DriveTrain2 implements Subsystem {
             Gamepads.gamepad1().rightBumper().whenBecomesTrue(()->openStopper.schedule())
                     .whenBecomesFalse(()->closeStopper.schedule());
             // Correct binding: Runs the path once per press, and automatically clears out when done
-            Gamepads.gamepad1().dpadUp().whenBecomesTrue(getDriveToGateCommand());
+            //Gamepads.gamepad1().dpadUp().whenBecomesTrue(getDriveToGateCommand());
             //Gamepads.gamepad1().leftBumper().whenBecomesTrue(toggleAutoShoot);
             Gamepads.gamepad1().rightTrigger().greaterThan(0.3).whenBecomesTrue(shooterer);
             //Gamepads.gamepad1().square().whenBecomesTrue(() -> farAngle());
@@ -540,7 +538,7 @@ public class DriveTrain2 implements Subsystem {
 
 
     // Fixed constructor name to match class name exactly
-    public Command getDriveToGateCommand() {
+   /* public Command getDriveToGateCommand() {
         return new LambdaCommand()
                 .setStart(() -> {
                     // 1. Build the path dynamically from your current position
@@ -571,5 +569,5 @@ public class DriveTrain2 implements Subsystem {
                     follower.breakFollowing(); // Safely hand control back to the joysticks
                 })
                 .requires(this); // Lock out your TeleOp joysticks while this is executing
-    }
+    }*/
 }

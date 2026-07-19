@@ -67,6 +67,7 @@ public class TeleOpRed2 extends NextFTCOpMode {
 
     @Override
     public void onUpdate() {
+        Gamepads.gamepad1().x().whenBecomesTrue(()-> follower.setPose(new Pose(128, 86, Math.toRadians(90))));
     }
 
     @Override

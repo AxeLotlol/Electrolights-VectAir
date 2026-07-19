@@ -260,7 +260,7 @@ public class blueFar extends NextFTCOpMode {
     public Command Auto() {
         return new SequentialGroup(
                 disablePreload,
-                new Delay(1.8),
+                new Delay(2.5),
                 // Preload shot happens from the start pose — FarAuto.shootPreloads() never
                 // drives before shooting, so there's no leading FollowPath here (unlike
                 // blue24Near's FollowPath(paths.Preload,...)).

@@ -39,7 +39,7 @@ import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
 
 
-@Autonomous(name = "Red Close 21 Near V23")
+@Autonomous(name = "Red Close 21 Near V25")
 @Configurable
 public class redNearFusion extends NextFTCOpMode {
 
@@ -198,7 +198,7 @@ public class redNearFusion extends NextFTCOpMode {
         isOverridden = true;
         preload = true;
 
-        overriddenTurretAngle = getClosestValidTurretAngle(-160);
+        overriddenTurretAngle = getClosestValidTurretAngle(160);
         double hoodAngle = 0.4;
         hoodServo.setPosition(hoodAngle);
         servoStopper.setPosition(closeStopperPos);
@@ -239,7 +239,7 @@ public class redNearFusion extends NextFTCOpMode {
 
     public Command Auto() {
         return new SequentialGroup(
-                new Delay(1),
+                new Delay(1.1),
                 new FollowPath(paths.shootPreloads, true, 1.0),
                 intakeMotorOn,
                 openStopper,
@@ -328,7 +328,7 @@ public class redNearFusion extends NextFTCOpMode {
         Double[] results = calculateShotVectorandUpdateHeading(
                 robotHeading,
                 robotToGoalVector,
-                follower.getVelocity().times(1.0), follower.getAcceleration());
+                follower.getVelocity().times(0.8), follower.getAcceleration());
 
         flywheelSpeed = results[0];
 
@@ -348,7 +348,7 @@ public class redNearFusion extends NextFTCOpMode {
         double headingError = results[2];
         double robotAngularVelocityRads = follower.getAngularVelocity();
         double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
-        double feedforwardOffset = robotAngularVelocityDegs * 0.115;
+        double feedforwardOffset = robotAngularVelocityDegs * 0;
         targetTurretAngle = getClosestValidTurretAngle(headingError - turretOffset - feedforwardOffset);
         double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
         servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));

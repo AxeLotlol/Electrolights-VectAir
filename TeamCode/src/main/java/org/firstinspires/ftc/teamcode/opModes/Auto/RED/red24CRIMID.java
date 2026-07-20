@@ -323,7 +323,7 @@ public class red24CRIMID extends NextFTCOpMode {
                 setTurretHeading(overriddenTurretAngle),
                 new Delay(0.3),
 
-                new FollowPath(paths.Path1, false, 1.0),
+                new FollowPath(paths.Path1, true, 1.0),
 
                 intakeMotorOn,
                 openStopper,
@@ -333,30 +333,32 @@ public class red24CRIMID extends NextFTCOpMode {
 
                 //autoShootEnable(),
 
-                new FollowPath(paths.Path2, false, 1.0),
-                new FollowPath(paths.Path3, false, 1.0),
+                new FollowPath(paths.Path2, true, 1.0),
+                new FollowPath(paths.Path3, true, 1.0),
+                //new FollowPath(paths.Intake, true, 1.0),
+                //new FollowPath(paths.Shoot, true, 1.0),
                 new FollowPath(paths.Path4, true, 1.0),
                 new FollowPath(paths.Path5,true,1.0),
-                new FollowPath(paths.Path6, false, 1.0),
-                new FollowPath(paths.Path7, false, 1.0),
+                new FollowPath(paths.Path6, true, 1.0),
+                new FollowPath(paths.Path7, true, 1.0),
                 new FollowPath(paths.Path8, true, 1.0),
 
-                new FollowPath(paths.Path9, false, 1.0),
+                new FollowPath(paths.Path9, true, 1.0),
                 new FollowPath(paths.Path10, true, 1.0),
 
-                new FollowPath(paths.Path11, false, 1.0),
+                new FollowPath(paths.Path11, true, 1.0),
                 new FollowPath(paths.Path12, true, 1.0),
 
-                new FollowPath(paths.Path13, false, 1.0),
-                new FollowPath(paths.Path14, false, 1.0),
+                new FollowPath(paths.Path13, true, 1.0),
+                new FollowPath(paths.Path14, true, 1.0),
                 intakeMotorOff,
-                new FollowPath(paths.Path15, false, 1.0),
+                new FollowPath(paths.Path15, true, 1.0),
                 intakeMotorOn,
                 new FollowPath(paths.Path16, true, 1.0),
 
-                new FollowPath(paths.Path17, false, 1.0),
+                new FollowPath(paths.Path17, true, 1.0),
                 new FollowPath(paths.Path18, true, 1.0)
-
+                
         );
     }
 
@@ -474,7 +476,6 @@ public class red24CRIMID extends NextFTCOpMode {
         public PathChain Path3;
         public PathChain Path4;
         public PathChain Path5;
-
         public PathChain Path6;
         public PathChain Path7;
         public PathChain Path8;
@@ -488,6 +489,15 @@ public class red24CRIMID extends NextFTCOpMode {
         public PathChain Path16;
         public PathChain Path17;
         public PathChain Path18;
+        public PathChain Intake;
+        public PathChain Shoot;
+        double ControlX = 180;
+        double ControlY = 74;
+        double GoalX = 143;
+        double GoalY = 78;
+        double ShootX = 111;
+        double ShootY = 75;
+
 
 
         public Paths(Follower follower) {
@@ -497,12 +507,13 @@ public class red24CRIMID extends NextFTCOpMode {
                     .addPath(
                             new BezierCurve(
                                     new Pose(110.318, 159.809),
-                                    new Pose(147.262, 81.581),
+                                    new Pose(115.44244186046514, 104.0113811841796),
                                     new Pose(151.765, 83.457)
                             )
                     )
                     .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                     .build();
+            //shoot
             Path2 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
@@ -512,6 +523,7 @@ public class red24CRIMID extends NextFTCOpMode {
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(0))
                     .build();
+            //shoot
             Path3 = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
@@ -522,6 +534,7 @@ public class red24CRIMID extends NextFTCOpMode {
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(0))
                     .build();
+            //shoot
             Path4 = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
@@ -532,6 +545,7 @@ public class red24CRIMID extends NextFTCOpMode {
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(0))
                     .build();
+            //shoot
             Path5 = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
@@ -542,6 +556,7 @@ public class red24CRIMID extends NextFTCOpMode {
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(0))
                     .build();
+            //shoot
             Path6 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
@@ -561,6 +576,7 @@ public class red24CRIMID extends NextFTCOpMode {
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(0))
                     .build();
+            //shoot
             Path8 = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
@@ -581,6 +597,7 @@ public class red24CRIMID extends NextFTCOpMode {
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(0))
                     .build();
+            //shoot
             Path10 = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
@@ -591,7 +608,7 @@ public class red24CRIMID extends NextFTCOpMode {
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(0))
                     .build();
-            Path12 = follower.pathBuilder()
+            Path11 = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
                                     new Pose(119.539, 54.536),
@@ -601,7 +618,8 @@ public class red24CRIMID extends NextFTCOpMode {
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(0))
                     .build();
-            Path13 = follower.pathBuilder()
+            //shoot
+            Path12 = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
                                     new Pose(176.834, 81.138),
@@ -611,7 +629,7 @@ public class red24CRIMID extends NextFTCOpMode {
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(0))
                     .build();
-            Path14 = follower.pathBuilder()
+            Path13 = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
                                     new Pose(115.132, 58.943),
@@ -621,7 +639,8 @@ public class red24CRIMID extends NextFTCOpMode {
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(0))
                     .build();
-            Path15 = follower.pathBuilder()
+            //shoot
+            Path14 = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
                                     new Pose(179.860, 75.194),
@@ -631,7 +650,7 @@ public class red24CRIMID extends NextFTCOpMode {
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(0))
                     .build();
-            Path16 = follower.pathBuilder()
+            Path15 = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
                                     new Pose(118.162, 60.871),
@@ -641,7 +660,8 @@ public class red24CRIMID extends NextFTCOpMode {
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(0))
                     .build();
-            Path17 = follower.pathBuilder()
+            //shoot
+            Path16 = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
                                     new Pose(179.033, 82.906),
@@ -651,12 +671,34 @@ public class red24CRIMID extends NextFTCOpMode {
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(0))
                     .build();
-            Path18 = follower.pathBuilder()
+            Path17 = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
                                     new Pose(118.269, 58.246),
                                     new Pose(139.095, 87.864),
                                     new Pose(179.033, 82.906)
+                            )
+                    )
+                    .setConstantHeadingInterpolation(Math.toRadians(0))
+                    .build();
+
+
+            Intake = follower.pathBuilder()
+                    .addPath(
+                            new BezierCurve(
+                                    new Pose(ShootX,ShootY),
+                                    new Pose(ControlX,ControlY),
+                                    new Pose(GoalX,GoalY)
+                            )
+                    )
+                    .setConstantHeadingInterpolation(Math.toRadians(0))
+                    .build();
+            Intake = follower.pathBuilder()
+                    .addPath(
+                            new BezierCurve(
+                                    new Pose(GoalX,GoalY),
+                                    new Pose(ControlX,ControlY),
+                                    new Pose(ShootX,ShootY)
                             )
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(0))

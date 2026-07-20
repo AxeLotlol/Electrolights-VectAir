@@ -6,8 +6,8 @@ import static org.firstinspires.ftc.teamcode.opModes.TeleOp.TeleOpRed2.isRed;
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 import static org.firstinspires.ftc.teamcode.subsystems.LaunchDetector.isOverlappingLaunchZone;
-import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalcAccel.calculateShotVectorandUpdateHeading;
-import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalcAccel.requiredTPS;
+import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalcAccelClaude.calculateShotVectorandUpdateHeading;
+import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalcAccelClaude.requiredTPS;
 
 import static java.lang.Math.abs;
 
@@ -75,6 +75,10 @@ public class DriveTrain2 implements Subsystem {
     public boolean firsttime = true;
 
     public static double servoOffset = 0.015;
+
+    /** Turret feedforward against robot yaw, deg of turret per deg/s of yaw.
+     *  Was hardcoded as 0.115 inside periodic(). */
+    public static double yawFeedforwardGain = 0.115;
 
     public int alliance;
     public boolean far;
@@ -474,56 +478,69 @@ public class DriveTrain2 implements Subsystem {
         double robotHeading = currPose.getHeading();
         Vector robotToGoalVector = getTurretToGoalVector(turretPose);
 
+        double robotAngularVelocityRads = follower.getAngularVelocity();
+        if (Double.isNaN(robotAngularVelocityRads)) robotAngularVelocityRads = 0.0;
+
         Double[] results = calculateShotVectorandUpdateHeading(
                 robotHeading,
                 robotToGoalVector,
                 velocity,
-                follower.getAcceleration()
-
+                follower.getAcceleration(),
+                robotAngularVelocityRads
         );
-        Double headingError = results[2];
+        double headingError = results[2];
         double flywheelSpeed = results[0];
-        shooter((float) flywheelSpeed);
-        currentMotorSpeed = flywheelSpeed;
+
+        // Never push NaN into hardware.
+        if (!Double.isNaN(flywheelSpeed)) {
+            shooter((float) flywheelSpeed);
+            currentMotorSpeed = flywheelSpeed;
+        }
         double hoodAngle = results[1];
-        hoodServo.setPosition(hoodAngle);
-        double robotAngularVelocityRads = follower.getAngularVelocity();
+        if (!Double.isNaN(hoodAngle)) {
+            hoodServo.setPosition(Math.max(0.0, Math.min(1.0, hoodAngle)));
+        }
+
+        // Yaw-rate feedforward against robot rotation. The coast projection in
+        // the solver handles translation; this covers rotation, which the
+        // projection does not model.
         double robotAngularVelocityDegs = Math.toDegrees(robotAngularVelocityRads);
-        double feedforwardOffset = robotAngularVelocityDegs * 0.115;
-        if(alliance == -1) {
-            targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset - feedforwardOffset);
-        }
-        else{
-            targetTurretAngle = getClosestValidTurretAngle(headingError + turretOffset2 - feedforwardOffset);
-        }
+        if (Double.isNaN(robotAngularVelocityDegs)) robotAngularVelocityDegs = 0.0;
+        double feedforwardOffset = robotAngularVelocityDegs * yawFeedforwardGain;
 
-        double servoPositionSignal = 0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
-        servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
+        double allianceOffset = (alliance == -1) ? turretOffset : turretOffset2;
+        double commandedAngle = headingError + allianceOffset - feedforwardOffset;
 
-        turret1.setPosition(1*(servoPositionSignal + servoOffset));
-        turret2.setPosition(1*(servoPositionSignal - servoOffset));
-        //turret1.setPosition(0.5);
-        //turret2.setPosition(0.5);
-        lastServoPos = servoPositionSignal;
+        if (!Double.isNaN(commandedAngle)) {
+            targetTurretAngle = getClosestValidTurretAngle(commandedAngle);
 
+            double servoPositionSignal =
+                    0.05 + ((targetTurretAngle - MIN_ANGLE) / 449.51) * 0.90;
+            servoPositionSignal = Math.max(0.05, Math.min(0.95, servoPositionSignal));
 
+            turret1.setPosition(servoPositionSignal + servoOffset);
+            turret2.setPosition(servoPositionSignal - servoOffset);
+            lastServoPos = servoPositionSignal;
             currentTurretPos = targetTurretAngle;
 
-            ActiveOpMode.telemetry().addData("hoodAngle", hoodAngle);
-            ActiveOpMode.telemetry().addData("ballVelocity", flywheelSpeed);
-            ActiveOpMode.telemetry().addData("flywheelSpeed", requiredTPS);
-            ActiveOpMode.telemetry().addData("launch?", isOverlappingLaunchZone(currPose));
             ActiveOpMode.telemetry().addData("turret", servoPositionSignal);
-            ActiveOpMode.telemetry().addData("Loop Time (ms)", loopTimeMs);
-            ActiveOpMode.telemetry().addData("Avg Loop Time", avgLoopTime);
-            ActiveOpMode.telemetry().addData("alliance", alliance);
-            ActiveOpMode.telemetry().addData("goalX", goalX);
-            ActiveOpMode.telemetry().addData("goalY", goalY);
-            ActiveOpMode.telemetry().addData("RobotX", currPose.getX());
-            ActiveOpMode.telemetry().addData("RobotY", currPose.getY());
-            ActiveOpMode.telemetry().addData("Robot Heading: ", follower.getHeading());
-            ActiveOpMode.telemetry().addData("Turret Offset", turretOffset);
-            ActiveOpMode.telemetry().update();
+        }
+
+
+        ActiveOpMode.telemetry().addData("hoodAngle", hoodAngle);
+        ActiveOpMode.telemetry().addData("ballVelocity", flywheelSpeed);
+        ActiveOpMode.telemetry().addData("flywheelSpeed", requiredTPS);
+        ActiveOpMode.telemetry().addData("launch?", isOverlappingLaunchZone(currPose));
+        ActiveOpMode.telemetry().addData("Loop Time (ms)", loopTimeMs);
+        ActiveOpMode.telemetry().addData("Avg Loop Time", avgLoopTime);
+        ActiveOpMode.telemetry().addData("alliance", alliance);
+        ActiveOpMode.telemetry().addData("goalX", goalX);
+        ActiveOpMode.telemetry().addData("goalY", goalY);
+        ActiveOpMode.telemetry().addData("RobotX", currPose.getX());
+        ActiveOpMode.telemetry().addData("RobotY", currPose.getY());
+        ActiveOpMode.telemetry().addData("Robot Heading: ", follower.getHeading());
+        ActiveOpMode.telemetry().addData("Turret Offset", turretOffset);
+        ActiveOpMode.telemetry().update();
 
 
 

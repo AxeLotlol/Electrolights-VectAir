@@ -5,7 +5,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.DriveTrain2.openStopperP
 import static org.firstinspires.ftc.teamcode.subsystems.DriveTrain2.servoOffset;
 import static org.firstinspires.ftc.teamcode.subsystems.Flywheel.shooter;
 import static org.firstinspires.ftc.teamcode.subsystems.LaunchDetector.isOverlappingLaunchZone;
-import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalcAccel.calculateShotVectorandUpdateHeading;
+import static org.firstinspires.ftc.teamcode.subsystems.ShooterCalcAccelClaude.calculateShotVectorandUpdateHeading;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
@@ -39,11 +39,11 @@ import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
 
 
-@Autonomous(name = "Blue Close 21 Near V23")
+@Autonomous(name = "Blue CRI Near V23")
 @Configurable
-public class blueNearFusion extends NextFTCOpMode {
+public class blueNearCRI extends NextFTCOpMode {
 
-    public blueNearFusion() {
+    public blueNearCRI() {
         addComponents(
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE,
@@ -200,7 +200,7 @@ public class blueNearFusion extends NextFTCOpMode {
         isOverridden = true;
         preload = true;
 
-        overriddenTurretAngle = getClosestValidTurretAngle(160);
+        overriddenTurretAngle = getClosestValidTurretAngle(0);
         double hoodAngle = 0.4;
         hoodServo.setPosition(hoodAngle);
         servoStopper.setPosition(closeStopperPos);
@@ -251,46 +251,34 @@ public class blueNearFusion extends NextFTCOpMode {
                 // --- Spike 2 cycle ---
                 new FollowPath(paths.intakeSpike2, true, 1.0),
                 new FollowPath(paths.shootSpike2, true, 1.0),
-                new Delay(0.05),
 
                 // --- Gate cycle 1 ---
                 new FollowPath(paths.gateIntake1, true, 1.0),
                 new Delay(1.1),
                 new FollowPath(paths.gateShoot1, true, 1.0),
-                new Delay(0.05),
 
                 // --- Gate cycle 2 ---
                 new FollowPath(paths.gateIntake2, true, 1.0),
                 new Delay(2.25),
                 new FollowPath(paths.gateShoot2, true, 1.0),
-                new Delay(0.05),
 
-
-                // --- Spike 1 cycle ---
-                new FollowPath(paths.intakeSpike1, true, 1.0),
-                new FollowPath(paths.shootSpike1, true, 1.0),
-                new Delay(0.05),
 
                 // --- Gate cycle 3 ---
                 new FollowPath(paths.gateIntake3, true, 1.0),
-                new Delay(1.1),
+                new Delay(2.25),
                 new FollowPath(paths.gateShoot3, true, 1.0),
-                new Delay(0.05),
 
                 // --- Gate cycle 4 ---
                 new FollowPath(paths.gateIntake4, true, 1.0),
                 new Delay(2.25),
-                //new FollowPath(paths.gateShoot4, true, 1.0),
+                new FollowPath(paths.gateShoot4, true, 1.0),
                 //new Delay(0.3),
 
                 // --- Gate cycle 5 ---
-//                new FollowPath(paths.gateIntake5, true, 1.0),
-//                new Delay(0.3),
-//                new FollowPath(paths.gateShoot5, true, 1.0),
-//                new Delay(0.3),
-
-                //new FollowPath(paths.park, true, 1.0)
+                new FollowPath(paths.gateIntake5, true, 1.0),
+                new Delay(2.25),
                 new FollowPath(paths.lastGateWithPark, true, 1.0)
+
         );
     }
 
@@ -374,6 +362,9 @@ public class blueNearFusion extends NextFTCOpMode {
         Storage.currentPose = follower.getPose();
 
         Storage.setPose = true;
+        telemetry.addData("XValue",follower.getPose().getX());
+        telemetry.addData("YValue",follower.getPose().getY());
+        telemetry.update();
     }
 
     @Override
@@ -389,6 +380,10 @@ public class blueNearFusion extends NextFTCOpMode {
         public PathChain shootSpike1;
         public PathChain intakeSpike2;
         public PathChain shootSpike2;
+
+        public PathChain gateIntakeTest;
+
+        public PathChain gateShootTest;
 
         public PathChain gateIntake1;
         public PathChain gateShoot1;
@@ -406,39 +401,35 @@ public class blueNearFusion extends NextFTCOpMode {
         public PathChain park;
 
 
-        Pose GATE_1                      = new Pose(39, 70, Math.toRadians(-151));
-        Pose GATE_2                      = new Pose(29, 63, Math.toRadians(151));
-        Pose GATE_3                      = new Pose(10.9, 57.75, Math.toRadians(144));
-        Pose GATE_SHOOT_1                = new Pose(36, 59, Math.toRadians(-151));
-        Pose GATE_SHOOT_2                = new Pose(56, 79, Math.toRadians(-151));
+        Pose GATE_1                      = new Pose(39, 70, Math.toRadians(-152));
+        Pose GATE_2                      = new Pose(29, 64, Math.toRadians(144));
+        Pose GATE_3                      = new Pose(10.5, 58.5, Math.toRadians(144));
+        Pose GATE_SHOOT_1                = new Pose(36, 59, Math.toRadians(-152));
+        Pose GATE_SHOOT_2                = new Pose(56, 79, Math.toRadians(-152));
         Pose PARK_POSE                   = new Pose(49, 71);
 
         public Paths(Follower follower) {
             shootPreloads = follower.pathBuilder()
-                    .addPath(new BezierLine(start, new Pose(51.495, 94.650)))
-                    .setLinearHeadingInterpolation(
-                            Math.toRadians(-90),
-                            Math.toRadians(-60))
+                    .addPath(new BezierLine(start, new Pose(33, 108)))
+                    .setConstantHeadingInterpolation(Math.toRadians(270))
                     .build();
 
             intakeSpike2 = follower.pathBuilder()
-                    .addPath(new BezierCurve(
-                            new Pose(51.495, 94.650),
-                            new Pose(53.02, 59.7),
-                            new Pose(21, 59.5)))
-                    .setLinearHeadingInterpolation(
-                            Math.toRadians(-60),
-                            Math.toRadians(160))
+                    .addPath(new BezierLine(
+                            new Pose(33, 108),
+                            new Pose(24, 65)))
+                    .setConstantHeadingInterpolation(
+                            Math.toRadians(270))
                     .build();
 
             shootSpike2 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(21.000, 59.500),
+                                    new Pose(24, 65),
                                     GATE_SHOOT_2
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(160), Math.toRadians(-152))
+                    .setLinearHeadingInterpolation(Math.toRadians(270), Math.toRadians(-152))
                     .build();
 
             intakeSpike1 = follower.pathBuilder()
@@ -480,6 +471,7 @@ public class blueNearFusion extends NextFTCOpMode {
             gateIntake5 = buildGateIntake(follower);
             gateShoot5 = buildGateShoot(follower);
 
+
             park = follower.pathBuilder()
                     .addPath(new BezierLine(GATE_SHOOT_2, PARK_POSE))
                     .setTangentHeadingInterpolation()
@@ -505,7 +497,8 @@ public class blueNearFusion extends NextFTCOpMode {
         private PathChain buildGateShoot(Follower follower) {
             return follower.pathBuilder()
                     .addPath(new BezierCurve(GATE_3, GATE_SHOOT_1, GATE_SHOOT_2))
-                    .setTangentHeadingInterpolation()
+                    //.setTangentHeadingInterpolation()
+                    .setLinearHeadingInterpolation(Math.toRadians(-152), Math.toRadians(-135))
                     .setReversed()
                     .build();
         }

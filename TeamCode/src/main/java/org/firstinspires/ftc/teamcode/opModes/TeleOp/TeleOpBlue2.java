@@ -53,6 +53,7 @@ public class TeleOpBlue2 extends NextFTCOpMode {
         Gamepads.gamepad2().a().whenBecomesTrue(() -> DriveTrain2.turretOffset2 = 0);
         Gamepads.gamepad2().dpadUp().whenBecomesTrue(() -> ShooterCalc.verticalShift += ShooterCalc.verticalShiftStep);
         Gamepads.gamepad2().dpadDown().whenBecomesTrue(() -> ShooterCalc.verticalShift -= ShooterCalc.verticalShiftStep);
+        Gamepads.gamepad2().y().whenBecomesTrue(() -> DriveTrain2.toggleTurretPark());
     }
 
     @Override

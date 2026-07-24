@@ -81,11 +81,11 @@ public class ShooterCalcAccelClaude implements Subsystem {
      *  projection tolerates lag far better than it tolerates noise. Simulation
      *  worst-case hit rate (7in target, sigma=75 in/s^2 accel noise) was 96%
      *  at 0.05 versus 28% at 0.3. */
-    public static double accelFilterAlphaDecel = 0.15;
+    public static double accelFilterAlphaDecel = 0.5;
 
     /** EMA coefficient while ACCELERATING. Powered acceleration decays as the
      *  robot approaches free speed, so a fast filter overshoots. */
-    public static double accelFilterAlphaAccel = 0.05;
+    public static double accelFilterAlphaAccel = 0.3;
 
     /** Hard ceiling on projected speed, in/s. The drivetrain physically cannot
      *  exceed its free speed (~123 in/s at 15V, ~98 at 12V), so any projection
@@ -111,6 +111,31 @@ public class ShooterCalcAccelClaude implements Subsystem {
      *  beyond that is not physically reachable. */
     public static double accelClamp = 400.0;
 
+    // ---- Velocity-history slope estimator ----------------------------------
+    // Replaces Pedro's getAcceleration(), which this robot's own accel logs
+    // showed is heavily pre-smoothed: at brake onset the velocity signal
+    // responds in ONE loop (a 144-181 in/s^2 slope is visible immediately)
+    // while getAcceleration() takes ~0.5-0.6s to reach the true value. The
+    // ball is long gone by then. d|speed|/dt over a short trailing window IS
+    // the along-track acceleration, from a signal that is both fresh and
+    // clean (velocity noise measured at sigma = 0.025 in/s at rest).
+
+    /** Trailing window for the slope, seconds. ~3 samples at 65ms loops,
+     *  ~8 at 26ms. Shorter = faster response, noisier estimate. */
+    public static double slopeWindowSeconds = 0.20;
+
+    /** Unfiltered along-track acceleration estimate, for logging/telemetry.
+     *  Compare against lastAlongTrackAccel to see what the EMA is costing. */
+    public static double lastAlongTrackAccelRaw = 0.0;
+
+    /** Ring buffer of recent (time, speed) samples. Sized to cover the
+     *  window with margin even at fast loop times. */
+    private static final int HIST_N = 12;
+    private static final double[] histT = new double[HIST_N];
+    private static final double[] histV = new double[HIST_N];
+    private static int histHead = 0;
+    private static int histCount = 0;
+
     /** Retained EMA state. Reset by resetProjectionFilter(). */
     private static double filteredAlongTrackAccel = 0.0;
 
@@ -119,7 +144,10 @@ public class ShooterCalcAccelClaude implements Subsystem {
     public static void resetProjectionFilter() {
         filteredAlongTrackAccel = 0.0;
         lastAlongTrackAccel = 0.0;
+        lastAlongTrackAccelRaw = 0.0;
         lastProjectedSpeed = 0.0;
+        histHead = 0;
+        histCount = 0;
     }
 
     // ---- Existing empirical terms -----------------------------------------
@@ -142,7 +170,7 @@ public class ShooterCalcAccelClaude implements Subsystem {
     public static double verticalShiftStep = 50.0;
 
     /** Below this projected speed (in/s) the shot is treated as stationary. */
-    public static double sotmMinSpeed = 2.0;
+    public static double sotmMinSpeed = 12.0;
 
     /** Width of the blend between calibration zones, inches. Replaces the hard
      *  switches, which produced a 13 degree step in commanded entry angle at
@@ -159,8 +187,8 @@ public class ShooterCalcAccelClaude implements Subsystem {
     public static double lastAlongTrackAccel = 0.0;
 
     private static final double G_IN = 32.174 * 12.0;   // in/s^2
-    private static final double HOOD_MIN = Math.toRadians(40.0);
-    private static final double HOOD_MAX = Math.toRadians(75.0);
+    private static final double HOOD_MIN = Math.toRadians(46.0);
+    private static final double HOOD_MAX = Math.toRadians(80);
 
     private static final double CLOSE_ZONE_END = 66.29;
     private static final double FAR_ZONE_START = 136.0;
@@ -169,7 +197,7 @@ public class ShooterCalcAccelClaude implements Subsystem {
 
     /** Target height above the launch point, inches, blended across zones. */
     public static double targetHeight(double range) {
-        double poly = 0.0032 * range * range - 0.6653 * range + 66.888 + 1.0;
+        double poly = 0.0032 * range * range - 0.6653 * range + 66.888 + 2;
         if (range <= FAR_ZONE_START) return poly;
         if (range >= FAR_ZONE_START + zoneBlendWidth) return 36.0;
         double f = (range - FAR_ZONE_START) / zoneBlendWidth;
@@ -295,26 +323,46 @@ public class ShooterCalcAccelClaude implements Subsystem {
 
         double horizon = feederDelay + turretSettleTime;
 
-        // Signed acceleration along the direction of travel. getMagnitude() is
-        // never negative, so the component must be recovered by projection.
-        // Negative = slowing down, positive = speeding up.
+        // Along-track acceleration from the VELOCITY HISTORY, not from
+        // robotAccel. d|v|/dt along the direction of travel IS the along-track
+        // acceleration, so no vector projection is needed. Real timestamps are
+        // used because this robot's loop time varies (26ms cold, 90ms+ hot) -
+        // never assume a fixed dt here.
+        double nowSec = System.nanoTime() * 1e-9;
+        histT[histHead] = nowSec;
+        histV[histHead] = currentSpeed;
+        histHead = (histHead + 1) % HIST_N;
+        if (histCount < HIST_N) histCount++;
+
         double aAlongV = 0.0;
-        if (robotAccel != null
-                && currentSpeed > 1e-6
-                && robotAccel.getMagnitude() > 1e-6) {
-            aAlongV = robotAccel.getMagnitude()
-                    * Math.cos(robotAccel.getTheta() - velTheta);
+        double bestDt = 0.0;
+        double oldV = currentSpeed;
+        for (int i = 0; i < histCount; i++) {
+            int idx = (histHead - 1 - i + 2 * HIST_N) % HIST_N;
+            double dt = nowSec - histT[idx];
+            if (dt <= slopeWindowSeconds && dt > bestDt) {
+                bestDt = dt;
+                oldV = histV[idx];
+            }
         }
+        if (bestDt > 0.03) aAlongV = (currentSpeed - oldV) / bestDt;
+        // Stationary: kill stale carryover so one maneuver cannot contaminate
+        // the next. Without this the filter holds a decel value for a second
+        // or more after the robot has already stopped.
+        if (currentSpeed < 2.0) aAlongV = 0.0;
         if (isNaN(aAlongV) || Double.isInfinite(aAlongV)) aAlongV = 0.0;
         // Reject physically impossible readings before they reach the filter.
         if (aAlongV > accelClamp) aAlongV = accelClamp;
         if (aAlongV < -accelClamp) aAlongV = -accelClamp;
 
-        // Asymmetric EMA on the along-track acceleration. Pedro's acceleration
-        // is a differentiated velocity, so it is noisy; unfiltered it is
-        // roughly 4x worse than filtered at this horizon. Deceleration is
-        // tracked faster than acceleration because braking is close to
-        // constant while powered acceleration decays toward free speed.
+        lastAlongTrackAccelRaw = aAlongV;
+
+        // Asymmetric EMA. With the slope estimator the input is already both
+        // fresh and clean, so these alphas are FAST (0.5 decel / 0.3 accel) -
+        // the heavy smoothing that older builds needed was compensating for
+        // Pedro's pre-smoothing lag, and on this input it is pure added delay.
+        // Accel stays slower than decel because powered acceleration decays
+        // toward free speed, so a fast filter overshoots it.
         if (isNaN(filteredAlongTrackAccel)) filteredAlongTrackAccel = 0.0;
         double alpha = (aAlongV < 0.0) ? accelFilterAlphaDecel : accelFilterAlphaAccel;
         filteredAlongTrackAccel += alpha * (aAlongV - filteredAlongTrackAccel);

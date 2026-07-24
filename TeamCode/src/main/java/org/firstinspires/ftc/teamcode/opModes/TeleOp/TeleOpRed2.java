@@ -58,11 +58,12 @@ public class TeleOpRed2 extends NextFTCOpMode {
         // These only fire on edge transitions, so loop impact is minimal
         Gamepads.gamepad2().leftTrigger().greaterThan(0.5).whenBecomesTrue(() -> DriveTrain2.turretOffset -= DriveTrain2.turretOffsetStep);
         Gamepads.gamepad2().rightTrigger().greaterThan(0.5).whenBecomesTrue(() -> DriveTrain2.turretOffset += DriveTrain2.turretOffsetStep);
-        Gamepads.gamepad2().rightBumper().whenBecomesTrue(()->DriveTrain2.turretOffset-= 1);
-        Gamepads.gamepad2().leftBumper().whenBecomesTrue(()->DriveTrain2.turretOffset+= 1);
+        Gamepads.gamepad2().rightBumper().whenBecomesTrue(()->DriveTrain2.turretOffset+= 1);
+        Gamepads.gamepad2().leftBumper().whenBecomesTrue(()->DriveTrain2.turretOffset-= 1);
         Gamepads.gamepad2().a().whenBecomesTrue(() -> DriveTrain2.turretOffset = 0);
         Gamepads.gamepad2().dpadUp().whenBecomesTrue(() -> ShooterCalc.verticalShift += ShooterCalc.verticalShiftStep);
         Gamepads.gamepad2().dpadDown().whenBecomesTrue(() -> ShooterCalc.verticalShift -= ShooterCalc.verticalShiftStep);
+        Gamepads.gamepad2().y().whenBecomesTrue(() -> DriveTrain2.toggleTurretPark());
     }
 
     @Override

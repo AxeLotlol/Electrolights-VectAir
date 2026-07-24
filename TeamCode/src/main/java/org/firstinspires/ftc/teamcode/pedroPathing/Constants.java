@@ -13,23 +13,23 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(10.6)
-            .predictiveBrakingCoefficients(new PredictiveBrakingCoefficients(0.16, 0.172742,0.0003776))
-            .forwardZeroPowerAcceleration(-47)
+            .mass(10)
+            .predictiveBrakingCoefficients(new PredictiveBrakingCoefficients(0.18, 0.11091,0.00097587))
+            .forwardZeroPowerAcceleration(-52)
             .lateralZeroPowerAcceleration(-83)
             .headingPIDFCoefficients(new PIDFCoefficients(
-                    1.6,
+                    1.77,
                     0,
-                    0.215,
+                    0.2235,
                     0
             ))
             .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(
-                    0.7126,
+                    0.7895,
                     0,
-                    0.1127,
+                    0.1171,
                     0
             ))
-            .centripetalScaling(0);
+            .centripetalScaling(0.000);
     public static MecanumConstants driveConstants = new MecanumConstants()
             .useBrakeModeInTeleOp(true)
             .leftFrontMotorName("frontLeft")
